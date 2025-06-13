@@ -6,7 +6,7 @@ import { FormatTanggal } from "@/utils/formatTanggal";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatNumber } from "@/utils/formatNumber";
 import { Button } from "@/components/ui/button";
-import { exportToStyledExcel } from "@/utils/ExportExcel/excelPerDivisi";
+import { exportToStyledExcel } from "@/utils/ExportExcel/exportToExcel";
 
 // Tipe data hasil dari API
 type DivisiRow = {
