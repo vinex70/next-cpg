@@ -40,11 +40,11 @@ const Navbar = () => {
             <NavigationMenu viewport={false} className="flex-1">
                 <NavigationMenuList className="gap-6">
                     <NavigationMenuItem>
-                        <Link href="/" legacyBehavior passHref>
-                            <NavigationMenuLink className="text-sm font-medium hover:underline">
+                        <NavigationMenuLink asChild>
+                            <Link href="/" className="text-sm font-medium hover:underline">
                                 Dashboard
-                            </NavigationMenuLink>
-                        </Link>
+                            </Link>
+                        </NavigationMenuLink>
                     </NavigationMenuItem>
 
                     <NavigationMenuItem>
@@ -54,18 +54,18 @@ const Navbar = () => {
                         <NavigationMenuContent className="bg-white text-black p-4 rounded shadow">
                             <ul className="grid gap-2 w-[200px]">
                                 <li>
-                                    <Link href="/evaluasi-sales" passHref legacyBehavior>
-                                        <NavigationMenuLink className="text-sm hover:underline">
+                                    <NavigationMenuLink asChild>
+                                        <Link href="/evaluasi-sales" className="text-sm hover:underline">
                                             Evaluasi Sales
-                                        </NavigationMenuLink>
-                                    </Link>
+                                        </Link>
+                                    </NavigationMenuLink>
                                 </li>
                                 <li>
-                                    <Link href="/store/cabang-2" passHref legacyBehavior>
-                                        <NavigationMenuLink className="text-sm hover:underline">
+                                    <NavigationMenuLink asChild>
+                                        <Link href="/" className="text-sm hover:underline">
                                             Cabang 2
-                                        </NavigationMenuLink>
-                                    </Link>
+                                        </Link>
+                                    </NavigationMenuLink>
                                 </li>
                             </ul>
                         </NavigationMenuContent>
@@ -75,11 +75,11 @@ const Navbar = () => {
                         <NavigationMenuTrigger className="bg-transparent text-white hover:bg-white/10 dark:hover:bg-white/20 dark:text-white">
                             Web HO
                         </NavigationMenuTrigger>
-                        <NavigationMenuContent >
+                        <NavigationMenuContent>
                             <ul className="grid w-[300px] gap-4">
                                 <li>
                                     <NavigationMenuLink asChild>
-                                        <Link href="http://192.168.226.190:81/login" target="_blank">
+                                        <Link href="http://192.168.226.190:81/login" target="_blank" rel="noopener noreferrer">
                                             <div className="font-medium">IAS PHP</div>
                                             <div className="text-muted-foreground">
                                                 Program IAS dari IT HO.
@@ -87,7 +87,7 @@ const Navbar = () => {
                                         </Link>
                                     </NavigationMenuLink>
                                     <NavigationMenuLink asChild>
-                                        <Link href="http://172.20.30.3/tsm/" target="_blank">
+                                        <Link href="http://172.20.30.3/tsm/" target="_blank" rel="noopener noreferrer">
                                             <div className="font-medium">TSM 1</div>
                                             <div className="text-muted-foreground">
                                                 Program TSM 1 untuk input/merubah/edit Jadwal.
@@ -95,7 +95,7 @@ const Navbar = () => {
                                         </Link>
                                     </NavigationMenuLink>
                                     <NavigationMenuLink asChild>
-                                        <Link href="http://172.20.30.4/tsm/" target="_blank">
+                                        <Link href="http://172.20.30.4/tsm/" target="_blank" rel="noopener noreferrer">
                                             <div className="font-medium">TSM 2</div>
                                             <div className="text-muted-foreground">
                                                 Program TSM 2 untuk input/merubah/edit Jadwal.
@@ -103,7 +103,7 @@ const Navbar = () => {
                                         </Link>
                                     </NavigationMenuLink>
                                     <NavigationMenuLink asChild>
-                                        <Link href="http://172.20.30.5/tsm/" target="_blank">
+                                        <Link href="http://172.20.30.5/tsm/" target="_blank" rel="noopener noreferrer">
                                             <div className="font-medium">TSM 3</div>
                                             <div className="text-muted-foreground">
                                                 Program TSM 3 untuk input/merubah/edit Jadwal.
@@ -111,7 +111,7 @@ const Navbar = () => {
                                         </Link>
                                     </NavigationMenuLink>
                                     <NavigationMenuLink asChild>
-                                        <Link href="http://172.20.30.6/tsm/" target="_blank">
+                                        <Link href="http://172.20.30.6/tsm/" target="_blank" rel="noopener noreferrer">
                                             <div className="font-medium">TSM 4</div>
                                             <div className="text-muted-foreground">
                                                 Program TSM 4 untuk input/merubah/edit Jadwal.
@@ -124,11 +124,11 @@ const Navbar = () => {
                     </NavigationMenuItem>
 
                     <NavigationMenuItem>
-                        <Link href="/setting-harga" legacyBehavior passHref>
-                            <NavigationMenuLink className="text-sm font-medium hover:underline">
+                        <NavigationMenuLink asChild>
+                            <Link href="/setting-harga" className="text-sm font-medium hover:underline">
                                 Setting Harga
-                            </NavigationMenuLink>
-                        </Link>
+                            </Link>
+                        </NavigationMenuLink>
                     </NavigationMenuItem>
                 </NavigationMenuList>
             </NavigationMenu>

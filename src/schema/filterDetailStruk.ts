@@ -33,6 +33,7 @@ export const FilterDetailStrukSchema = z.object({
     kode_supplier: z.array(z.string()).optional(),
     namaSupplier: z.string().optional(),
     monitoringSupplier: z.string().optional(),
+    selectedReport: z.string().optional(),
 });
 
 export type FilterDetailStrukInput = z.infer<typeof FilterDetailStrukSchema>;
