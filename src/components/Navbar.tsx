@@ -46,7 +46,7 @@ const Navbar = () => {
                             </Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
-
+                    {/* Store */}
                     <NavigationMenuItem>
                         <NavigationMenuTrigger className="bg-transparent text-white hover:bg-white/10 dark:hover:bg-white/20 dark:text-white">
                             Store
@@ -70,7 +70,31 @@ const Navbar = () => {
                             </ul>
                         </NavigationMenuContent>
                     </NavigationMenuItem>
-
+                    {/* Logistik */}
+                    <NavigationMenuItem>
+                        <NavigationMenuTrigger className="bg-transparent text-white hover:bg-white/10 dark:hover:bg-white/20 dark:text-white">
+                            Logistik
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent className="bg-white text-black p-4 rounded shadow">
+                            <ul className="grid gap-2 w-[200px]">
+                                <li>
+                                    <NavigationMenuLink asChild>
+                                        <Link href="/lpp-produk" className="text-sm hover:underline">
+                                            LPP PRODUK
+                                        </Link>
+                                    </NavigationMenuLink>
+                                </li>
+                                <li>
+                                    <NavigationMenuLink asChild>
+                                        <Link href="/" className="text-sm hover:underline">
+                                            Cabang 2
+                                        </Link>
+                                    </NavigationMenuLink>
+                                </li>
+                            </ul>
+                        </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    {/* Web HO */}
                     <NavigationMenuItem>
                         <NavigationMenuTrigger className="bg-transparent text-white hover:bg-white/10 dark:hover:bg-white/20 dark:text-white">
                             Web HO
@@ -121,14 +145,6 @@ const Navbar = () => {
                                 </li>
                             </ul>
                         </NavigationMenuContent>
-                    </NavigationMenuItem>
-
-                    <NavigationMenuItem>
-                        <NavigationMenuLink asChild>
-                            <Link href="/setting-harga" className="text-sm font-medium hover:underline">
-                                Setting Harga
-                            </Link>
-                        </NavigationMenuLink>
                     </NavigationMenuItem>
                 </NavigationMenuList>
             </NavigationMenu>

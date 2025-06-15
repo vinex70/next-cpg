@@ -1,14 +1,24 @@
 import { useRouter } from "next/router";
 import Layout from "@/components/Layout";
-import { useEffect, useState } from "react";
-import axios from "axios";
 import { FormatTanggal } from "@/utils/formatTanggal";
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
 import { formatNumber } from "@/utils/formatNumber";
-import { Button } from "@/components/ui/button";
 import { exportToStyledExcel } from "@/utils/ExportExcel/exportToExcel";
+import ButtonExportExcel from "@/components/ButtonExportExcel";
+import { useFetchData } from "@/hooks/useFetchData";
+import { useEffect, useMemo, useState } from "react";
+import ButtonRefresh from "@/components/ButtonRefresh";
+import getDays from "@/hooks/getDays";
+import SearchInput from "@/components/SearchInput";
 
-// Tipe data hasil dari API
 type DivisiRow = {
     div: string;
     nama_div: string;
@@ -24,37 +34,64 @@ type DivisiRow = {
 const PerDivisiPage = () => {
     const router = useRouter();
     const query = router.query;
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
-    const [data, setData] = useState<DivisiRow[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const endpoint = query.selectedReport
+        ? `/evaluasi-sales/${query.selectedReport}`
+        : "";
+
+    const { data, loading, error } = useFetchData<DivisiRow[]>({
+        endpoint,
+        queryParams: query as Record<string, string>,
+        enabled: !!query.selectedReport,
+    });
+
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        await router.replace(router.asPath);
+    };
 
     useEffect(() => {
-        if (Object.keys(query).length > 0) {
-            const fetchData = async () => {
-                setLoading(true);
-                try {
-                    const res = await axios.get(`/api/evaluasi-sales/${router.query.selectedReport}`, {
-                        params: query,
-                    });
-                    setData(res.data.data);
-                } catch (err: unknown) {
-                    if (err instanceof Error) {
-                        console.error(err);
-                    } else {
-                        console.error("Unknown error", err);
-                    }
-                    setError("Gagal memuat data laporan");
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            fetchData();
+        if (!loading) {
+            setIsRefreshing(false);
         }
-    }, [query, router.query.selectedReport]);
+    }, [loading]);
+
+    const title =
+        router.query.selectedReport
+            ?.toString()
+            .replaceAll(/-/g, " ")
+            .replace(/\b\w/g, (c) => c.toUpperCase()) || "-";
+
+    const filteredData = useMemo(() => {
+        if (!data || !searchTerm) return data;
+        const term = searchTerm.toLowerCase();
+        return data.filter((row) =>
+            Object.values(row).some((val) =>
+                String(val).toLowerCase().includes(term)
+            )
+        );
+    }, [data, searchTerm]);
+
+    const totalRow = useMemo(() => {
+        if (!filteredData) return [];
+        return [
+            "TOTAL",
+            "",
+            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.jumlah_member), 0)),
+            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.jumlah_struk), 0)),
+            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.jumlah_produk), 0)),
+            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.total_qty), 0)),
+            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.total_gross), 0)),
+            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.total_netto), 0)),
+            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.total_margin), 0)),
+        ];
+    }, [filteredData]);
 
     const handleExport = async () => {
+        if (!filteredData) return;
+
         const headers = [
             "Kode Divisi",
             "Nama Divisi",
@@ -67,7 +104,7 @@ const PerDivisiPage = () => {
             "Total Margin",
         ];
 
-        const rows = data.map((row) => [
+        const rows = filteredData.map((row) => [
             row.div,
             row.nama_div,
             formatNumber(Number(row.jumlah_member)),
@@ -79,79 +116,72 @@ const PerDivisiPage = () => {
             formatNumber(Number(row.total_margin)),
         ]);
 
-        const totalRow = [
-            "TOTAL",
-            "",
-            formatNumber(data.reduce((acc, row) => acc + Number(row.jumlah_member), 0)),
-            formatNumber(data.reduce((acc, row) => acc + Number(row.jumlah_struk), 0)),
-            formatNumber(data.reduce((acc, row) => acc + Number(row.jumlah_produk), 0)),
-            formatNumber(data.reduce((acc, row) => acc + Number(row.total_qty), 0)),
-            formatNumber(data.reduce((acc, row) => acc + Number(row.total_gross), 0)),
-            formatNumber(data.reduce((acc, row) => acc + Number(row.total_netto), 0)),
-            formatNumber(data.reduce((acc, row) => acc + Number(row.total_margin), 0)),
-        ];
-
-        const today = new Date();
-        const pad = (n: number) => n.toString().padStart(2, "0");
-
         await exportToStyledExcel({
-            title: "LAPORAN PER DIVISI",
+            title: `Laporan ${title}`,
             headers,
             rows,
             totalRow,
-            fileName: `Laporan_Per_Divisi_${pad(today.getDate())}${pad(today.getMonth() + 1)}${today.getFullYear()}.xlsx`,
+            fileName: `Laporan_${title}_${getDays()}.xlsx`,
         });
     };
 
-
     return (
-        <Layout title={router.query.selectedReport?.toString().replaceAll(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "-"}>
+        <Layout title={title}>
             <div className="space-y-4 p-4">
-                <h1 className="text-2xl font-bold text-green-600">📊 Laporan {router.query.selectedReport?.toString().replaceAll(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "-"}</h1>
-                <p>Periode : {FormatTanggal(router.query.startDate?.toLocaleString())} s/d {FormatTanggal(router.query.endDate?.toLocaleString())}</p>
-                <Button variant="outline" className="mb-4" size="sm">
-                    <span className="flex items-center gap-2" onClick={handleExport}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10 3a1 1 0 00-1 1v6H6a1 1 0 000 2h3v6a1 1 0 001.707.707l4-4a1 1 0 000-1.414l-4-4A1 1 0 0010 9V4a1 1 0 00-1-1z" />
-                        </svg>
-                        Export to Excel
-                    </span>
-                </Button>
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold text-green-600">
+                            📊 Laporan {title}
+                        </h1>
+                        <p>
+                            Periode:{" "}
+                            {FormatTanggal(router.query.startDate?.toString())} s/d{" "}
+                            {FormatTanggal(router.query.endDate?.toString())}
+                        </p>
+                    </div>
+                    <div className="flex gap-2 itemes-center">
+                        <ButtonRefresh disabled={isRefreshing} onClick={handleRefresh} isRefreshing={isRefreshing} />
+                        <ButtonExportExcel handleExport={handleExport} />
+                    </div>
+                </div>
+                <div className="flex justify-end">
+                    <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search..." />
+                </div>
 
                 {loading && <p>Loading...</p>}
                 {error && <p className="text-red-500">{error}</p>}
 
-                {!loading && !error && (
+                {!loading && !error && filteredData && (
                     <Table className="border bg-white dark:bg-gray-900 shadow-xl">
                         <TableHeader className="border sticky top-0 dark:bg-gray-700">
-                            <TableRow className="border">
-                                <TableHead colSpan={2} className="text-center">Divisi</TableHead>
-                                <TableHead rowSpan={2} className="text-center border">Member</TableHead>
-                                <TableHead rowSpan={2} className="text-center border">Struk</TableHead>
-                                <TableHead rowSpan={2} className="text-center border">Produk</TableHead>
-                                <TableHead rowSpan={2} className="text-center border">Qty</TableHead>
-                                <TableHead rowSpan={2} className="text-center border">Gross</TableHead>
-                                <TableHead rowSpan={2} className="text-center border">Netto</TableHead>
-                                <TableHead rowSpan={2} className="text-center border">Margin</TableHead>
+                            <TableRow className="border bg-blue-400 dark:bg-blue-600 hover:bg-blue-500">
+                                <TableHead colSpan={2} className="text-center"> Divisi </TableHead>
+                                <TableHead rowSpan={2} className="text-center border"> Member </TableHead>
+                                <TableHead rowSpan={2} className="text-center border"> Struk </TableHead>
+                                <TableHead rowSpan={2} className="text-center border"> Produk </TableHead>
+                                <TableHead rowSpan={2} className="text-center border"> Qty </TableHead>
+                                <TableHead rowSpan={2} className="text-center border"> Gross </TableHead>
+                                <TableHead rowSpan={2} className="text-center border"> Netto </TableHead>
+                                <TableHead rowSpan={2} className="text-center border"> Margin </TableHead>
                             </TableRow>
-                            <TableRow className="border">
+                            <TableRow className="border bg-blue-400 dark:bg-blue-600 hover:bg-blue-500">
                                 <TableHead className="text-center border">Kd</TableHead>
                                 <TableHead className="text-center border">Nama</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className="border dark:bg-gray-800">
-                            {data.length > 0 ? (
-                                data.map((row) => (
+                            {filteredData.length > 0 ? (
+                                filteredData.map((row) => (
                                     <TableRow key={row.div} className="border">
                                         <TableCell className="border text-center">{row.div}</TableCell>
                                         <TableCell className="border text-center">{row.nama_div}</TableCell>
-                                        <TableCell className="text-end border">{row.jumlah_member}</TableCell>
-                                        <TableCell className="text-end border">{row.jumlah_struk}</TableCell>
-                                        <TableCell className="text-end border">{row.jumlah_produk}</TableCell>
-                                        <TableCell className="text-end border">{formatNumber(row.total_qty)}</TableCell>
-                                        <TableCell className="text-end border">{formatNumber(row.total_gross)}</TableCell>
-                                        <TableCell className="text-end border">{formatNumber(row.total_netto)}</TableCell>
-                                        <TableCell className="text-end border">{formatNumber(row.total_margin)}</TableCell>
+                                        <TableCell className="text-end border"> {row.jumlah_member} </TableCell>
+                                        <TableCell className="text-end border"> {row.jumlah_struk} </TableCell>
+                                        <TableCell className="text-end border"> {row.jumlah_produk} </TableCell>
+                                        <TableCell className="text-end border"> {formatNumber(row.total_qty)} </TableCell>
+                                        <TableCell className="text-end border"> {formatNumber(row.total_gross)} </TableCell>
+                                        <TableCell className="text-end border"> {formatNumber(row.total_netto)} </TableCell>
+                                        <TableCell className="text-end border"> {formatNumber(row.total_margin)} </TableCell>
                                     </TableRow>
                                 ))
                             ) : (
@@ -164,14 +194,14 @@ const PerDivisiPage = () => {
                         </TableBody>
                         <TableFooter className="border">
                             <TableRow className="border">
-                                <TableCell colSpan={2} className="text-center font-bold">Total</TableCell>
-                                <TableCell className="text-end border">{data.reduce((acc, row) => acc + Number(row.jumlah_member), 0)}</TableCell>
-                                <TableCell className="text-end border">{data.reduce((acc, row) => acc + Number(row.jumlah_struk), 0)}</TableCell>
-                                <TableCell className="text-end border">{data.reduce((acc, row) => acc + Number(row.jumlah_produk), 0)}</TableCell>
-                                <TableCell className="text-end border">{formatNumber(data.reduce((acc, row) => acc + Number(row.total_qty), 0))}</TableCell>
-                                <TableCell className="text-end border">{formatNumber(data.reduce((acc, row) => acc + Number(row.total_gross), 0))}</TableCell>
-                                <TableCell className="text-end border">{formatNumber(data.reduce((acc, row) => acc + Number(row.total_netto), 0))}</TableCell>
-                                <TableCell className="text-end border">{formatNumber(data.reduce((acc, row) => acc + Number(row.total_margin), 0))}</TableCell>
+                                <TableCell colSpan={2} className="text-center font-bold">
+                                    Total
+                                </TableCell>
+                                {totalRow.slice(2).map((val, i) => (
+                                    <TableCell key={i} className="text-end border">
+                                        {val}
+                                    </TableCell>
+                                ))}
                             </TableRow>
                         </TableFooter>
                     </Table>
