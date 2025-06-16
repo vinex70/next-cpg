@@ -1,23 +1,18 @@
+// pages/evaluasi-sales/laporan/per-divisi.tsx
 import { useRouter } from "next/router";
 import Layout from "@/components/Layout";
-import { FormatTanggal } from "@/utils/formatTanggal";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { formatNumber } from "@/utils/formatNumber";
 import { exportToStyledExcel } from "@/utils/ExportExcel/exportToExcel";
-import ButtonExportExcel from "@/components/ButtonExportExcel";
 import { useFetchData } from "@/hooks/useFetchData";
-import { useEffect, useMemo, useState } from "react";
-import ButtonRefresh from "@/components/ButtonRefresh";
+import { useEffect, useState } from "react";
 import getDays from "@/hooks/getDays";
 import SearchInput from "@/components/SearchInput";
+import { useFilteredData } from "@/hooks/useFilteredData";
+import { useTitleFromQuery } from "@/hooks/useTitleFromQuery";
+import ReportHeader from "@/components/ReportHeader";
+import { formatReportPeriod } from "@/utils/formatReportPeriode";
+import { useTotalRow } from "@/hooks/useTotalRow";
 
 type DivisiRow = {
     div: string;
@@ -47,6 +42,13 @@ const PerDivisiPage = () => {
         enabled: !!query.selectedReport,
     });
 
+    const filteredData = useFilteredData(data ?? undefined, searchTerm);
+    // Contoh jika ingin memfilter berdasarkan beberapa kolom
+    // const filteredData = useFilteredData(data ?? undefined, searchTerm, [
+    //     "div",
+    //     "nama_div",
+    // ]);
+
     const handleRefresh = async () => {
         setIsRefreshing(true);
         await router.replace(router.asPath);
@@ -58,36 +60,21 @@ const PerDivisiPage = () => {
         }
     }, [loading]);
 
-    const title =
-        router.query.selectedReport
-            ?.toString()
-            .replaceAll(/-/g, " ")
-            .replace(/\b\w/g, (c) => c.toUpperCase()) || "-";
+    const title = useTitleFromQuery();
 
-    const filteredData = useMemo(() => {
-        if (!data || !searchTerm) return data;
-        const term = searchTerm.toLowerCase();
-        return data.filter((row) =>
-            Object.values(row).some((val) =>
-                String(val).toLowerCase().includes(term)
-            )
-        );
-    }, [data, searchTerm]);
-
-    const totalRow = useMemo(() => {
-        if (!filteredData) return [];
-        return [
-            "TOTAL",
-            "",
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.jumlah_member), 0)),
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.jumlah_struk), 0)),
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.jumlah_produk), 0)),
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.total_qty), 0)),
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.total_gross), 0)),
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.total_netto), 0)),
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.total_margin), 0)),
-        ];
-    }, [filteredData]);
+    const totalRow = useTotalRow<DivisiRow>(
+        filteredData,
+        ["div", "nama_div"],
+        [
+            "jumlah_member",
+            "jumlah_struk",
+            "jumlah_produk",
+            "total_qty",
+            "total_gross",
+            "total_netto",
+            "total_margin",
+        ]
+    );
 
     const handleExport = async () => {
         if (!filteredData) return;
@@ -125,25 +112,12 @@ const PerDivisiPage = () => {
         });
     };
 
+    const periode = formatReportPeriod(query.startDate as string, query.endDate as string);
+
     return (
         <Layout title={title}>
-            <div className="space-y-4 p-4">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-green-600">
-                            📊 Laporan {title}
-                        </h1>
-                        <p>
-                            Periode:{" "}
-                            {FormatTanggal(router.query.startDate?.toString())} s/d{" "}
-                            {FormatTanggal(router.query.endDate?.toString())}
-                        </p>
-                    </div>
-                    <div className="flex gap-2 itemes-center">
-                        <ButtonRefresh disabled={isRefreshing} onClick={handleRefresh} isRefreshing={isRefreshing} />
-                        <ButtonExportExcel handleExport={handleExport} />
-                    </div>
-                </div>
+            <section className="space-y-4 p-4">
+                <ReportHeader title={title} periode={periode} onExport={handleExport} onRefresh={handleRefresh} isRefreshing={isRefreshing} />
                 <div className="flex justify-end">
                     <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search..." />
                 </div>
@@ -206,7 +180,7 @@ const PerDivisiPage = () => {
                         </TableFooter>
                     </Table>
                 )}
-            </div>
+            </section>
         </Layout>
     );
 };
