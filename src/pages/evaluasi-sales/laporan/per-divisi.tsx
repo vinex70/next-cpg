@@ -1,18 +1,16 @@
 // pages/evaluasi-sales/laporan/per-divisi.tsx
-import { useRouter } from "next/router";
+import { useState } from "react";
 import Layout from "@/components/Layout";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { formatNumber } from "@/utils/formatNumber";
-import { exportToStyledExcel } from "@/utils/ExportExcel/exportToExcel";
-import { useFetchData } from "@/hooks/useFetchData";
-import { useEffect, useState } from "react";
-import getDays from "@/hooks/getDays";
-import SearchInput from "@/components/SearchInput";
-import { useFilteredData } from "@/hooks/useFilteredData";
-import { useTitleFromQuery } from "@/hooks/useTitleFromQuery";
 import ReportHeader from "@/components/ReportHeader";
-import { formatReportPeriod } from "@/utils/formatReportPeriode";
-import { useTotalRow } from "@/hooks/useTotalRow";
+import SearchInput from "@/components/SearchInput";
+
+import { useFetchData } from "@/hooks/useFetchData";
+import { useRefreshRouter } from "@/hooks/useRefreshRouter";
+import { useReportQueryEndpoint } from "@/hooks/useReportQueryEndpoint";
+import { useReportTableLogic } from "@/hooks/useReportTableLogic";
+import { useExportToExcel } from "@/hooks/useExportToExcel";
+import { formatNumber } from "@/utils/formatNumber";
 
 type DivisiRow = {
     div: string;
@@ -27,14 +25,8 @@ type DivisiRow = {
 };
 
 const PerDivisiPage = () => {
-    const router = useRouter();
-    const query = router.query;
-    const [isRefreshing, setIsRefreshing] = useState(false);
+    const { query, endpoint } = useReportQueryEndpoint();
     const [searchTerm, setSearchTerm] = useState("");
-
-    const endpoint = query.selectedReport
-        ? `/evaluasi-sales/${query.selectedReport}`
-        : "";
 
     const { data, loading, error } = useFetchData<DivisiRow[]>({
         endpoint,
@@ -42,28 +34,11 @@ const PerDivisiPage = () => {
         enabled: !!query.selectedReport,
     });
 
-    const filteredData = useFilteredData(data ?? undefined, searchTerm);
-    // Contoh jika ingin memfilter berdasarkan beberapa kolom
-    // const filteredData = useFilteredData(data ?? undefined, searchTerm, [
-    //     "div",
-    //     "nama_div",
-    // ]);
+    const { isRefreshing, handleRefresh } = useRefreshRouter(loading);
 
-    const handleRefresh = async () => {
-        setIsRefreshing(true);
-        await router.replace(router.asPath);
-    };
-
-    useEffect(() => {
-        if (!loading) {
-            setIsRefreshing(false);
-        }
-    }, [loading]);
-
-    const title = useTitleFromQuery();
-
-    const totalRow = useTotalRow<DivisiRow>(
-        filteredData,
+    const { filteredData, title, periode, totalRow } = useReportTableLogic<DivisiRow>(
+        data ?? undefined,
+        searchTerm,
         ["div", "nama_div"],
         [
             "jumlah_member",
@@ -76,10 +51,9 @@ const PerDivisiPage = () => {
         ]
     );
 
-    const handleExport = async () => {
-        if (!filteredData) return;
-
-        const headers = [
+    const { handleExport } = useExportToExcel<DivisiRow>({
+        title,
+        headers: [
             "Kode Divisi",
             "Nama Divisi",
             "Jumlah Member",
@@ -89,35 +63,33 @@ const PerDivisiPage = () => {
             "Total Gross",
             "Total Netto",
             "Total Margin",
-        ];
-
-        const rows = filteredData.map((row) => [
+        ],
+        data: filteredData ?? [],
+        mapRow: (row) => [
             row.div,
             row.nama_div,
-            formatNumber(Number(row.jumlah_member)),
-            formatNumber(Number(row.jumlah_struk)),
-            formatNumber(Number(row.jumlah_produk)),
-            formatNumber(Number(row.total_qty)),
-            formatNumber(Number(row.total_gross)),
-            formatNumber(Number(row.total_netto)),
-            formatNumber(Number(row.total_margin)),
-        ]);
-
-        await exportToStyledExcel({
-            title: `Laporan ${title}`,
-            headers,
-            rows,
-            totalRow,
-            fileName: `Laporan_${title}_${getDays()}.xlsx`,
-        });
-    };
-
-    const periode = formatReportPeriod(query.startDate as string, query.endDate as string);
+            formatNumber(row.jumlah_member),
+            formatNumber(row.jumlah_struk),
+            formatNumber(row.jumlah_produk),
+            formatNumber(row.total_qty),
+            formatNumber(row.total_gross),
+            formatNumber(row.total_netto),
+            formatNumber(row.total_margin),
+        ],
+        totalRow,
+    });
 
     return (
         <Layout title={title}>
             <section className="space-y-4 p-4">
-                <ReportHeader title={title} periode={periode} onExport={handleExport} onRefresh={handleRefresh} isRefreshing={isRefreshing} />
+                <ReportHeader
+                    title={title}
+                    periode={periode}
+                    onExport={handleExport}
+                    onRefresh={handleRefresh}
+                    isRefreshing={isRefreshing}
+                />
+
                 <div className="flex justify-end">
                     <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search..." />
                 </div>
@@ -129,18 +101,18 @@ const PerDivisiPage = () => {
                     <Table className="border bg-white dark:bg-gray-900 shadow-xl">
                         <TableHeader className="border sticky top-0 dark:bg-gray-700">
                             <TableRow className="border bg-blue-400 dark:bg-blue-600 hover:bg-blue-500">
-                                <TableHead colSpan={2} className="text-center"> Divisi </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Member </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Struk </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Produk </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Qty </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Gross </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Netto </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Margin </TableHead>
+                                <TableHead colSpan={2} className="font-bold text-center">Divisi</TableHead>
+                                <TableHead rowSpan={2} className="font-bold text-center border">Member</TableHead>
+                                <TableHead rowSpan={2} className="font-bold text-center border">Struk</TableHead>
+                                <TableHead rowSpan={2} className="font-bold text-center border">Produk</TableHead>
+                                <TableHead rowSpan={2} className="font-bold text-center border">Qty</TableHead>
+                                <TableHead rowSpan={2} className="font-bold text-center border">Gross</TableHead>
+                                <TableHead rowSpan={2} className="font-bold text-center border">Netto</TableHead>
+                                <TableHead rowSpan={2} className="font-bold text-center border">Margin</TableHead>
                             </TableRow>
                             <TableRow className="border bg-blue-400 dark:bg-blue-600 hover:bg-blue-500">
-                                <TableHead className="text-center border">Kd</TableHead>
-                                <TableHead className="text-center border">Nama</TableHead>
+                                <TableHead className="font-bold text-center border">Kd</TableHead>
+                                <TableHead className="font-bold text-center border">Nama</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className="border dark:bg-gray-800">
@@ -149,13 +121,13 @@ const PerDivisiPage = () => {
                                     <TableRow key={row.div} className="border">
                                         <TableCell className="border text-center">{row.div}</TableCell>
                                         <TableCell className="border text-center">{row.nama_div}</TableCell>
-                                        <TableCell className="text-end border"> {row.jumlah_member} </TableCell>
-                                        <TableCell className="text-end border"> {row.jumlah_struk} </TableCell>
-                                        <TableCell className="text-end border"> {row.jumlah_produk} </TableCell>
-                                        <TableCell className="text-end border"> {formatNumber(row.total_qty)} </TableCell>
-                                        <TableCell className="text-end border"> {formatNumber(row.total_gross)} </TableCell>
-                                        <TableCell className="text-end border"> {formatNumber(row.total_netto)} </TableCell>
-                                        <TableCell className="text-end border"> {formatNumber(row.total_margin)} </TableCell>
+                                        <TableCell className="text-end border">{row.jumlah_member}</TableCell>
+                                        <TableCell className="text-end border">{row.jumlah_struk}</TableCell>
+                                        <TableCell className="text-end border">{row.jumlah_produk}</TableCell>
+                                        <TableCell className="text-end border">{formatNumber(row.total_qty)}</TableCell>
+                                        <TableCell className="text-end border">{formatNumber(row.total_gross)}</TableCell>
+                                        <TableCell className="text-end border">{formatNumber(row.total_netto)}</TableCell>
+                                        <TableCell className="text-end border">{formatNumber(row.total_margin)}</TableCell>
                                     </TableRow>
                                 ))
                             ) : (
@@ -168,13 +140,9 @@ const PerDivisiPage = () => {
                         </TableBody>
                         <TableFooter className="border">
                             <TableRow className="border">
-                                <TableCell colSpan={2} className="text-center font-bold">
-                                    Total
-                                </TableCell>
+                                <TableCell colSpan={2} className="text-center font-bold">Total</TableCell>
                                 {totalRow.slice(2).map((val, i) => (
-                                    <TableCell key={i} className="text-end border">
-                                        {val}
-                                    </TableCell>
+                                    <TableCell key={i} className="text-end border">{val}</TableCell>
                                 ))}
                             </TableRow>
                         </TableFooter>

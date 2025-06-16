@@ -1,17 +1,17 @@
 // pages/evaluasi-sales/laporan/per-departement.tsx
-import { useRouter } from "next/router";
+import { useState } from "react";
+// components
 import Layout from "@/components/Layout";
-import { FormatTanggal } from "@/utils/formatTanggal";
-import { useFetchData } from "@/hooks/useFetchData";
-import { useFilteredData } from "@/hooks/useFilteredData";
-import ButtonExportExcel from "@/components/ButtonExportExcel";
-import ButtonRefresh from "@/components/ButtonRefresh";
+import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
+import ReportHeader from "@/components/ReportHeader";
 import SearchInput from "@/components/SearchInput";
-import { useEffect, useMemo, useState } from "react";
+// hooks
+import { useFetchData } from "@/hooks/useFetchData";
+import { useRefreshRouter } from "@/hooks/useRefreshRouter";
+import { useReportQueryEndpoint } from "@/hooks/useReportQueryEndpoint";
+import { useReportTableLogic } from "@/hooks/useReportTableLogic";
+import { useExportToExcel } from "@/hooks/useExportToExcel";
 import { formatNumber } from "@/utils/formatNumber";
-import { exportToStyledExcel } from "@/utils/ExportExcel/exportToExcel";
-import getDays from "@/hooks/getDays";
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 // Tipe data hasil dari API
 type DepartementRows = {
@@ -28,54 +28,37 @@ type DepartementRows = {
 };
 
 const PerDepartementPage = () => {
-    const router = useRouter();
-    const query = router.query;
-    const [isRefreshing, setIsRefreshing] = useState(false);
+    const { query, endpoint } = useReportQueryEndpoint();
     const [searchTerm, setSearchTerm] = useState("");
 
-    const endpoint = query.selectedReport ? `/evaluasi-sales/${query.selectedReport}` : "";
-    const { data, loading, error } = useFetchData<DepartementRows[]>({ endpoint, queryParams: query as Record<string, string>, enabled: !!query.selectedReport });
-    const filteredData = useFilteredData(data ?? undefined, searchTerm);
+    const { data, loading, error } = useFetchData<DepartementRows[]>({
+        endpoint,
+        queryParams: query as Record<string, string>,
+        enabled: !!query.selectedReport,
+    });
 
-    const handleRefresh = async () => {
-        setIsRefreshing(true);
-        await router.replace(router.asPath);
-    };
+    const { isRefreshing, handleRefresh } = useRefreshRouter(loading);
 
-    useEffect(() => {
-        if (!loading) {
-            setIsRefreshing(false);
-        }
-    }, [loading]);
+    const { filteredData, title, periode, totalRow } = useReportTableLogic<DepartementRows>(
+        data ?? undefined,
+        searchTerm,
+        ["div", "dept", "nama_dept"],
+        [
+            "jumlah_member",
+            "jumlah_struk",
+            "jumlah_produk",
+            "total_qty",
+            "total_gross",
+            "total_netto",
+            "total_margin",
+        ]
+    );
 
-    const title =
-        query.selectedReport
-            ?.toString()
-            .replaceAll(/-/g, " ")
-            .replace(/\b\w/g, (c) => c.toUpperCase()) || "-";
-
-    const totalRow = useMemo(() => {
-        if (!filteredData) return [];
-        return [
-            "TOTAL",
-            "",
-            "",
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.jumlah_member), 0)),
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.jumlah_struk), 0)),
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.jumlah_produk), 0)),
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.total_qty), 0)),
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.total_gross), 0)),
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.total_netto), 0)),
-            formatNumber(filteredData.reduce((acc, row) => acc + Number(row.total_margin), 0)),
-        ];
-    }, [filteredData]);
-
-    const handleExport = async () => {
-        if (!filteredData) return;
-
-        const headers = [
-            "Div",
-            "Kode Dept",
+    const { handleExport } = useExportToExcel<DepartementRows>({
+        title,
+        headers: [
+            "Divisi",
+            "Dept",
             "Nama Dept",
             "Jumlah Member",
             "Jumlah Struk",
@@ -84,49 +67,33 @@ const PerDepartementPage = () => {
             "Total Gross",
             "Total Netto",
             "Total Margin",
-        ];
-
-        const rows = filteredData.map((row) => [
+        ],
+        data: filteredData ?? [],
+        mapRow: (row) => [
             row.div,
             row.dept,
             row.nama_dept,
-            formatNumber(Number(row.jumlah_member)),
-            formatNumber(Number(row.jumlah_struk)),
-            formatNumber(Number(row.jumlah_produk)),
-            formatNumber(Number(row.total_qty)),
-            formatNumber(Number(row.total_gross)),
-            formatNumber(Number(row.total_netto)),
-            formatNumber(Number(row.total_margin)),
-        ]);
-
-        await exportToStyledExcel({
-            title: `Laporan ${title}`,
-            headers,
-            rows,
-            totalRow,
-            fileName: `Laporan_${title}_${getDays()}.xlsx`,
-        });
-    };
+            formatNumber(row.jumlah_member),
+            formatNumber(row.jumlah_struk),
+            formatNumber(row.jumlah_produk),
+            formatNumber(row.total_qty),
+            formatNumber(row.total_gross),
+            formatNumber(row.total_netto),
+            formatNumber(row.total_margin),
+        ],
+        totalRow,
+    });
 
     return (
-        <Layout title={router.query.selectedReport?.toString().replaceAll(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "-"}>
-            <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-green-600">
-                            📊 Laporan {title}
-                        </h1>
-                        <p>
-                            Periode:{" "}
-                            {FormatTanggal(router.query.startDate?.toString())} s/d{" "}
-                            {FormatTanggal(router.query.endDate?.toString())}
-                        </p>
-                    </div>
-                    <div className="flex gap-2 itemes-center">
-                        <ButtonExportExcel handleExport={handleExport} />
-                        <ButtonRefresh disabled={isRefreshing} onClick={handleRefresh} isRefreshing={isRefreshing} />
-                    </div>
-                </div>
+        <Layout title={title}>
+            <section className="space-y-4 p-4">
+                <ReportHeader
+                    title={title}
+                    periode={periode}
+                    onExport={handleExport}
+                    onRefresh={handleRefresh}
+                    isRefreshing={isRefreshing}
+                />
                 <div className="flex justify-end">
                     <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search..." />
                 </div>
@@ -191,7 +158,7 @@ const PerDepartementPage = () => {
                         </TableFooter>
                     </Table>
                 )}
-            </div>
+            </section>
         </Layout>
     );
 };
