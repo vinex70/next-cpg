@@ -90,6 +90,7 @@ const EvaluasiSales = () => {
                             <SelectContent>
                                 <SelectItem value="per-divisi">Laporan Per Divisi</SelectItem>
                                 <SelectItem value="per-departement">Laporan Per Departement</SelectItem>
+                                <SelectItem value="per-kategori">Laporan Per Kategori</SelectItem>
                                 {/* Tambahkan jenis laporan lainnya di sini */}
                             </SelectContent>
                         </Select>
