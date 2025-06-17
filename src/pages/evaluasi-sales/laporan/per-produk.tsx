@@ -102,7 +102,7 @@ const PerProdukPage = () => {
         { field: "dept", label: "Dept" },
         { field: "kategori", label: "Kat" },
         { field: "plu", label: "PLU" },
-        { field: "nama_produk", label: "Produk" },
+        { field: "nama_produk", label: "Nama" },
         { field: "jumlah_member", label: "Member", isNumeric: true },
         { field: "jumlah_struk", label: "Struk", isNumeric: true },
         { field: "total_qty", label: "Qty", isNumeric: true },
@@ -146,7 +146,7 @@ const PerProdukPage = () => {
                         renderHeaderGroup={
                             <tr>
                                 <th colSpan={5} className="border border-gray-400 px-2 py-2">
-                                    Kategori
+                                    Produk
                                 </th>
                                 <th colSpan={7} className="border border-gray-400 px-2 py-2">
                                     Sales

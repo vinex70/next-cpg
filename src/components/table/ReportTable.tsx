@@ -30,7 +30,7 @@ export function ReportTable<T extends Record<string, unknown>>({
     return (
         <div className="max-h-[70vh] overflow-y-auto shadow-xl">
             <table className="table-fixed border-collapse border-gray-400 max-w-fit">
-                <thead className="sticky top-0 z-10 bg-blue-400 border border-gray-400">
+                <thead className="sticky top-0 z-10 bg-blue-400 border border-collapse border-gray-400">
                     {renderHeaderGroup}
                     <tr>
                         {columns.map((col, idx) => (
@@ -47,7 +47,7 @@ export function ReportTable<T extends Record<string, unknown>>({
                             {columns.map((col, colIndex) => (
                                 <td
                                     key={colIndex}
-                                    className={`border border-gray-400 px-2 py-2 ${col.isNumeric ? "text-end" : ""}`}
+                                    className={`border border-gray-400 px-2 py-2 text-sm ${col.isNumeric ? "text-end" : ""}`}
                                 >
                                     {col.isNumeric
                                         ? formatNumber(Number(row[col.field]))
@@ -55,7 +55,7 @@ export function ReportTable<T extends Record<string, unknown>>({
                                 </td>
                             ))}
                             {renderAction && (
-                                <td className="border border-gray-400 px-2 py-2 text-center">
+                                <td className="border border-gray-400 px-2 py-2 text-center text-sm">
                                     {renderAction(row)}
                                 </td>
                             )}
@@ -73,7 +73,7 @@ export function ReportTable<T extends Record<string, unknown>>({
                                 <>
                                     <td
                                         colSpan={nonNumericCols.length}
-                                        className="border border-gray-400 px-2 py-2 text-center"
+                                        className="border border-gray-400 px-2 py-2 text-center dark:bg-blue-400"
                                     >
                                         TOTAL
                                     </td>
@@ -88,14 +88,14 @@ export function ReportTable<T extends Record<string, unknown>>({
                                         return (
                                             <td
                                                 key={col.field as string}
-                                                className="border border-gray-400 px-2 py-2 text-end"
+                                                className="border border-gray-400 px-2 py-2 text-end dark:bg-blue-400"
                                             >
                                                 {isValidNumber ? formatNumber(value as number) : String(value ?? "")}
                                             </td>
                                         );
                                     })}
                                     {renderAction && (
-                                        <td className="border border-gray-400 px-2 py-2"></td>
+                                        <td className="border border-gray-400 px-2 py-2 dark:bg-blue-400"></td>
                                     )}
                                 </>
                             );
