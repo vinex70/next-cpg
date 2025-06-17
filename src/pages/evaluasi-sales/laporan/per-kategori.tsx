@@ -1,4 +1,4 @@
-// pages/evaluasi-sales/laporan/per-departement.tsx
+// pages/evaluasi-sales/laporan/per-.tsx
 import { useState } from "react";
 // components
 import Layout from "@/components/Layout";
@@ -28,7 +28,7 @@ type KategoriRows = {
     total_margin: number;
 };
 
-const PerDepartementPage = () => {
+const PerKategoriPage = () => {
     const { query, endpoint } = useReportQueryEndpoint();
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -168,4 +168,4 @@ const PerDepartementPage = () => {
     );
 };
 
-export default PerDepartementPage;
+export default PerKategoriPage;
