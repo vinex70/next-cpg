@@ -26,7 +26,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             dtl_struk as struk,
             dtl_stat as station,
             dtl_kasir as kasir,
-            count(distinct dtl_cusno) as jumlah_member,
+            dtl_cusno as kd_member,
+            dtl_namamember as nama_member,
             count(distinct dtl_prdcd_ctn) as jumlah_produk,
             sum(dtl_qty) as total_qty,
             sum(dtl_gross) as total_gross,
@@ -52,6 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             dtl_outlet,
             dtl_suboutlet,
             dtl_cusno,
+            dtl_namamember,
             dtl_memberkhusus
         HAVING count(dtl_netto) > 0
         ORDER BY to_char(dtl_tanggal, 'yyyymmdd'), dtl_struk, dtl_stat, dtl_kasir

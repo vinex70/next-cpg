@@ -29,7 +29,7 @@ export function ReportTable<T extends Record<string, unknown>>({
 
     return (
         <div className="max-h-[70vh] overflow-y-auto shadow-xl">
-            <table className="table-fixed border-collapse border-gray-400 max-w-fit">
+            <table className="min-w-full table-auto border-collapse border-gray-400 max-w-fit">
                 <thead className="sticky top-0 z-10 bg-blue-400 border border-collapse border-gray-400">
                     {renderHeaderGroup}
                     <tr>

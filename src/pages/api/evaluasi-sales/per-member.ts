@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         SELECT
             dtl_outlet as outlet,
             dtl_suboutlet as suboutlet,
-            dtl_cusno as member,
+            dtl_cusno as kd_member,
             dtl_namamember as nama_member,
             count(distinct dtl_struk) as jumlah_struk,
             count(distinct dtl_prdcd_ctn) as jumlah_produk,

@@ -1,11 +1,10 @@
 import Layout from "@/components/Layout";
-import Modal from "@/components/Modal";
 import ReportHeader from "@/components/ReportHeader";
 import SearchInput from "@/components/SearchInput";
 import { ReportTable } from "@/components/table/ReportTable";
 import { useReportPage } from "@/hooks/useReportPage";
-import { formatNumber } from "@/utils/formatNumber";
 import { useState } from "react";
+import DetailProdukModal from "@/components/modal/DetailProdukModal";
 
 type ProdukRows = {
     div: string;
@@ -23,6 +22,7 @@ type ProdukRows = {
 
 const PerProdukPage = () => {
     const {
+        query,
         searchTerm,
         setSearchTerm,
         filteredData,
@@ -140,22 +140,14 @@ const PerProdukPage = () => {
                 )}
 
                 {/* Modal detail */}
-                <Modal show={showModal} onClose={() => setShowModal(false)}>
-                    <h2 className="text-lg font-bold mb-4">Detail Produk</h2>
-                    {selectedRow && (
-                        <ul className="space-y-1 text-sm">
-                            <li><strong>PLU:</strong> {selectedRow.plu}</li>
-                            <li><strong>Nama:</strong> {selectedRow.nama_produk}</li>
-                            <li><strong>Div:</strong> {selectedRow.div}</li>
-                            <li><strong>Dept:</strong> {selectedRow.dept}</li>
-                            <li><strong>Kategori:</strong> {selectedRow.kategori}</li>
-                            <li><strong>Qty:</strong> {formatNumber(selectedRow.total_qty)}</li>
-                            <li><strong>Gross:</strong> {formatNumber(selectedRow.total_gross)}</li>
-                            <li><strong>Netto:</strong> {formatNumber(selectedRow.total_netto)}</li>
-                            <li><strong>Margin:</strong> {formatNumber(selectedRow.total_margin)}</li>
-                        </ul>
-                    )}
-                </Modal>
+                <DetailProdukModal
+                    show={showModal}
+                    onClose={() => setShowModal(false)}
+                    startDate={query.startDate as string}
+                    endDate={query.endDate as string}
+                    prdcd={selectedRow?.plu as string}
+                    namaProduk={selectedRow?.nama_produk as string}
+                />
             </section>
         </Layout>
     );

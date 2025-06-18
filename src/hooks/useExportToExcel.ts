@@ -1,6 +1,6 @@
 // hooks/useExportToExcel.ts
 import { exportToStyledExcel } from "@/utils/ExportExcel/exportToExcel";
-import getDays from "./getDays";
+import getDays from "@/hooks/getDays";
 
 export const useExportToExcel = <T extends object>({
     title,
