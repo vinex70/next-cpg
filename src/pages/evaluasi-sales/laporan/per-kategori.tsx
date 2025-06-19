@@ -1,17 +1,11 @@
-// pages/evaluasi-sales/laporan/per-.tsx
-import { useState } from "react";
-// components
+// pages/evaluasi-sales/laporan/per-kategori.tsx
 import Layout from "@/components/Layout";
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
+import DetailKategoriModal from "@/components/modal/evaluasi-sales/DetailKategoriModal";
 import ReportHeader from "@/components/ReportHeader";
 import SearchInput from "@/components/SearchInput";
-// hooks
-import { useFetchData } from "@/hooks/useFetchData";
-import { useRefreshRouter } from "@/hooks/useRefreshRouter";
-import { useReportQueryEndpoint } from "@/hooks/useReportQueryEndpoint";
-import { useReportTableLogic } from "@/hooks/useReportTableLogic";
-import { useExportToExcel } from "@/hooks/useExportToExcel";
-import { formatNumber } from "@/utils/formatNumber";
+import { ReportTable } from "@/components/table/ReportTable";
+import { useReportPage } from "@/hooks/useReportPage";
+import { useState } from "react";
 
 // Tipe data hasil dari API
 type KategoriRows = {
@@ -29,22 +23,22 @@ type KategoriRows = {
 };
 
 const PerKategoriPage = () => {
-    const { query, endpoint } = useReportQueryEndpoint();
-    const [searchTerm, setSearchTerm] = useState("");
-
-    const { data, loading, error } = useFetchData<KategoriRows[]>({
-        endpoint,
-        queryParams: query as Record<string, string>,
-        enabled: !!query.selectedReport,
-    });
-
-    const { isRefreshing, handleRefresh } = useRefreshRouter(loading);
-
-    const { filteredData, title, periode, totalRow } = useReportTableLogic<KategoriRows>(
-        data ?? undefined,
+    const {
+        query,
         searchTerm,
-        ["div", "dept", "kategori", "nama_kategori"],
-        [
+        setSearchTerm,
+        filteredData,
+        loading,
+        error,
+        title,
+        periode,
+        totalRow,
+        handleExport,
+        isRefreshing,
+        handleRefresh,
+    } = useReportPage<KategoriRows>({
+        searchableFields: ["div", "dept", "kategori", "nama_kategori"],
+        numericFields: [
             "jumlah_member",
             "jumlah_struk",
             "jumlah_produk",
@@ -52,40 +46,62 @@ const PerKategoriPage = () => {
             "total_gross",
             "total_netto",
             "total_margin",
-        ]
-    );
-
-    const { handleExport } = useExportToExcel<KategoriRows>({
-        title,
+        ],
         headers: [
             "Div",
             "Dept",
-            "kat",
+            "Kategori",
             "Nama Kategori",
-            "Jumlah Member",
-            "Jumlah Struk",
-            "Jumlah Produk",
-            "Total Qty",
-            "Total Gross",
-            "Total Netto",
-            "Total Margin",
+            "Member",
+            "Struk",
+            "Produk",
+            "Qty",
+            "Gross",
+            "Netto",
+            "Margin",
         ],
-        data: filteredData ?? [],
         mapRow: (row) => [
             row.div,
             row.dept,
             row.kategori,
             row.nama_kategori,
-            formatNumber(row.jumlah_member),
-            formatNumber(row.jumlah_struk),
-            formatNumber(row.jumlah_produk),
-            formatNumber(row.total_qty),
-            formatNumber(row.total_gross),
-            formatNumber(row.total_netto),
-            formatNumber(row.total_margin),
-        ],
-        totalRow,
-    });
+            Number(row.jumlah_member),
+            Number(row.jumlah_struk),
+            Number(row.jumlah_produk),
+            Number(row.total_qty),
+            Number(row.total_gross),
+            Number(row.total_netto),
+            Number(row.total_margin),
+        ]
+    })
+
+    const columns: { field: keyof KategoriRows; label: string; isNumeric?: boolean }[] = [
+        { field: "div", label: "Div" },
+        { field: "dept", label: "Dept" },
+        { field: "kategori", label: "Katb" },
+        { field: "nama_kategori", label: "Nama" },
+        { field: "jumlah_member", label: "Member", isNumeric: true },
+        { field: "jumlah_struk", label: "Struk", isNumeric: true },
+        { field: "jumlah_produk", label: "Produk", isNumeric: true },
+        { field: "total_qty", label: "Qty", isNumeric: true },
+        { field: "total_gross", label: "Gross", isNumeric: true },
+        { field: "total_netto", label: "Netto", isNumeric: true },
+        { field: "total_margin", label: "Margin", isNumeric: true },
+    ]
+
+    const [selectedRow, setSelectedRow] = useState<KategoriRows | null>(null);
+    const [showModal, setShowModal] = useState(false);
+
+    const handleOpenModal = (row: KategoriRows) => {
+        setSelectedRow(row);
+        setShowModal(true);
+    };
+
+    const keyField = {
+        field: "div_dept_kat",
+        label: "Div - Dept - Kat",
+        render: (row: KategoriRows) => `${row.div}${row.dept}${row.kategori}`,
+    };
 
     return (
         <Layout title={title}>
@@ -105,64 +121,42 @@ const PerKategoriPage = () => {
                 {error && <p className="text-red-500">{error}</p>}
 
                 {!loading && !error && filteredData && (
-                    <Table className="border bg-white dark:bg-gray-900 shadow-xl">
-                        <TableHeader className="border sticky top-0 dark:bg-gray-700">
-                            <TableRow className="border bg-blue-400 dark:bg-blue-600 hover:bg-blue-500">
-                                <TableHead colSpan={4} className="text-center"> Kategori </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Member </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Struk </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Produk </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Qty </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Gross </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Netto </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Margin </TableHead>
-                            </TableRow>
-                            <TableRow className="border bg-blue-400 dark:bg-blue-600 hover:bg-blue-500">
-                                <TableHead className="text-center border">Div</TableHead>
-                                <TableHead className="text-center border">Dept</TableHead>
-                                <TableHead className="text-center border">Kat</TableHead>
-                                <TableHead className="text-center border">Nama</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody className="border dark:bg-gray-800">
-                            {filteredData.length > 0 ? (
-                                filteredData.map((row) => (
-                                    <TableRow key={row.div.concat(row.dept).concat(row.kategori)} className="border">
-                                        <TableCell className="border text-center">{row.div}</TableCell>
-                                        <TableCell className="border text-center">{row.dept}</TableCell>
-                                        <TableCell className="border text-center">{row.kategori}</TableCell>
-                                        <TableCell className="border text-center">{row.nama_kategori}</TableCell>
-                                        <TableCell className="text-end border"> {row.jumlah_member} </TableCell>
-                                        <TableCell className="text-end border"> {row.jumlah_struk} </TableCell>
-                                        <TableCell className="text-end border"> {row.jumlah_produk} </TableCell>
-                                        <TableCell className="text-end border"> {formatNumber(row.total_qty)} </TableCell>
-                                        <TableCell className="text-end border"> {formatNumber(row.total_gross)} </TableCell>
-                                        <TableCell className="text-end border"> {formatNumber(row.total_netto)} </TableCell>
-                                        <TableCell className="text-end border"> {formatNumber(row.total_margin)} </TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={9} className="p-4 text-center text-gray-500">
-                                        Tidak ada data untuk periode ini
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                        <TableFooter className="border">
-                            <TableRow className="border">
-                                <TableCell colSpan={4} className="text-center font-bold">
-                                    Total
-                                </TableCell>
-                                {totalRow.slice(4).map((val, i) => (
-                                    <TableCell key={i} className="text-end border">
-                                        {val}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        </TableFooter>
-                    </Table>
+                    <ReportTable
+                        columns={columns}
+                        data={filteredData}
+                        totalRow={totalRow}
+                        keyField={keyField.field as keyof KategoriRows}
+                        renderHeaderGroup={
+                            <tr>
+                                <th colSpan={4} className="border border-gray-400 px-2 py-2">
+                                    Kategori
+                                </th>
+                                <th colSpan={8} className="border border-gray-400 px-2 py-2">
+                                    Sales
+                                </th>
+                            </tr>
+                        }
+                        renderAction={(row) => (
+                            <button
+                                onClick={() => handleOpenModal(row)}
+                                className="text-blue-600 hover:underline"
+                            >
+                                Detail
+                            </button>
+                        )}
+                    />
                 )}
+                {/* Modal detail */}
+                <DetailKategoriModal
+                    show={showModal}
+                    onClose={() => setShowModal(false)}
+                    startDate={query.startDate as string}
+                    endDate={query.endDate as string}
+                    div={selectedRow?.div as string}
+                    dept={selectedRow?.div as string + selectedRow?.dept as string}
+                    kat={selectedRow?.dept as string + selectedRow?.kategori as string}
+                    namaKategori={selectedRow?.nama_kategori as string}
+                />
             </section>
         </Layout>
     );

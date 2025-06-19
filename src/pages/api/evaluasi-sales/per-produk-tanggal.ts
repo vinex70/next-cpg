@@ -22,12 +22,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const query = `
         SELECT
+        to_char(dtl_tanggal, 'dd-MM-yyyy') as tanggal,
             dtl_k_div as div,
             dtl_k_dept as dept,
             dtl_k_katb as kategori,
             dtl_prdcd_ctn as plu,
             dtl_nama_barang as nama_produk,
-            to_char(dtl_tanggal, 'dd-MM-yyyy') as tanggal,
             count(distinct dtl_cusno) as jumlah_member,
             count(distinct dtl_struk) as jumlah_struk,
             sum(dtl_qty) as total_qty,

@@ -4,7 +4,7 @@ import SearchInput from "@/components/SearchInput";
 import { ReportTable } from "@/components/table/ReportTable";
 import { useReportPage } from "@/hooks/useReportPage";
 import { useState } from "react";
-import DetailProdukModal from "@/components/modal/DetailProdukModal";
+import DetailProdukModal from "@/components/modal/evaluasi-sales/DetailProdukModal";
 
 type ProdukRows = {
     div: string;
@@ -63,12 +63,12 @@ const PerProdukPage = () => {
             row.kategori,
             row.plu,
             row.nama_produk,
-            row.jumlah_member,
-            row.jumlah_struk,
-            row.total_qty,
-            row.total_gross,
-            row.total_netto,
-            row.total_margin,
+            Number(row.jumlah_member),
+            Number(row.jumlah_struk),
+            Number(row.total_qty),
+            Number(row.total_gross),
+            Number(row.total_netto),
+            Number(row.total_margin),
         ],
     });
 
