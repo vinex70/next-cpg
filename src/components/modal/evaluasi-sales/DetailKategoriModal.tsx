@@ -160,7 +160,7 @@ export default function DetailKategoriModal({
             <div className="space-y-4 max-h-[90vh]">
                 <div className="flex justify-between items-center my-2">
                     <h2 className="text-lg font-bold">
-                        Detail Kategori: {kat.slice(2, 4)} - {namaKategori}
+                        Detail Kategori: {String(kat).slice(-2)} - {namaKategori}
                     </h2>
                     <button
                         onClick={handleExport}
