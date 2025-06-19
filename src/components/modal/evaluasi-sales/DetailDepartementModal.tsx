@@ -11,41 +11,42 @@ interface Props {
     onClose: () => void;
     startDate: string;
     endDate: string;
-    prdcd: string;
-    namaProduk: string;
+    div: string;
+    dept: string;
+    namaDepartement: string;
 }
 
-type DetailProduk = {
+type DetailDepartement = {
     no?: number;
-    tanggal: string;
-    struk: string;
-    station: string;
-    kasir: string;
-    kd_member: string;
-    nama_member: string;
+    div: string;
+    dept: string;
+    kategori: string;
+    plu: string;
+    nama_produk: string;
+    jumlah_member: number;
+    jumlah_struk: number;
     total_qty: number;
     total_gross: number;
     total_netto: number;
     total_margin: number;
-    metode_pembayaran: string;
-    jenis_member: string;
 };
 
-export default function DetailProdukModal({
+export default function DetailDepartementModal({
     show,
     onClose,
     startDate,
     endDate,
-    prdcd,
-    namaProduk
+    div,
+    dept,
+    namaDepartement
 }: Props) {
     const [searchTerm, setSearchTerm] = useState("");
-
     const queryParams = useMemo(() => ({
         startDate,
         endDate,
-        prdcd,
-    }), [startDate, endDate, prdcd]);
+        div,
+        dept,
+    }), [startDate, endDate, div, dept]);
 
     useEffect(() => {
         if (!show) {
@@ -53,18 +54,19 @@ export default function DetailProdukModal({
         }
     }, [show]);
 
-    const { data, error, loading } = useFetchData<DetailProduk[]>({
-        endpoint: "/evaluasi-sales/per-struk",
+
+    const { data, error, loading } = useFetchData<DetailDepartement[]>({
+        endpoint: "/evaluasi-sales/per-produk",
         queryParams,
         enabled: show,
     });
 
     const filteredData = useFilteredData(data ?? [], searchTerm, [
-        "struk",
-        "nama_member",
-        "kd_member",
-        "metode_pembayaran",
-        "jenis_member"
+        "div",
+        "dept",
+        "kategori",
+        "plu",
+        "nama_produk",
     ]);
 
     const numberedData = useMemo(() => {
@@ -75,34 +77,32 @@ export default function DetailProdukModal({
     }, [filteredData]);
 
     const columns = useMemo<
-        { field: keyof DetailProduk; label: string; isNumeric?: boolean }[]
+        { field: keyof DetailDepartement; label: string; isNumeric?: boolean }[]
     >(() => [
         { field: "no", label: "No" },
-        { field: "tanggal", label: "Tanggal" },
-        { field: "struk", label: "Struk" },
-        { field: "station", label: "Station" },
-        { field: "kasir", label: "Kasir" },
-        { field: "kd_member", label: "Kode" },
-        { field: "nama_member", label: "Nama" },
-        { field: "jenis_member", label: "Jenis" },
-        { field: "metode_pembayaran", label: "Metode" },
-        { field: "total_qty", label: "Qty", isNumeric: true },
-        { field: "total_gross", label: "Gross", isNumeric: true },
-        { field: "total_netto", label: "Netto", isNumeric: true },
-        { field: "total_margin", label: "Margin", isNumeric: true },
+        { field: "div", label: "Div" },
+        { field: "dept", label: "Dept" },
+        { field: "kategori", label: "Kat" },
+        { field: "plu", label: "PLU" },
+        { field: "nama_produk", label: "Nama Produk" },
+        { field: "jumlah_member", label: "Jumlah Member", isNumeric: true },
+        { field: "jumlah_struk", label: "Jumlah Struk", isNumeric: true },
+        { field: "total_qty", label: "Total Qty", isNumeric: true },
+        { field: "total_gross", label: "Total Gross", isNumeric: true },
+        { field: "total_netto", label: "Total Netto", isNumeric: true },
+        { field: "total_margin", label: "Total Margin", isNumeric: true },
     ], []);
 
     const totalRow = useMemo(() => {
-        const init: DetailProduk = {
+        const init: DetailDepartement = {
             no: 0,
-            tanggal: "",
-            struk: "",
-            station: "",
-            kasir: "",
-            kd_member: "",
-            nama_member: "",
-            metode_pembayaran: "",
-            jenis_member: "",
+            div: "",
+            dept: "",
+            kategori: "",
+            plu: "",
+            nama_produk: "",
+            jumlah_member: 0,
+            jumlah_struk: 0,
             total_qty: 0,
             total_gross: 0,
             total_netto: 0,
@@ -111,6 +111,8 @@ export default function DetailProdukModal({
 
         return (filteredData ?? []).reduce((acc, cur) => ({
             ...acc,
+            jumlah_member: Number(acc.jumlah_member) + Number(cur.jumlah_member),
+            jumlah_struk: Number(acc.jumlah_struk) + Number(cur.jumlah_struk),
             total_qty: Number(acc.total_qty) + Number(cur.total_qty),
             total_gross: Number(acc.total_gross) + Number(cur.total_gross),
             total_netto: Number(acc.total_netto) + Number(cur.total_netto),
@@ -119,20 +121,19 @@ export default function DetailProdukModal({
     }, [filteredData]);
 
     // ✅ Gunakan useExportToExcel
-    const { handleExport } = useExportToExcel<DetailProduk>({
-        title: `Detail Produk ${prdcd}`,
+    const { handleExport } = useExportToExcel<DetailDepartement>({
+        title: `Detail Departement: ${dept} - ${namaDepartement}`,
         headers: columns.map(col => col.label),
         data: numberedData,
         mapRow: (row) => [
             row.no ?? "",
-            row.tanggal,
-            row.struk,
-            row.station,
-            row.kasir,
-            row.kd_member,
-            row.nama_member,
-            row.jenis_member,
-            row.metode_pembayaran ?? "-",
+            row.div,
+            row.dept,
+            row.kategori,
+            row.plu,
+            row.nama_produk,
+            Number(row.jumlah_member),
+            Number(row.jumlah_struk),
             Number(row.total_qty),
             Number(row.total_gross),
             Number(row.total_netto),
@@ -152,7 +153,7 @@ export default function DetailProdukModal({
             <div className="space-y-4 max-h-[90vh]">
                 <div className="flex justify-between items-center my-2">
                     <h2 className="text-lg font-bold">
-                        Detail Produk: {prdcd} - {namaProduk}
+                        Detail Departement: {String(dept).slice(-2)} - {namaDepartement}
                     </h2>
                     <button
                         onClick={handleExport}
@@ -165,7 +166,7 @@ export default function DetailProdukModal({
                 <SearchInput
                     value={searchTerm}
                     onChange={setSearchTerm}
-                    placeholder="Cari detail struk..."
+                    placeholder="Cari detail Produk..."
                 />
 
                 {loading && <p>Loading...</p>}
@@ -176,13 +177,13 @@ export default function DetailProdukModal({
                         columns={columns}
                         data={numberedData}
                         totalRow={totalRow}
-                        keyField="struk"
+                        keyField={(row) => `${row.div}-${row.dept}-${row.kategori}-${row.plu}`}
                         renderHeaderGroup={
                             <tr>
-                                <th colSpan={9} className="bg-blue-400 text-white text-left px-2 py-1 border">
-                                    Info Transaksi
+                                <th colSpan={6} className="bg-blue-400 text-white text-left px-2 py-1 border">
+                                    Info Produk
                                 </th>
-                                <th colSpan={4} className="bg-green-400 text-white text-left px-2 py-1 border">
+                                <th colSpan={6} className="bg-green-400 text-white text-left px-2 py-1 border">
                                     Penjualan
                                 </th>
                             </tr>

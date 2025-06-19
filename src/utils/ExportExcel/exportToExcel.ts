@@ -63,7 +63,14 @@ export const exportToStyledExcel = async ({
     worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
         if (rowNumber >= 3) {
             row.eachCell((cell) => {
-                cell.alignment = { vertical: "middle", horizontal: "center" };
+                let horizontal: "center" | "left" | "right" = "center";
+                if (typeof cell.value === "number") {
+                    horizontal = "right";
+                } else if (typeof cell.value === "string") {
+                    horizontal = "left";
+                }
+
+                cell.alignment = { vertical: "middle", horizontal };
                 cell.border = {
                     top: { style: "thin" },
                     left: { style: "thin" },
@@ -73,6 +80,7 @@ export const exportToStyledExcel = async ({
             });
         }
     });
+
 
     // Auto width
     worksheet.columns.forEach((column) => {

@@ -2,16 +2,12 @@
 import { useState } from "react";
 // components
 import Layout from "@/components/Layout";
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import ReportHeader from "@/components/ReportHeader";
 import SearchInput from "@/components/SearchInput";
-// hooks
-import { useFetchData } from "@/hooks/useFetchData";
-import { useRefreshRouter } from "@/hooks/useRefreshRouter";
-import { useReportQueryEndpoint } from "@/hooks/useReportQueryEndpoint";
-import { useReportTableLogic } from "@/hooks/useReportTableLogic";
-import { useExportToExcel } from "@/hooks/useExportToExcel";
-import { formatNumber } from "@/utils/formatNumber";
+import { useReportPage } from "@/hooks/useReportPage";
+import { ReportTable } from "@/components/table/ReportTable";
+import { Button } from "@/components/ui/button";
+import DetailDepartementModal from "@/components/modal/evaluasi-sales/DetailDepartementModal";
 
 // Tipe data hasil dari API
 type DepartementRows = {
@@ -28,22 +24,22 @@ type DepartementRows = {
 };
 
 const PerDepartementPage = () => {
-    const { query, endpoint } = useReportQueryEndpoint();
-    const [searchTerm, setSearchTerm] = useState("");
-
-    const { data, loading, error } = useFetchData<DepartementRows[]>({
-        endpoint,
-        queryParams: query as Record<string, string>,
-        enabled: !!query.selectedReport,
-    });
-
-    const { isRefreshing, handleRefresh } = useRefreshRouter(loading);
-
-    const { filteredData, title, periode, totalRow } = useReportTableLogic<DepartementRows>(
-        data ?? undefined,
+    const {
+        query,
         searchTerm,
-        ["div", "dept", "nama_dept"],
-        [
+        setSearchTerm,
+        filteredData,
+        loading,
+        error,
+        title,
+        periode,
+        totalRow,
+        handleExport,
+        isRefreshing,
+        handleRefresh,
+    } = useReportPage<DepartementRows>({
+        searchableFields: ["div", "dept", "nama_dept"],
+        numericFields: [
             "jumlah_member",
             "jumlah_struk",
             "jumlah_produk",
@@ -51,42 +47,62 @@ const PerDepartementPage = () => {
             "total_gross",
             "total_netto",
             "total_margin",
-        ]
-    );
-
-    const { handleExport } = useExportToExcel<DepartementRows>({
-        title,
-        headers: [
-            "Divisi",
-            "Dept",
-            "Nama Dept",
-            "Jumlah Member",
-            "Jumlah Struk",
-            "Jumlah Produk",
-            "Total Qty",
-            "Total Gross",
-            "Total Netto",
-            "Total Margin",
         ],
-        data: filteredData ?? [],
+        headers: [
+            "div",
+            "dept",
+            "nama_dept",
+            "member",
+            "struk",
+            "produk",
+            "qty",
+            "gross",
+            "netto",
+            "margin",
+        ],
         mapRow: (row) => [
             row.div,
             row.dept,
             row.nama_dept,
-            formatNumber(row.jumlah_member),
-            formatNumber(row.jumlah_struk),
-            formatNumber(row.jumlah_produk),
-            formatNumber(row.total_qty),
-            formatNumber(row.total_gross),
-            formatNumber(row.total_netto),
-            formatNumber(row.total_margin),
-        ],
-        totalRow,
-    });
+            Number(row.jumlah_member),
+            Number(row.jumlah_struk),
+            Number(row.jumlah_produk),
+            Number(row.total_qty),
+            Number(row.total_gross),
+            Number(row.total_netto),
+            Number(row.total_margin),
+        ]
+    })
+
+    const columns: { field: keyof DepartementRows; label: string; isNumeric?: boolean }[] = [
+        { field: "div", label: "Div" },
+        { field: "dept", label: "Dept" },
+        { field: "nama_dept", label: "Nama" },
+        { field: "jumlah_member", label: "Member", isNumeric: true },
+        { field: "jumlah_struk", label: "Struk", isNumeric: true },
+        { field: "jumlah_produk", label: "Produk", isNumeric: true },
+        { field: "total_qty", label: "Qty", isNumeric: true },
+        { field: "total_gross", label: "Gross", isNumeric: true },
+        { field: "total_netto", label: "Netto", isNumeric: true },
+        { field: "total_margin", label: "Margin", isNumeric: true },
+    ]
+
+    const numberedData = filteredData?.map((item, index) => ({
+        ...item,
+        no: String(index + 1),
+    })) ?? [];
+
+    const [selectedRow, setSelectedRow] = useState<DepartementRows | null>(null);
+    const [showModal, setShowModal] = useState(false);
+
+    const handleOpenModal = (row: DepartementRows) => {
+        setSelectedRow(row);
+        setShowModal(true);
+    };
 
     return (
         <Layout title={title}>
-            <section className="space-y-4 p-4">
+            <section className="space-y-2 p-2">
                 <ReportHeader
                     title={title}
                     periode={periode}
@@ -94,70 +110,58 @@ const PerDepartementPage = () => {
                     onRefresh={handleRefresh}
                     isRefreshing={isRefreshing}
                 />
-                <div className="flex justify-end">
-                    <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search..." />
+                <div className="flex space-x-2 justify-end">
+                    <Button
+                        variant="outline"
+                        onClick={() => setSearchTerm("")}
+                        className="text-sm h-8 bg-red-400 dark:bg-red-400 dark:hover:bg-red-500 dark:hover:text-black hover:bg-red-500 text-white shadow-2xl hover:cursor-pointer"
+                    >
+                        Reset
+                    </Button>
+                    <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search Departement..." />
                 </div>
 
                 {loading && <p>Loading...</p>}
                 {error && <p className="text-red-500">{error}</p>}
 
                 {!loading && !error && filteredData && (
-                    <Table className="border bg-white dark:bg-gray-900 shadow-xl">
-                        <TableHeader className="border sticky top-0 dark:bg-gray-700">
-                            <TableRow className="border bg-blue-400 dark:bg-blue-600 hover:bg-blue-500">
-                                <TableHead colSpan={3} className="text-center"> Departement </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Member </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Struk </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Produk </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Qty </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Gross </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Netto </TableHead>
-                                <TableHead rowSpan={2} className="text-center border"> Margin </TableHead>
-                            </TableRow>
-                            <TableRow className="border bg-blue-400 dark:bg-blue-600 hover:bg-blue-500">
-                                <TableHead className="text-center border">Div</TableHead>
-                                <TableHead className="text-center border">Dept</TableHead>
-                                <TableHead className="text-center border">Nama</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody className="border dark:bg-gray-800">
-                            {filteredData.length > 0 ? (
-                                filteredData.map((row) => (
-                                    <TableRow key={row.div.concat(row.dept)} className="border">
-                                        <TableCell className="border text-center">{row.div}</TableCell>
-                                        <TableCell className="border text-center">{row.dept}</TableCell>
-                                        <TableCell className="border text-center">{row.nama_dept}</TableCell>
-                                        <TableCell className="text-end border"> {row.jumlah_member} </TableCell>
-                                        <TableCell className="text-end border"> {row.jumlah_struk} </TableCell>
-                                        <TableCell className="text-end border"> {row.jumlah_produk} </TableCell>
-                                        <TableCell className="text-end border"> {formatNumber(row.total_qty)} </TableCell>
-                                        <TableCell className="text-end border"> {formatNumber(row.total_gross)} </TableCell>
-                                        <TableCell className="text-end border"> {formatNumber(row.total_netto)} </TableCell>
-                                        <TableCell className="text-end border"> {formatNumber(row.total_margin)} </TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={9} className="p-4 text-center text-gray-500">
-                                        Tidak ada data untuk periode ini
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                        <TableFooter className="border">
-                            <TableRow className="border">
-                                <TableCell colSpan={3} className="text-center font-bold">
-                                    Total
-                                </TableCell>
-                                {totalRow.slice(3).map((val, i) => (
-                                    <TableCell key={i} className="text-end border">
-                                        {val}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        </TableFooter>
-                    </Table>
+                    <ReportTable
+                        columns={columns}
+                        data={numberedData}
+                        totalRow={totalRow}
+                        keyField={(row) => `${row.div}-${row.dept}`}
+                        showRowNumber={true}
+                        renderHeaderGroup={
+                            <tr>
+                                <th colSpan={4} className="border border-gray-400 px-2 py-2">
+                                    Depertement
+                                </th>
+                                <th colSpan={8} className="border border-gray-400 px-2 py-2">
+                                    Sales
+                                </th>
+                            </tr>
+                        }
+                        renderAction={(row) => (
+                            <Button
+                                variant={"link"}
+                                onClick={() => handleOpenModal(row)}
+                                className="text-blue-600 hover:underline hover:cursor-pointer"
+                            >
+                                Detail
+                            </Button>
+                        )}
+                    />
                 )}
+                {/* Modal detail */}
+                <DetailDepartementModal
+                    show={showModal}
+                    onClose={() => setShowModal(false)}
+                    startDate={query.startDate as string}
+                    endDate={query.endDate as string}
+                    div={selectedRow?.div as string}
+                    dept={selectedRow?.div as string + selectedRow?.dept as string}
+                    namaDepartement={selectedRow?.nama_dept as string}
+                />
             </section>
         </Layout>
     );

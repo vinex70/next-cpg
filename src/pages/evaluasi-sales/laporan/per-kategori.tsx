@@ -4,11 +4,13 @@ import DetailKategoriModal from "@/components/modal/evaluasi-sales/DetailKategor
 import ReportHeader from "@/components/ReportHeader";
 import SearchInput from "@/components/SearchInput";
 import { ReportTable } from "@/components/table/ReportTable";
+import { Button } from "@/components/ui/button";
 import { useReportPage } from "@/hooks/useReportPage";
 import { useState } from "react";
 
 // Tipe data hasil dari API
 type KategoriRows = {
+    no?: number;
     div: string;
     dept: string;
     kategori: string;
@@ -50,7 +52,7 @@ const PerKategoriPage = () => {
         headers: [
             "Div",
             "Dept",
-            "Kategori",
+            "Kat",
             "Nama Kategori",
             "Member",
             "Struk",
@@ -76,6 +78,7 @@ const PerKategoriPage = () => {
     })
 
     const columns: { field: keyof KategoriRows; label: string; isNumeric?: boolean }[] = [
+        { field: "no", label: "#" },
         { field: "div", label: "Div" },
         { field: "dept", label: "Dept" },
         { field: "kategori", label: "Katb" },
@@ -89,18 +92,17 @@ const PerKategoriPage = () => {
         { field: "total_margin", label: "Margin", isNumeric: true },
     ]
 
+    const numberedData = filteredData?.map((item, index) => ({
+        ...item,
+        no: index + 1,
+    })) ?? [];
+
     const [selectedRow, setSelectedRow] = useState<KategoriRows | null>(null);
     const [showModal, setShowModal] = useState(false);
 
     const handleOpenModal = (row: KategoriRows) => {
         setSelectedRow(row);
         setShowModal(true);
-    };
-
-    const keyField = {
-        field: "div_dept_kat",
-        label: "Div - Dept - Kat",
-        render: (row: KategoriRows) => `${row.div}${row.dept}${row.kategori}`,
     };
 
     return (
@@ -113,7 +115,14 @@ const PerKategoriPage = () => {
                     onRefresh={handleRefresh}
                     isRefreshing={isRefreshing}
                 />
-                <div className="flex justify-end">
+                <div className="flex space-x-2 justify-end">
+                    <Button
+                        variant="outline"
+                        onClick={() => setSearchTerm("")}
+                        className="text-sm h-8 bg-red-400 dark:bg-red-400 dark:hover:bg-red-500 dark:hover:text-black hover:bg-red-500 text-white shadow-2xl hover:cursor-pointer"
+                    >
+                        Reset
+                    </Button>
                     <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search..." />
                 </div>
 
@@ -123,9 +132,9 @@ const PerKategoriPage = () => {
                 {!loading && !error && filteredData && (
                     <ReportTable
                         columns={columns}
-                        data={filteredData}
+                        data={numberedData}
                         totalRow={totalRow}
-                        keyField={keyField.field as keyof KategoriRows}
+                        keyField={(row) => `${row.div}-${row.dept}-${row.kategori}`}
                         renderHeaderGroup={
                             <tr>
                                 <th colSpan={4} className="border border-gray-400 px-2 py-2">
@@ -137,12 +146,13 @@ const PerKategoriPage = () => {
                             </tr>
                         }
                         renderAction={(row) => (
-                            <button
+                            <Button
+                                variant={"link"}
                                 onClick={() => handleOpenModal(row)}
-                                className="text-blue-600 hover:underline"
+                                className="text-blue-600 hover:underline hover:cursor-pointer"
                             >
                                 Detail
-                            </button>
+                            </Button>
                         )}
                     />
                 )}

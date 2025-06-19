@@ -12,8 +12,8 @@ export const useExportToExcel = <T extends object>({
     title: string;
     headers: string[];
     data: T[];
-    mapRow: (row: T) => (string | number)[];
-    totalRow: (string | number)[];
+    mapRow: (row: T) => (string | number | null)[];
+    totalRow: (string | number | null)[];
 }) => {
     const handleExport = async () => {
         const rows = data.map(mapRow);

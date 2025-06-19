@@ -1,7 +1,7 @@
 import Modal from "@/components/modal";
 import SearchInput from "@/components/SearchInput";
 import { useFetchData } from "@/hooks/useFetchData";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ReportTable } from "@/components/table/ReportTable";
 import { useFilteredData } from "@/hooks/useFilteredData";
 import { useExportToExcel } from "@/hooks/useExportToExcel";
@@ -51,6 +51,12 @@ export default function DetailKategoriModal({
         dept,
         kat
     }), [startDate, endDate, div, dept, kat]);
+
+    useEffect(() => {
+        if (!show) {
+            setSearchTerm("");
+        }
+    }, [show]);
 
     const { data, error, loading } = useFetchData<DetailKategori[]>({
         endpoint: "/evaluasi-sales/per-produk-tanggal",

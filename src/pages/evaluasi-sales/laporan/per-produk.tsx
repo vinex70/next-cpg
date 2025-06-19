@@ -5,8 +5,10 @@ import { ReportTable } from "@/components/table/ReportTable";
 import { useReportPage } from "@/hooks/useReportPage";
 import { useState } from "react";
 import DetailProdukModal from "@/components/modal/evaluasi-sales/DetailProdukModal";
+import { Button } from "@/components/ui/button";
 
 type ProdukRows = {
+    no?: number;
     div: string;
     dept: string;
     kategori: string;
@@ -73,6 +75,7 @@ const PerProdukPage = () => {
     });
 
     const columns: { field: keyof ProdukRows; label: string; isNumeric?: boolean }[] = [
+        { field: "no", label: "#" },
         { field: "div", label: "Div" },
         { field: "dept", label: "Dept" },
         { field: "kategori", label: "Kat" },
@@ -85,6 +88,11 @@ const PerProdukPage = () => {
         { field: "total_netto", label: "Netto", isNumeric: true },
         { field: "total_margin", label: "Margin", isNumeric: true },
     ];
+
+    const numberedData = filteredData?.map((item, index) => ({
+        ...item,
+        no: index + 1,
+    })) ?? [];
 
     const [selectedRow, setSelectedRow] = useState<ProdukRows | null>(null);
     const [showModal, setShowModal] = useState(false);
@@ -105,7 +113,14 @@ const PerProdukPage = () => {
                     isRefreshing={isRefreshing}
                 />
 
-                <div className="flex justify-end">
+                <div className="flex space-x-2 justify-end">
+                    <Button
+                        variant="outline"
+                        onClick={() => setSearchTerm("")}
+                        className="text-sm h-8 bg-red-400 dark:bg-red-400 dark:hover:bg-red-500 dark:hover:text-black hover:bg-red-500 text-white shadow-2xl hover:cursor-pointer"
+                    >
+                        Reset
+                    </Button>
                     <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Cari..." />
                 </div>
 
@@ -115,7 +130,7 @@ const PerProdukPage = () => {
                 {!loading && !error && filteredData && (
                     <ReportTable
                         columns={columns}
-                        data={filteredData}
+                        data={numberedData}
                         totalRow={totalRow}
                         keyField="plu"
                         renderHeaderGroup={
@@ -129,12 +144,13 @@ const PerProdukPage = () => {
                             </tr>
                         }
                         renderAction={(row) => (
-                            <button
+                            <Button
+                                variant={"link"}
                                 onClick={() => handleOpenModal(row)}
-                                className="text-blue-600 hover:underline"
+                                className="text-blue-600 hover:underline hover:cursor-pointer"
                             >
                                 Detail
-                            </button>
+                            </Button>
                         )}
                     />
                 )}

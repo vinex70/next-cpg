@@ -1,4 +1,3 @@
-// src/components/table/ReportTable.tsx
 import { formatNumber } from "@/utils/formatNumber";
 import React from "react";
 
@@ -13,8 +12,9 @@ interface ReportTableProps<T> {
     data: T[];
     totalRow: T | (string | number)[];
     renderHeaderGroup?: React.ReactNode;
-    keyField?: keyof T;
+    keyField?: keyof T | ((row: T) => string);
     renderAction?: (row: T) => React.ReactNode;
+    showRowNumber?: boolean; // ✅ Tambahan untuk kontrol kolom nomor
 }
 
 export function ReportTable<T extends Record<string, unknown>>({
@@ -24,6 +24,7 @@ export function ReportTable<T extends Record<string, unknown>>({
     renderHeaderGroup,
     keyField,
     renderAction,
+    showRowNumber = false, // ✅ Default tidak ditampilkan
 }: ReportTableProps<T>) {
     const isArrayTotal = Array.isArray(totalRow);
 
@@ -33,6 +34,9 @@ export function ReportTable<T extends Record<string, unknown>>({
                 <thead className="sticky top-0 z-10 bg-blue-400 border border-collapse border-gray-400">
                     {renderHeaderGroup}
                     <tr>
+                        {showRowNumber && (
+                            <th className="border border-gray-400 px-2 py-2 text-center w-12">No</th>
+                        )}
                         {columns.map((col, idx) => (
                             <th key={idx} className="border border-gray-400 px-2 py-2">{col.label}</th>
                         ))}
@@ -43,7 +47,18 @@ export function ReportTable<T extends Record<string, unknown>>({
                 </thead>
                 <tbody>
                     {data.map((row, rowIndex) => (
-                        <tr key={keyField ? String(row[keyField]) : rowIndex}>
+                        <tr key={
+                            keyField
+                                ? typeof keyField === "function"
+                                    ? keyField(row)
+                                    : String(row[keyField])
+                                : rowIndex
+                        }>
+                            {showRowNumber && (
+                                <td className="border border-gray-400 px-2 py-2 text-center text-sm">
+                                    {rowIndex + 1}
+                                </td>
+                            )}
                             {columns.map((col, colIndex) => (
                                 <td
                                     key={colIndex}
@@ -71,6 +86,9 @@ export function ReportTable<T extends Record<string, unknown>>({
 
                             return (
                                 <>
+                                    {showRowNumber && (
+                                        <td className="border border-gray-400 px-2 py-2 dark:bg-blue-400" />
+                                    )}
                                     <td
                                         colSpan={nonNumericCols.length}
                                         className="border border-gray-400 px-2 py-2 text-center dark:bg-blue-400"
