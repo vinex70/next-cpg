@@ -10,7 +10,6 @@ import { useState } from "react";
 
 // Tipe data hasil dari API
 type KategoriRows = {
-    no?: number;
     div: string;
     dept: string;
     kategori: string;
@@ -78,7 +77,6 @@ const PerKategoriPage = () => {
     })
 
     const columns: { field: keyof KategoriRows; label: string; isNumeric?: boolean }[] = [
-        { field: "no", label: "#" },
         { field: "div", label: "Div" },
         { field: "dept", label: "Dept" },
         { field: "kategori", label: "Katb" },
@@ -91,11 +89,6 @@ const PerKategoriPage = () => {
         { field: "total_netto", label: "Netto", isNumeric: true },
         { field: "total_margin", label: "Margin", isNumeric: true },
     ]
-
-    const numberedData = filteredData?.map((item, index) => ({
-        ...item,
-        no: index + 1,
-    })) ?? [];
 
     const [selectedRow, setSelectedRow] = useState<KategoriRows | null>(null);
     const [showModal, setShowModal] = useState(false);
@@ -132,9 +125,10 @@ const PerKategoriPage = () => {
                 {!loading && !error && filteredData && (
                     <ReportTable
                         columns={columns}
-                        data={numberedData}
+                        data={filteredData}
                         totalRow={totalRow}
                         keyField={(row) => `${row.div}-${row.dept}-${row.kategori}`}
+                        showRowNumber={true}
                         renderHeaderGroup={
                             <tr>
                                 <th colSpan={4} className="border border-gray-400 px-2 py-2">

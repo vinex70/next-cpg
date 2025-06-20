@@ -8,7 +8,6 @@ import DetailProdukModal from "@/components/modal/evaluasi-sales/DetailProdukMod
 import { Button } from "@/components/ui/button";
 
 type ProdukRows = {
-    no?: number;
     div: string;
     dept: string;
     kategori: string;
@@ -75,7 +74,6 @@ const PerProdukPage = () => {
     });
 
     const columns: { field: keyof ProdukRows; label: string; isNumeric?: boolean }[] = [
-        { field: "no", label: "#" },
         { field: "div", label: "Div" },
         { field: "dept", label: "Dept" },
         { field: "kategori", label: "Kat" },
@@ -89,11 +87,8 @@ const PerProdukPage = () => {
         { field: "total_margin", label: "Margin", isNumeric: true },
     ];
 
-    const numberedData = filteredData?.map((item, index) => ({
-        ...item,
-        no: index + 1,
-    })) ?? [];
-
+    // State for modal
+    // Use a more specific type for selectedRow
     const [selectedRow, setSelectedRow] = useState<ProdukRows | null>(null);
     const [showModal, setShowModal] = useState(false);
 
@@ -130,7 +125,7 @@ const PerProdukPage = () => {
                 {!loading && !error && filteredData && (
                     <ReportTable
                         columns={columns}
-                        data={numberedData}
+                        data={filteredData}
                         totalRow={totalRow}
                         keyField="plu"
                         renderHeaderGroup={
