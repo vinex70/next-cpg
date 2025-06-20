@@ -13,8 +13,12 @@ interface ReportTableProps<T> {
     totalRow: T | (string | number)[];
     renderHeaderGroup?: React.ReactNode;
     keyField?: keyof T | ((row: T) => string);
-    renderAction?: (row: T) => React.ReactNode;
-    showRowNumber?: boolean; // ✅ Tambahan untuk kontrol kolom nomor
+    renderActions?: (row: T) => React.ReactNode; // ✅ renamed for multi-action support
+    actionHeaderLabel?: string; // ✅ optional action column title
+    showRowNumber?: boolean;
+    textHeader?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+    textBody?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+    textFooter?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export function ReportTable<T extends Record<string, unknown>>({
@@ -23,31 +27,35 @@ export function ReportTable<T extends Record<string, unknown>>({
     totalRow,
     renderHeaderGroup,
     keyField,
-    renderAction,
-    showRowNumber = false, // ✅ Default tidak ditampilkan
+    renderActions,
+    actionHeaderLabel = "Actions", // ✅ default header for action column
+    showRowNumber = false,
+    textHeader,
+    textBody,
+    textFooter,
 }: ReportTableProps<T>) {
     const isArrayTotal = Array.isArray(totalRow);
 
     return (
-        <div className="max-h-[70vh] overflow-y-auto shadow-xl">
+        <div className="max-h-[60vh] overflow-y-auto shadow-xl rounded-md">
             <table className="min-w-full table-auto border-collapse border-gray-400 max-w-fit">
                 <thead className="sticky top-0 z-10 bg-blue-400 border border-collapse border-gray-400">
                     {renderHeaderGroup}
-                    <tr>
+                    <tr className={textHeader ? `text-${textHeader}` : "text-md"}>
                         {showRowNumber && (
                             <th className="border border-gray-400 px-2 py-2 text-center w-12">No</th>
                         )}
                         {columns.map((col, idx) => (
                             <th key={idx} className="border border-gray-400 px-2 py-2">{col.label}</th>
                         ))}
-                        {renderAction && (
-                            <th className="border border-gray-400 px-2 py-2">Action</th>
+                        {renderActions && (
+                            <th className="border border-gray-400 px-2 py-2 text-center">{actionHeaderLabel}</th>
                         )}
                     </tr>
                 </thead>
                 <tbody>
                     {data.map((row, rowIndex) => (
-                        <tr key={
+                        <tr className={textBody ? `text-${textBody}` : "text-sm"} key={
                             keyField
                                 ? typeof keyField === "function"
                                     ? keyField(row)
@@ -55,30 +63,30 @@ export function ReportTable<T extends Record<string, unknown>>({
                                 : rowIndex
                         }>
                             {showRowNumber && (
-                                <td className="border border-gray-400 px-2 py-2 text-center text-sm">
+                                <td className="border border-gray-400 px-2 py-2 text-center">
                                     {rowIndex + 1}
                                 </td>
                             )}
                             {columns.map((col, colIndex) => (
                                 <td
                                     key={colIndex}
-                                    className={`border border-gray-400 px-2 py-2 text-sm ${col.isNumeric ? "text-end" : ""}`}
+                                    className={`border border-gray-400 px-2 py-2 ${col.isNumeric ? "text-end" : ""}`}
                                 >
                                     {col.isNumeric
                                         ? formatNumber(Number(row[col.field]))
                                         : String(row[col.field] ?? "")}
                                 </td>
                             ))}
-                            {renderAction && (
-                                <td className="border border-gray-400 px-2 py-2 text-center text-sm">
-                                    {renderAction(row)}
+                            {renderActions && (
+                                <td className="border border-gray-400 text-center space-x-1">
+                                    {renderActions(row)}
                                 </td>
                             )}
                         </tr>
                     ))}
                 </tbody>
                 <tfoot>
-                    <tr className="font-semibold bg-white">
+                    <tr className={`font-semibold bg-white ${textFooter ? `text-${textFooter}` : "text-md"}`}>
                         {(() => {
                             const nonNumericCols = columns.filter((col) => !col.isNumeric);
                             const numericCols = columns.filter((col) => col.isNumeric);
@@ -112,8 +120,8 @@ export function ReportTable<T extends Record<string, unknown>>({
                                             </td>
                                         );
                                     })}
-                                    {renderAction && (
-                                        <td className="border border-gray-400 px-2 py-2 dark:bg-blue-400"></td>
+                                    {renderActions && (
+                                        <td className="border border-gray-400 px-2 py-2 dark:bg-blue-400" />
                                     )}
                                 </>
                             );

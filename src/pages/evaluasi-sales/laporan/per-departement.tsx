@@ -7,7 +7,10 @@ import SearchInput from "@/components/SearchInput";
 import { useReportPage } from "@/hooks/useReportPage";
 import { ReportTable } from "@/components/table/ReportTable";
 import { Button } from "@/components/ui/button";
-import DetailDepartementModal from "@/components/modal/evaluasi-sales/DetailDepartementModal";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import ProdukTanggalModal from "@/components/modal/evaluasi-sales/ProdukTanggalModal";
+import ProdukModal from "@/components/modal/evaluasi-sales/ProdukModal";
+import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
 
 // Tipe data hasil dari API
 type DepartementRows = {
@@ -87,17 +90,24 @@ const PerDepartementPage = () => {
         { field: "total_margin", label: "Margin", isNumeric: true },
     ]
 
-    const numberedData = filteredData?.map((item, index) => ({
-        ...item,
-        no: String(index + 1),
-    })) ?? [];
-
     const [selectedRow, setSelectedRow] = useState<DepartementRows | null>(null);
-    const [showModal, setShowModal] = useState(false);
+    const [showProdukModal, setShowProdukModal] = useState(false);
+    const [showProdukTanggalModal, setShowProdukTanggalModal] = useState(false);
+    const [showStrukModal, setShowStrukModal] = useState(false);
 
-    const handleOpenModal = (row: DepartementRows) => {
+    const handleOpenProdukTanggalModal = (row: DepartementRows) => {
         setSelectedRow(row);
-        setShowModal(true);
+        setShowProdukTanggalModal(true);
+    };
+
+    const handleOpenStrukModal = (row: DepartementRows) => {
+        setSelectedRow(row);
+        setShowStrukModal(true);
+    };
+
+    const handleOpenProdukModal = (row: DepartementRows) => {
+        setSelectedRow(row);
+        setShowProdukModal(true);
     };
 
     return (
@@ -127,7 +137,7 @@ const PerDepartementPage = () => {
                 {!loading && !error && filteredData && (
                     <ReportTable
                         columns={columns}
-                        data={numberedData}
+                        data={filteredData}
                         totalRow={totalRow}
                         keyField={(row) => `${row.div}-${row.dept}`}
                         showRowNumber={true}
@@ -141,26 +151,74 @@ const PerDepartementPage = () => {
                                 </th>
                             </tr>
                         }
-                        renderAction={(row) => (
-                            <Button
-                                variant={"link"}
-                                onClick={() => handleOpenModal(row)}
-                                className="text-blue-600 hover:underline hover:cursor-pointer"
-                            >
-                                Detail
-                            </Button>
+                        renderActions={(row) => (
+                            <DropdownMenu dir="rtl">
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="link" size={"sm"} className="text-blue-600 hover:cursor-pointer">Detail</Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start">
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuItem>
+                                            <Button
+                                                variant="link"
+                                                onClick={() => handleOpenProdukTanggalModal(row)}
+                                                className="text-blue-600 hover:underline hover:cursor-pointer"
+                                            >
+                                                Produk Per Tanggal
+                                            </Button>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem>
+                                            <Button
+                                                variant="link"
+                                                onClick={() => handleOpenProdukModal(row)}
+                                                className="text-blue-600 hover:underline hover:cursor-pointer"
+                                            >
+                                                Produk
+                                            </Button>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem >
+                                            <Button
+                                                variant="link"
+                                                onClick={() => handleOpenStrukModal(row)}
+                                                className="text-blue-600 hover:underline hover:cursor-pointer"
+                                            >
+                                                Struk
+                                            </Button>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuGroup>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         )}
                     />
                 )}
-                {/* Modal detail */}
-                <DetailDepartementModal
-                    show={showModal}
-                    onClose={() => setShowModal(false)}
+
+                {/* Modal Produk Per Tanggal */}
+                <ProdukTanggalModal
+                    show={showProdukTanggalModal}
+                    onClose={() => setShowProdukTanggalModal(false)}
                     startDate={query.startDate as string}
                     endDate={query.endDate as string}
                     div={selectedRow?.div as string}
                     dept={selectedRow?.div as string + selectedRow?.dept as string}
-                    namaDepartement={selectedRow?.nama_dept as string}
+                />
+                {/* Modal Produk */}
+                <ProdukModal
+                    show={showProdukModal}
+                    onClose={() => setShowProdukModal(false)}
+                    startDate={query.startDate as string}
+                    endDate={query.endDate as string}
+                    div={selectedRow?.div as string}
+                    dept={selectedRow?.div as string + selectedRow?.dept as string}
+                />
+
+                {/* Modal Struk */}
+                <StrukModal
+                    show={showStrukModal}
+                    onClose={() => setShowStrukModal(false)}
+                    startDate={query.startDate as string}
+                    endDate={query.endDate as string}
+                    div={selectedRow?.div as string}
+                    dept={selectedRow?.div as string + selectedRow?.dept as string}
                 />
             </section>
         </Layout>

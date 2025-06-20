@@ -7,7 +7,10 @@ import SearchInput from "@/components/SearchInput";
 import { useReportPage } from "@/hooks/useReportPage";
 import { ReportTable } from "@/components/table/ReportTable";
 import { Button } from "@/components/ui/button";
-import DetailDivisiModal from "@/components/modal/evaluasi-sales/DetailDivisiModal";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import ProdukTanggalModal from "@/components/modal/evaluasi-sales/ProdukTanggalModal";
+import ProdukModal from "@/components/modal/evaluasi-sales/ProdukModal";
+import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
 
 type DivisiRow = {
     div: string;
@@ -84,11 +87,23 @@ const PerDivisiPage = () => {
     ]
 
     const [selectedRow, setSelectedRow] = useState<DivisiRow | null>(null);
-    const [showModal, setShowModal] = useState(false);
+    const [showProdukModal, setShowProdukModal] = useState(false);
+    const [showProdukTanggalModal, setShowProdukTanggalModal] = useState(false);
+    const [showStrukModal, setShowStrukModal] = useState(false);
 
-    const handleOpenModal = (row: DivisiRow) => {
+    const handleOpenProdukTanggalModal = (row: DivisiRow) => {
         setSelectedRow(row);
-        setShowModal(true);
+        setShowProdukTanggalModal(true);
+    };
+
+    const handleOpenStrukModal = (row: DivisiRow) => {
+        setSelectedRow(row);
+        setShowStrukModal(true);
+    };
+
+    const handleOpenProdukModal = (row: DivisiRow) => {
+        setSelectedRow(row);
+        setShowProdukModal(true);
     };
 
     return (
@@ -133,25 +148,71 @@ const PerDivisiPage = () => {
                                 </th>
                             </tr>
                         }
-                        renderAction={(row) => (
-                            <Button
-                                variant={"link"}
-                                onClick={() => handleOpenModal(row)}
-                                className="text-blue-600 hover:underline hover:cursor-pointer"
-                            >
-                                Detail
-                            </Button>
+                        renderActions={(row) => (
+                            <DropdownMenu dir="rtl">
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="link" size={"sm"} className="text-blue-600 hover:cursor-pointer">Detail</Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start">
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuItem>
+                                            <Button
+                                                variant="link"
+                                                onClick={() => handleOpenProdukTanggalModal(row)}
+                                                className="text-blue-600 hover:underline hover:cursor-pointer"
+                                            >
+                                                Produk Per Tanggal
+                                            </Button>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem>
+                                            <Button
+                                                variant="link"
+                                                onClick={() => handleOpenProdukModal(row)}
+                                                className="text-blue-600 hover:underline hover:cursor-pointer"
+                                            >
+                                                Produk
+                                            </Button>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem >
+                                            <Button
+                                                variant="link"
+                                                onClick={() => handleOpenStrukModal(row)}
+                                                className="text-blue-600 hover:underline hover:cursor-pointer"
+                                            >
+                                                Struk
+                                            </Button>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuGroup>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         )}
                     />
                 )}
-                {/* Modal detail */}
-                <DetailDivisiModal
-                    show={showModal}
-                    onClose={() => setShowModal(false)}
+
+                {/* Modal Produk Per Tanggal */}
+                <ProdukTanggalModal
+                    show={showProdukTanggalModal}
+                    onClose={() => setShowProdukTanggalModal(false)}
                     startDate={query.startDate as string}
                     endDate={query.endDate as string}
                     div={selectedRow?.div as string}
-                    namaDivisi={selectedRow?.nama_div as string}
+                />
+
+                <ProdukModal
+                    show={showProdukModal}
+                    onClose={() => setShowProdukModal(false)}
+                    startDate={query.startDate as string}
+                    endDate={query.endDate as string}
+                    div={selectedRow?.div as string}
+                />
+
+                {/* Modal Struk */}
+                <StrukModal
+                    show={showStrukModal}
+                    onClose={() => setShowStrukModal(false)}
+                    startDate={query.startDate as string}
+                    endDate={query.endDate as string}
+                    div={selectedRow?.div as string}
                 />
             </section>
         </Layout>

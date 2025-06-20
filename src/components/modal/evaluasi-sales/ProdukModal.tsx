@@ -5,52 +5,56 @@ import { useEffect, useMemo, useState } from "react";
 import { ReportTable } from "@/components/table/ReportTable";
 import { useFilteredData } from "@/hooks/useFilteredData";
 import { useExportToExcel } from "@/hooks/useExportToExcel";
+import { FormatTanggal } from "@/utils/formatTanggal";
 
 interface Props {
     show: boolean;
     onClose: () => void;
     startDate: string;
     endDate: string;
+    div?: string;
+    dept?: string;
+    kat?: string;
     prdcd?: string;
-    namaProduk?: string;
 }
 
-type DetailProduk = {
+type ProdukRows = {
     no?: number;
-    tanggal: string;
-    struk: string;
-    station: string;
-    kasir: string;
-    kd_member: string;
-    nama_member: string;
+    div: string;
+    dept: string;
+    kategori: string;
+    plu: string;
+    nama_produk: string;
+    jumlah_member: number;
+    jumlah_struk: number;
     total_qty: number;
     total_gross: number;
     total_netto: number;
     total_margin: number;
-    metode_pembayaran: string;
-    jenis_member: string;
 };
 
-export default function DetailProdukModal({
+export default function ProdukModal({
     show,
     onClose,
     startDate,
     endDate,
+    div,
+    dept,
+    kat,
     prdcd,
-    namaProduk
 }: Props) {
     const [searchTerm, setSearchTerm] = useState("");
-
     const queryParams = useMemo(() => {
         const params: Record<string, string | number | boolean> = {
             startDate,
             endDate,
         };
-        if (prdcd !== undefined) {
-            params.prdcd = prdcd;
-        }
+        if (div !== undefined) params.div = div;
+        if (dept !== undefined) params.dept = dept;
+        if (kat !== undefined) params.kat = kat;
+        if (prdcd !== undefined) params.plu = prdcd;
         return params;
-    }, [startDate, endDate, prdcd]);
+    }, [startDate, endDate, div, dept, kat, prdcd]);
 
     useEffect(() => {
         if (!show) {
@@ -58,18 +62,18 @@ export default function DetailProdukModal({
         }
     }, [show]);
 
-    const { data, error, loading } = useFetchData<DetailProduk[]>({
-        endpoint: "/evaluasi-sales/per-struk",
+    const { data, error, loading } = useFetchData<ProdukRows[]>({
+        endpoint: "/evaluasi-sales/per-produk",
         queryParams,
         enabled: show,
     });
 
     const filteredData = useFilteredData(data ?? [], searchTerm, [
-        "struk",
-        "nama_member",
-        "kd_member",
-        "metode_pembayaran",
-        "jenis_member"
+        "div",
+        "dept",
+        "kategori",
+        "plu",
+        "nama_produk",
     ]);
 
     const numberedData = useMemo(() => {
@@ -80,34 +84,32 @@ export default function DetailProdukModal({
     }, [filteredData]);
 
     const columns = useMemo<
-        { field: keyof DetailProduk; label: string; isNumeric?: boolean }[]
+        { field: keyof ProdukRows; label: string; isNumeric?: boolean }[]
     >(() => [
         { field: "no", label: "No" },
-        { field: "tanggal", label: "Tanggal" },
-        { field: "struk", label: "Struk" },
-        { field: "station", label: "Station" },
-        { field: "kasir", label: "Kasir" },
-        { field: "kd_member", label: "Kode" },
-        { field: "nama_member", label: "Nama" },
-        { field: "jenis_member", label: "Jenis" },
-        { field: "metode_pembayaran", label: "Metode" },
-        { field: "total_qty", label: "Qty", isNumeric: true },
-        { field: "total_gross", label: "Gross", isNumeric: true },
-        { field: "total_netto", label: "Netto", isNumeric: true },
-        { field: "total_margin", label: "Margin", isNumeric: true },
+        { field: "div", label: "Div" },
+        { field: "dept", label: "Dept" },
+        { field: "kategori", label: "Kat" },
+        { field: "plu", label: "PLU" },
+        { field: "nama_produk", label: "Nama Produk" },
+        { field: "jumlah_member", label: "Jumlah Member", isNumeric: true },
+        { field: "jumlah_struk", label: "Jumlah Struk", isNumeric: true },
+        { field: "total_qty", label: "Total Qty", isNumeric: true },
+        { field: "total_gross", label: "Total Gross", isNumeric: true },
+        { field: "total_netto", label: "Total Netto", isNumeric: true },
+        { field: "total_margin", label: "Total Margin", isNumeric: true },
     ], []);
 
     const totalRow = useMemo(() => {
-        const init: DetailProduk = {
+        const init: ProdukRows = {
             no: 0,
-            tanggal: "",
-            struk: "",
-            station: "",
-            kasir: "",
-            kd_member: "",
-            nama_member: "",
-            metode_pembayaran: "",
-            jenis_member: "",
+            div: "",
+            dept: "",
+            kategori: "",
+            plu: "",
+            nama_produk: "",
+            jumlah_member: 0,
+            jumlah_struk: 0,
             total_qty: 0,
             total_gross: 0,
             total_netto: 0,
@@ -116,6 +118,8 @@ export default function DetailProdukModal({
 
         return (filteredData ?? []).reduce((acc, cur) => ({
             ...acc,
+            jumlah_member: Number(acc.jumlah_member) + Number(cur.jumlah_member),
+            jumlah_struk: Number(acc.jumlah_struk) + Number(cur.jumlah_struk),
             total_qty: Number(acc.total_qty) + Number(cur.total_qty),
             total_gross: Number(acc.total_gross) + Number(cur.total_gross),
             total_netto: Number(acc.total_netto) + Number(cur.total_netto),
@@ -124,20 +128,19 @@ export default function DetailProdukModal({
     }, [filteredData]);
 
     // ✅ Gunakan useExportToExcel
-    const { handleExport } = useExportToExcel<DetailProduk>({
-        title: `Detail Produk ${prdcd}`,
+    const { handleExport } = useExportToExcel<ProdukRows>({
+        title: `Detail Produk`,
         headers: columns.map(col => col.label),
         data: numberedData,
         mapRow: (row) => [
             row.no ?? "",
-            row.tanggal,
-            row.struk,
-            row.station,
-            row.kasir,
-            row.kd_member,
-            row.nama_member,
-            row.jenis_member,
-            row.metode_pembayaran ?? "-",
+            row.div,
+            row.dept,
+            row.kategori,
+            row.plu,
+            row.nama_produk,
+            Number(row.jumlah_member),
+            Number(row.jumlah_struk),
             Number(row.total_qty),
             Number(row.total_gross),
             Number(row.total_netto),
@@ -156,9 +159,10 @@ export default function DetailProdukModal({
         <Modal show={show} onClose={onClose}>
             <div className="space-y-4 max-h-[90vh]">
                 <div className="flex justify-between items-center my-2">
-                    <h2 className="text-lg font-bold">
-                        Detail Produk: {prdcd} - {namaProduk}
-                    </h2>
+                    <div>
+                        <h1 className="text-2xl font-bold text-green-600">Detail Produk</h1>
+                        <p>{FormatTanggal(startDate)} s/d {FormatTanggal(endDate)}</p>
+                    </div>
                     <button
                         onClick={handleExport}
                         className="text-sm text-blue-600 hover:underline"
@@ -170,7 +174,7 @@ export default function DetailProdukModal({
                 <SearchInput
                     value={searchTerm}
                     onChange={setSearchTerm}
-                    placeholder="Cari struk..."
+                    placeholder="Cari Produk..."
                 />
 
                 {loading && <p>Loading...</p>}
@@ -181,15 +185,13 @@ export default function DetailProdukModal({
                         columns={columns}
                         data={numberedData}
                         totalRow={totalRow}
-                        keyField="struk"
-                        textHeader="sm"
-                        textFooter="sm"
+                        keyField={(row) => `${row.div}${row.dept}${row.kategori}${row.plu}`}
                         renderHeaderGroup={
                             <tr>
-                                <th colSpan={9} className="bg-blue-400 text-white text-left px-2 py-1 border">
+                                <th colSpan={7} className="bg-blue-400 text-white text-left px-2 py-1 border">
                                     Info Transaksi
                                 </th>
-                                <th colSpan={4} className="bg-green-400 text-white text-left px-2 py-1 border">
+                                <th colSpan={6} className="bg-green-400 text-white text-left px-2 py-1 border">
                                     Penjualan
                                 </th>
                             </tr>

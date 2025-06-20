@@ -8,6 +8,7 @@ import DetailProdukModal from "@/components/modal/evaluasi-sales/DetailProdukMod
 import { Button } from "@/components/ui/button";
 
 type ProdukRows = {
+    tanggal: string;
     div: string;
     dept: string;
     kategori: string;
@@ -21,7 +22,7 @@ type ProdukRows = {
     total_margin: number;
 };
 
-const PerProdukPage = () => {
+const PerProdukTanggalPage = () => {
     const {
         query,
         searchTerm,
@@ -36,7 +37,7 @@ const PerProdukPage = () => {
         isRefreshing,
         handleRefresh,
     } = useReportPage<ProdukRows>({
-        searchableFields: ["div", "dept", "kategori", "plu", "nama_produk"],
+        searchableFields: ["div", "dept", "kategori", "plu", "nama_produk", "tanggal"],
         numericFields: [
             "jumlah_member",
             "jumlah_struk",
@@ -46,6 +47,7 @@ const PerProdukPage = () => {
             "total_margin",
         ],
         headers: [
+            "Tgl",
             "Div",
             "Dept",
             "Kat",
@@ -59,6 +61,7 @@ const PerProdukPage = () => {
             "Total Margin",
         ],
         mapRow: (row) => [
+            row.tanggal,
             row.div,
             row.dept,
             row.kategori,
@@ -74,6 +77,7 @@ const PerProdukPage = () => {
     });
 
     const columns: { field: keyof ProdukRows; label: string; isNumeric?: boolean }[] = [
+        { field: "tanggal", label: "Tgl" },
         { field: "div", label: "Div" },
         { field: "dept", label: "Dept" },
         { field: "kategori", label: "Kat" },
@@ -131,10 +135,10 @@ const PerProdukPage = () => {
                         showRowNumber={true}
                         renderHeaderGroup={
                             <tr>
-                                <th colSpan={5} className="border border-gray-400 px-2 py-2">
+                                <th colSpan={7} className="border border-gray-400 px-2 py-2">
                                     Produk
                                 </th>
-                                <th colSpan={7} className="border border-gray-400 px-2 py-2">
+                                <th colSpan={7} className="border border-gray-400 px-2 py-2 bg-red-400">
                                     Sales
                                 </th>
                             </tr>
@@ -165,4 +169,4 @@ const PerProdukPage = () => {
     );
 };
 
-export default PerProdukPage;
+export default PerProdukTanggalPage;
