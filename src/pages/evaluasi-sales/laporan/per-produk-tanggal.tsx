@@ -6,6 +6,7 @@ import { useReportPage } from "@/hooks/useReportPage";
 import { useState } from "react";
 import DetailProdukModal from "@/components/modal/evaluasi-sales/DetailProdukModal";
 import { Button } from "@/components/ui/button";
+import LoadingIgr from "@/components/LoadingIgr";
 
 type ProdukRows = {
     tanggal: string;
@@ -104,66 +105,70 @@ const PerProdukTanggalPage = () => {
     return (
         <Layout title={title}>
             <section className="space-y-4 p-4">
-                <ReportHeader
-                    title={title}
-                    periode={periode}
-                    onExport={handleExport}
-                    onRefresh={handleRefresh}
-                    isRefreshing={isRefreshing}
-                />
+                {loading && !isRefreshing ?
+                    <LoadingIgr /> :
+                    <>
+                        <ReportHeader
+                            title={title}
+                            periode={periode}
+                            onExport={handleExport}
+                            onRefresh={handleRefresh}
+                            isRefreshing={isRefreshing}
+                        />
 
-                <div className="flex space-x-2 justify-end">
-                    <Button
-                        variant="outline"
-                        onClick={() => setSearchTerm("")}
-                        className="text-sm h-8 bg-red-400 dark:bg-red-400 dark:hover:bg-red-500 dark:hover:text-black hover:bg-red-500 text-white shadow-2xl hover:cursor-pointer"
-                    >
-                        Reset
-                    </Button>
-                    <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Cari..." />
-                </div>
-
-                {loading && <p>Loading...</p>}
-                {error && <p className="text-red-500">{error}</p>}
-
-                {!loading && !error && filteredData && (
-                    <ReportTable
-                        columns={columns}
-                        data={filteredData}
-                        totalRow={totalRow}
-                        keyField="plu"
-                        showRowNumber={true}
-                        renderHeaderGroup={
-                            <tr>
-                                <th colSpan={7} className="border border-gray-400 px-2 py-2">
-                                    Produk
-                                </th>
-                                <th colSpan={7} className="border border-gray-400 px-2 py-2 bg-red-400">
-                                    Sales
-                                </th>
-                            </tr>
-                        }
-                        renderActions={(row) => (
+                        <div className="flex space-x-2 justify-end">
                             <Button
-                                variant={"link"}
-                                onClick={() => handleOpenModal(row)}
-                                className="text-blue-600 hover:underline hover:cursor-pointer"
+                                variant="outline"
+                                onClick={() => setSearchTerm("")}
+                                className="text-sm h-8 bg-red-400 dark:bg-red-400 dark:hover:bg-red-500 dark:hover:text-black hover:bg-red-500 text-white shadow-2xl hover:cursor-pointer"
                             >
-                                Detail
+                                Reset
                             </Button>
-                        )}
-                    />
-                )}
+                            <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Cari..." />
+                        </div>
 
-                {/* Modal detail */}
-                <DetailProdukModal
-                    show={showModal}
-                    onClose={() => setShowModal(false)}
-                    startDate={query.startDate as string}
-                    endDate={query.endDate as string}
-                    prdcd={selectedRow?.plu as string}
-                    namaProduk={selectedRow?.nama_produk as string}
-                />
+                        {error && <p className="text-red-500">{error}</p>}
+
+                        {!error && filteredData && (
+                            <ReportTable
+                                columns={columns}
+                                data={filteredData}
+                                totalRow={totalRow}
+                                keyField="plu"
+                                showRowNumber={true}
+                                renderHeaderGroup={
+                                    <tr>
+                                        <th colSpan={7} className="border border-gray-400 px-2 py-2">
+                                            Produk
+                                        </th>
+                                        <th colSpan={7} className="border border-gray-400 px-2 py-2 bg-red-400">
+                                            Sales
+                                        </th>
+                                    </tr>
+                                }
+                                renderActions={(row) => (
+                                    <Button
+                                        variant={"link"}
+                                        onClick={() => handleOpenModal(row)}
+                                        className="text-blue-600 hover:underline hover:cursor-pointer"
+                                    >
+                                        Detail
+                                    </Button>
+                                )}
+                            />
+                        )}
+
+                        {/* Modal detail */}
+                        <DetailProdukModal
+                            show={showModal}
+                            onClose={() => setShowModal(false)}
+                            startDate={query.startDate as string}
+                            endDate={query.endDate as string}
+                            prdcd={selectedRow?.plu as string}
+                            namaProduk={selectedRow?.nama_produk as string}
+                        />
+                    </>
+                }
             </section>
         </Layout>
     );

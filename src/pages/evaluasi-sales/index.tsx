@@ -14,6 +14,8 @@ import {
     SelectItem,
 } from "@/components/ui/select";
 import { Calendar22 } from "@/components/DatePicker";
+import { toast } from "sonner";
+import { FormatTanggal } from "@/utils/formatTanggal";
 
 const EvaluasiSales = () => {
     const router = useRouter();
@@ -42,6 +44,13 @@ const EvaluasiSales = () => {
         });
 
         router.push(`/evaluasi-sales/laporan/${reportType}?${params.toString()}`);
+        toast.success(`Laporan ${reportType} sedang di proses`, {
+            duration: 3000,
+            position: "top-right",
+            description: `Periode: ${FormatTanggal(data.startDate)} - ${FormatTanggal(data.endDate)}`,
+            icon: "📊",
+            closeButton: true,
+        });
     };
 
     return (

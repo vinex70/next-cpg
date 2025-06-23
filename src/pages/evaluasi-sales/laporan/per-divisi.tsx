@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import ProdukTanggalModal from "@/components/modal/evaluasi-sales/ProdukTanggalModal";
 import ProdukModal from "@/components/modal/evaluasi-sales/ProdukModal";
 import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
+import LoadingIgr from "@/components/LoadingIgr";
 
 type DivisiRow = {
     div: string;
@@ -108,112 +109,117 @@ const PerDivisiPage = () => {
 
     return (
         <Layout title={title}>
-            <section className="space-y-4 p-4">
-                <ReportHeader
-                    title={title}
-                    periode={periode}
-                    onExport={handleExport}
-                    onRefresh={handleRefresh}
-                    isRefreshing={isRefreshing}
-                />
+            <section className="space-y-2 p-2">
+                {loading && !isRefreshing ?
+                    <LoadingIgr /> :
+                    <>
+                        <ReportHeader
+                            title={title}
+                            periode={periode}
+                            onExport={handleExport}
+                            onRefresh={handleRefresh}
+                            isRefreshing={isRefreshing}
+                        />
 
-                <div className="flex space-x-2 justify-end">
-                    <Button
-                        variant="outline"
-                        onClick={() => setSearchTerm("")}
-                        className="text-sm h-8 bg-red-400 dark:bg-red-400 dark:hover:bg-red-500 dark:hover:text-black hover:bg-red-500 text-white shadow-2xl hover:cursor-pointer"
-                    >
-                        Reset
-                    </Button>
-                    <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search..." />
-                </div>
+                        <div className="flex space-x-2 justify-end">
+                            <Button
+                                variant="outline"
+                                onClick={() => setSearchTerm("")}
+                                className="text-sm h-8 bg-red-400 dark:bg-red-400 dark:hover:bg-red-500 dark:hover:text-black hover:bg-red-500 text-white shadow-2xl hover:cursor-pointer"
+                            >
+                                Reset
+                            </Button>
+                            <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search..." />
+                        </div>
 
-                {loading && <p>Loading...</p>}
-                {error && <p className="text-red-500">{error}</p>}
+                        {error && <p className="text-red-500">{error}</p>}
 
-                {!loading && !error && filteredData && (
-                    <ReportTable
-                        columns={columns}
-                        data={filteredData}
-                        totalRow={totalRow}
-                        keyField={(row) => `${row.div}-${row.nama_div}`}
-                        showRowNumber={true}
-                        renderHeaderGroup={
-                            <tr>
-                                <th colSpan={3} className="border border-gray-400 px-2 py-2">
-                                    Divisi
-                                </th>
-                                <th colSpan={8} className="border border-gray-400 px-2 py-2">
-                                    Sales
-                                </th>
-                            </tr>
-                        }
-                        renderActions={(row) => (
-                            <DropdownMenu dir="rtl">
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="link" size={"sm"} className="text-blue-600 hover:cursor-pointer">Detail</Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="start">
-                                    <DropdownMenuGroup>
-                                        <DropdownMenuItem>
-                                            <Button
-                                                variant="link"
-                                                onClick={() => handleOpenProdukTanggalModal(row)}
-                                                className="text-blue-600 hover:underline hover:cursor-pointer"
-                                            >
-                                                Produk Per Tanggal
-                                            </Button>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            <Button
-                                                variant="link"
-                                                onClick={() => handleOpenProdukModal(row)}
-                                                className="text-blue-600 hover:underline hover:cursor-pointer"
-                                            >
-                                                Produk
-                                            </Button>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem >
-                                            <Button
-                                                variant="link"
-                                                onClick={() => handleOpenStrukModal(row)}
-                                                className="text-blue-600 hover:underline hover:cursor-pointer"
-                                            >
-                                                Struk
-                                            </Button>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                        {!error && filteredData && (
+                            <ReportTable
+                                columns={columns}
+                                data={filteredData}
+                                totalRow={totalRow}
+                                keyField={(row) => `${row.div}-${row.nama_div}`}
+                                showRowNumber={true}
+                                isRefreshing={isRefreshing}
+                                renderHeaderGroup={
+                                    <tr>
+                                        <th colSpan={3} className="border border-gray-400 px-2 py-2">
+                                            Divisi
+                                        </th>
+                                        <th colSpan={8} className="border border-gray-400 px-2 py-2">
+                                            Sales
+                                        </th>
+                                    </tr>
+                                }
+                                renderActions={(row) => (
+                                    <DropdownMenu dir="rtl">
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="link" size={"sm"} className="text-blue-600 hover:cursor-pointer">Detail</Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="start">
+                                            <DropdownMenuGroup>
+                                                <DropdownMenuItem>
+                                                    <Button
+                                                        variant="link"
+                                                        onClick={() => handleOpenProdukTanggalModal(row)}
+                                                        className="text-blue-600 hover:underline hover:cursor-pointer"
+                                                    >
+                                                        Produk Per Tanggal
+                                                    </Button>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem>
+                                                    <Button
+                                                        variant="link"
+                                                        onClick={() => handleOpenProdukModal(row)}
+                                                        className="text-blue-600 hover:underline hover:cursor-pointer"
+                                                    >
+                                                        Produk
+                                                    </Button>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem >
+                                                    <Button
+                                                        variant="link"
+                                                        onClick={() => handleOpenStrukModal(row)}
+                                                        className="text-blue-600 hover:underline hover:cursor-pointer"
+                                                    >
+                                                        Struk
+                                                    </Button>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuGroup>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                )}
+                            />
                         )}
-                    />
-                )}
 
-                {/* Modal Produk Per Tanggal */}
-                <ProdukTanggalModal
-                    show={showProdukTanggalModal}
-                    onClose={() => setShowProdukTanggalModal(false)}
-                    startDate={query.startDate as string}
-                    endDate={query.endDate as string}
-                    div={selectedRow?.div as string}
-                />
+                        {/* Modal Produk Per Tanggal */}
+                        <ProdukTanggalModal
+                            show={showProdukTanggalModal}
+                            onClose={() => setShowProdukTanggalModal(false)}
+                            startDate={query.startDate as string}
+                            endDate={query.endDate as string}
+                            div={selectedRow?.div as string}
+                        />
 
-                <ProdukModal
-                    show={showProdukModal}
-                    onClose={() => setShowProdukModal(false)}
-                    startDate={query.startDate as string}
-                    endDate={query.endDate as string}
-                    div={selectedRow?.div as string}
-                />
+                        <ProdukModal
+                            show={showProdukModal}
+                            onClose={() => setShowProdukModal(false)}
+                            startDate={query.startDate as string}
+                            endDate={query.endDate as string}
+                            div={selectedRow?.div as string}
+                        />
 
-                {/* Modal Struk */}
-                <StrukModal
-                    show={showStrukModal}
-                    onClose={() => setShowStrukModal(false)}
-                    startDate={query.startDate as string}
-                    endDate={query.endDate as string}
-                    div={selectedRow?.div as string}
-                />
+                        {/* Modal Struk */}
+                        <StrukModal
+                            show={showStrukModal}
+                            onClose={() => setShowStrukModal(false)}
+                            startDate={query.startDate as string}
+                            endDate={query.endDate as string}
+                            div={selectedRow?.div as string}
+                        />
+                    </>}
+
             </section>
         </Layout>
     );
