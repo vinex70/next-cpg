@@ -147,7 +147,7 @@ const PerProdukPage = () => {
                                         <th colSpan={6} className="border border-gray-400 px-2 py-2">
                                             Produk
                                         </th>
-                                        <th colSpan={7} className="border border-gray-400 px-2 py-2">
+                                        <th colSpan={7} className="border border-gray-400 bg-red-400 px-2 py-2">
                                             Sales
                                         </th>
                                     </tr>
