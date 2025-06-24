@@ -7,6 +7,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import ProdukModal from "@/components/modal/evaluasi-sales/ProdukModal";
 import LoadingIgr from "@/components/LoadingIgr";
+import RowDropdownMenu from "@/components/RowDropdownMenu";
+import { ReceiptText } from "lucide-react";
 
 type StrukRows = {
     tanggal: string;
@@ -96,12 +98,20 @@ const PerProdukPage = () => {
     // State for modal
     // Use a more specific type for selectedRow
     const [selectedRow, setSelectedRow] = useState<StrukRows | null>(null);
-    const [showModal, setShowModal] = useState(false);
+    const [showProdukModal, setShowProdukModal] = useState(false);
 
-    const handleOpenModal = (row: StrukRows) => {
+    const handleOpenProdukModal = (row: StrukRows) => {
         setSelectedRow(row);
-        setShowModal(true);
+        setShowProdukModal(true);
     };
+
+    const actionsRows = [
+        {
+            label: "Produk",
+            onClick: handleOpenProdukModal,
+            icon: <ReceiptText size={16} />,
+        },
+    ];
 
     return (
         <Layout title={title}>
@@ -138,7 +148,7 @@ const PerProdukPage = () => {
                                 showRowNumber={true}
                                 textHeader="sm"
                                 textFooter="sm"
-                                textBody="sm"
+                                textBody="xs"
                                 isRefreshing={isRefreshing}
                                 renderHeaderGroup={
                                     <tr>
@@ -151,21 +161,28 @@ const PerProdukPage = () => {
                                     </tr>
                                 }
                                 renderActions={(row) => (
-                                    <Button
-                                        variant={"link"}
-                                        onClick={() => handleOpenModal(row)}
-                                        className="text-blue-600 hover:underline hover:cursor-pointer"
-                                    >
-                                        Detail
-                                    </Button>
+                                    <RowDropdownMenu
+                                        label={
+                                            <div>
+                                                <span className="text-xs text-gray-500">Struk: {row.struk}</span>
+                                                <br />
+                                                {row.kd_member} - {row.nama_member}
+                                            </div>
+                                        }
+                                        triggerIconOnly={false}
+                                        actions={actionsRows.map(action => ({
+                                            label: action.label,
+                                            onClick: () => action.onClick(row),
+                                            icon: action.icon,
+                                        }))} />
                                 )}
                             />
                         )}
 
                         {/* Modal detail */}
                         <ProdukModal
-                            show={showModal}
-                            onClose={() => setShowModal(false)}
+                            show={showProdukModal}
+                            onClose={() => setShowProdukModal(false)}
                             startDate={query.startDate as string}
                             endDate={query.endDate as string}
                             struk={selectedRow?.struk || ""}

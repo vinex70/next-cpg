@@ -8,10 +8,11 @@ import { Button } from "@/components/ui/button";
 import ProdukTanggalModal from "@/components/modal/evaluasi-sales/ProdukTanggalModal";
 import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
 import ProdukModal from "@/components/modal/evaluasi-sales/ProdukModal";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import LoadingIgr from "@/components/LoadingIgr";
+import { FileText, PackageSearch, ReceiptText } from "lucide-react";
+import RowDropdownMenu from "@/components/RowDropdownMenu";
 
-type ProdukRows = {
+type TanggalRows = {
     tanggal: string;
     jumlah_member: number;
     jumlah_struk: number;
@@ -34,7 +35,7 @@ const PerTanggalPage = () => {
         handleExport,
         isRefreshing,
         handleRefresh,
-    } = useReportPage<ProdukRows>({
+    } = useReportPage<TanggalRows>({
         searchableFields: ["tanggal"],
         numericFields: [
             "jumlah_member",
@@ -64,7 +65,7 @@ const PerTanggalPage = () => {
         ],
     });
 
-    const columns: { field: keyof ProdukRows; label: string; isNumeric?: boolean }[] = [
+    const columns: { field: keyof TanggalRows; label: string; isNumeric?: boolean }[] = [
         { field: "tanggal", label: "Tgl" },
         { field: "jumlah_member", label: "Member", isNumeric: true },
         { field: "jumlah_struk", label: "Struk", isNumeric: true },
@@ -74,31 +75,49 @@ const PerTanggalPage = () => {
         { field: "total_margin", label: "Margin", isNumeric: true },
     ];
 
-    // Modal state
-    const [selectedRow, setSelectedRow] = useState<ProdukRows | null>(null);
-    const [showProdukModal, setShowProdukModal] = useState(false);
-    const [showProdukTanggalModal, setShowProdukTanggalModal] = useState(false);
-    const [showStrukModal, setShowStrukModal] = useState(false);
-
     const convertToISODate = (dateStr: string): string => {
         const [day, month, year] = dateStr.split("-");
         return `${year}-${month}-${day}`;
     };
 
-    const handleOpenProdukTanggalModal = (row: ProdukRows) => {
+    const [selectedRow, setSelectedRow] = useState<TanggalRows | null>(null);
+    const [showProdukModal, setShowProdukModal] = useState(false);
+    const [showProdukTanggalModal, setShowProdukTanggalModal] = useState(false);
+    const [showStrukModal, setShowStrukModal] = useState(false);
+
+    const handleOpenProdukTanggalModal = (row: TanggalRows) => {
         setSelectedRow(row);
         setShowProdukTanggalModal(true);
     };
 
-    const handleOpenStrukModal = (row: ProdukRows) => {
+    const handleOpenStrukModal = (row: TanggalRows) => {
         setSelectedRow(row);
         setShowStrukModal(true);
     };
 
-    const handleOpenProdukModal = (row: ProdukRows) => {
+    const handleOpenProdukModal = (row: TanggalRows) => {
         setSelectedRow(row);
         setShowProdukModal(true);
     };
+
+    const actionsRows = [
+        {
+            label: "Produk Per Tanggal",
+            onClick: handleOpenProdukTanggalModal,
+            icon: <PackageSearch size={16} />,
+        },
+        {
+            label: "Produk",
+            onClick: handleOpenProdukModal,
+            icon: <ReceiptText size={16} />,
+        },
+        {
+            label: "Struk",
+            onClick: handleOpenStrukModal,
+            icon: <FileText size={16} />,
+        },
+    ];
+
     return (
         <Layout title={title}>
             <section className="space-y-4 p-4">
@@ -132,7 +151,8 @@ const PerTanggalPage = () => {
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="tanggal"
-                                showRowNumber
+                                showRowNumber={true}
+                                isRefreshing={isRefreshing}
                                 textHeader="sm"
                                 textFooter="sm"
                                 renderHeaderGroup={
@@ -146,42 +166,14 @@ const PerTanggalPage = () => {
                                     </tr>
                                 }
                                 renderActions={(row) => (
-                                    <DropdownMenu dir="rtl">
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="link" size={"sm"} className="text-blue-600 hover:cursor-pointer">Detail</Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="start">
-                                            <DropdownMenuGroup>
-                                                <DropdownMenuItem>
-                                                    <Button
-                                                        variant="link"
-                                                        onClick={() => handleOpenProdukTanggalModal(row)}
-                                                        className="text-blue-600 hover:underline hover:cursor-pointer"
-                                                    >
-                                                        Produk Per Tanggal
-                                                    </Button>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem>
-                                                    <Button
-                                                        variant="link"
-                                                        onClick={() => handleOpenProdukModal(row)}
-                                                        className="text-blue-600 hover:underline hover:cursor-pointer"
-                                                    >
-                                                        Produk
-                                                    </Button>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem >
-                                                    <Button
-                                                        variant="link"
-                                                        onClick={() => handleOpenStrukModal(row)}
-                                                        className="text-blue-600 hover:underline hover:cursor-pointer"
-                                                    >
-                                                        Struk
-                                                    </Button>
-                                                </DropdownMenuItem>
-                                            </DropdownMenuGroup>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                    <RowDropdownMenu
+                                        label={`Tgl: ${row.tanggal}`}
+                                        triggerIconOnly={false}
+                                        actions={actionsRows.map(action => ({
+                                            label: action.label,
+                                            onClick: () => action.onClick(row),
+                                            icon: action.icon,
+                                        }))} />
                                 )}
                             />
                         )}

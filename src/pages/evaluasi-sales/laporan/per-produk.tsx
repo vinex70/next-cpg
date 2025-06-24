@@ -4,9 +4,11 @@ import SearchInput from "@/components/SearchInput";
 import { ReportTable } from "@/components/table/ReportTable";
 import { useReportPage } from "@/hooks/useReportPage";
 import { useState } from "react";
-import DetailProdukModal from "@/components/modal/evaluasi-sales/DetailProdukModal";
 import { Button } from "@/components/ui/button";
 import LoadingIgr from "@/components/LoadingIgr";
+import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
+import RowDropdownMenu from "@/components/RowDropdownMenu";
+import { FileText } from "lucide-react";
 
 type ProdukRows = {
     div: string;
@@ -91,12 +93,20 @@ const PerProdukPage = () => {
     // State for modal
     // Use a more specific type for selectedRow
     const [selectedRow, setSelectedRow] = useState<ProdukRows | null>(null);
-    const [showModal, setShowModal] = useState(false);
+    const [showStrukModal, setShowStrukModal] = useState(false);
 
-    const handleOpenModal = (row: ProdukRows) => {
+    const handleOpenStrukModal = (row: ProdukRows) => {
         setSelectedRow(row);
-        setShowModal(true);
+        setShowStrukModal(true);
     };
+
+    const actionsRows = [
+        {
+            label: "Struk",
+            onClick: handleOpenStrukModal,
+            icon: <FileText size={16} />,
+        },
+    ];
 
     return (
         <Layout title={title}>
@@ -143,25 +153,34 @@ const PerProdukPage = () => {
                                     </tr>
                                 }
                                 renderActions={(row) => (
-                                    <Button
-                                        variant={"link"}
-                                        onClick={() => handleOpenModal(row)}
-                                        className="text-blue-600 hover:underline hover:cursor-pointer"
-                                    >
-                                        Detail
-                                    </Button>
+                                    <RowDropdownMenu
+                                        label={
+                                            <div>
+                                                <span className="text-xs text-gray-500">Div: {row.div} - Dept: {row.dept} - Kat: {row.kategori}</span>
+                                                <br />
+                                                {row.plu} - {row.nama_produk}
+                                            </div>
+                                        }
+                                        triggerIconOnly={false}
+                                        actions={actionsRows.map(action => ({
+                                            label: action.label,
+                                            onClick: () => action.onClick(row),
+                                            icon: action.icon,
+                                        }))} />
                                 )}
                             />
                         )}
 
-                        {/* Modal detail */}
-                        <DetailProdukModal
-                            show={showModal}
-                            onClose={() => setShowModal(false)}
+                        {/* Modal Struk */}
+                        <StrukModal
+                            show={showStrukModal}
+                            onClose={() => setShowStrukModal(false)}
                             startDate={query.startDate as string}
                             endDate={query.endDate as string}
-                            prdcd={selectedRow?.plu as string}
-                            namaProduk={selectedRow?.nama_produk as string}
+                            div={selectedRow?.div as string}
+                            dept={selectedRow?.div as string + selectedRow?.dept as string}
+                            kat={selectedRow?.dept as string + selectedRow?.kategori as string}
+                            prdcd={selectedRow?.plu}
                         />
                     </>}
             </section>
