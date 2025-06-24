@@ -13,6 +13,7 @@ interface Props {
     endDate: string;
     prdcd?: string;
     namaProduk?: string;
+    struk?: string;
 }
 
 type DetailProduk = {
@@ -37,7 +38,8 @@ export default function DetailProdukModal({
     startDate,
     endDate,
     prdcd,
-    namaProduk
+    namaProduk,
+    struk
 }: Props) {
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -49,8 +51,11 @@ export default function DetailProdukModal({
         if (prdcd !== undefined) {
             params.prdcd = prdcd;
         }
+        if (struk !== undefined) {
+            params.struk = struk;
+        }
         return params;
-    }, [startDate, endDate, prdcd]);
+    }, [startDate, endDate, prdcd, struk]);
 
     useEffect(() => {
         if (!show) {

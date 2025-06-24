@@ -57,10 +57,10 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => {
             >
                 <button
                     onClick={onClose}
-                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 mb-4"
+                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 mb-4 hover:cursor-pointer"
                     aria-label="Close Modal"
                 >
-                    <IoCloseCircleSharp size={30} className="text-red-500 hover:text-red-800" />
+                    <IoCloseCircleSharp size={30} className="text-red-500 hover:text-red-800 w-10 h-10" />
                 </button>
                 {children}
             </div>

@@ -4,22 +4,24 @@ import SearchInput from "@/components/SearchInput";
 import { ReportTable } from "@/components/table/ReportTable";
 import { useReportPage } from "@/hooks/useReportPage";
 import { useState } from "react";
-import DetailProdukModal from "@/components/modal/evaluasi-sales/DetailProdukModal";
 import { Button } from "@/components/ui/button";
+import ProdukModal from "@/components/modal/evaluasi-sales/ProdukModal";
 import LoadingIgr from "@/components/LoadingIgr";
 
-type ProdukRows = {
-    div: string;
-    dept: string;
-    kategori: string;
-    plu: string;
-    nama_produk: string;
-    jumlah_member: number;
-    jumlah_struk: number;
+type StrukRows = {
+    tanggal: string;
+    struk: string;
+    station: string;
+    kasir: string;
+    kd_member: string;
+    nama_member: string;
+    jumlah_produk: number;
     total_qty: number;
     total_gross: number;
     total_netto: number;
     total_margin: number;
+    metode_pembayaran: string;
+    jenis_member: string;
 };
 
 const PerProdukPage = () => {
@@ -36,37 +38,38 @@ const PerProdukPage = () => {
         handleExport,
         isRefreshing,
         handleRefresh,
-    } = useReportPage<ProdukRows>({
-        searchableFields: ["div", "dept", "kategori", "plu", "nama_produk"],
+    } = useReportPage<StrukRows>({
+        searchableFields: ["tanggal", "struk", "station", "kasir", "kd_member", "nama_member", "jenis_member", "metode_pembayaran"],
         numericFields: [
-            "jumlah_member",
-            "jumlah_struk",
+            "jumlah_produk",
             "total_qty",
             "total_gross",
             "total_netto",
             "total_margin",
         ],
         headers: [
-            "Div",
-            "Dept",
-            "Kat",
-            "PLU",
-            "Nama Produk",
-            "Jumlah Member",
-            "Jumlah Struk",
+            "Tanggal",
+            "Struk",
+            "Station",
+            "Kasir",
+            "Kode Member",
+            "Nama Member",
+            "Jenis Member",
+            "Metode Pembayaran",
+            "Jumlah Produk",
             "Total Qty",
             "Total Gross",
             "Total Netto",
             "Total Margin",
         ],
         mapRow: (row) => [
-            row.div,
-            row.dept,
-            row.kategori,
-            row.plu,
-            row.nama_produk,
-            Number(row.jumlah_member),
-            Number(row.jumlah_struk),
+            row.tanggal,
+            row.struk,
+            row.station,
+            row.kasir,
+            row.kd_member,
+            row.nama_member,
+            Number(row.jumlah_produk),
             Number(row.total_qty),
             Number(row.total_gross),
             Number(row.total_netto),
@@ -74,14 +77,16 @@ const PerProdukPage = () => {
         ],
     });
 
-    const columns: { field: keyof ProdukRows; label: string; isNumeric?: boolean }[] = [
-        { field: "div", label: "Div" },
-        { field: "dept", label: "Dept" },
-        { field: "kategori", label: "Kat" },
-        { field: "plu", label: "PLU" },
-        { field: "nama_produk", label: "Nama" },
-        { field: "jumlah_member", label: "Member", isNumeric: true },
-        { field: "jumlah_struk", label: "Struk", isNumeric: true },
+    const columns: { field: keyof StrukRows; label: string; isNumeric?: boolean }[] = [
+        { field: "tanggal", label: "Tanggal" },
+        { field: "struk", label: "Struk" },
+        { field: "station", label: "Station" },
+        { field: "kasir", label: "Kasir" },
+        { field: "kd_member", label: "Kd Mem" },
+        { field: "nama_member", label: "Nama Mem" },
+        { field: "jenis_member", label: "Jenis Mem" },
+        { field: "metode_pembayaran", label: "Metode Pembayaran" },
+        { field: "jumlah_produk", label: "Jumlah Produk", isNumeric: true },
         { field: "total_qty", label: "Qty", isNumeric: true },
         { field: "total_gross", label: "Gross", isNumeric: true },
         { field: "total_netto", label: "Netto", isNumeric: true },
@@ -90,10 +95,10 @@ const PerProdukPage = () => {
 
     // State for modal
     // Use a more specific type for selectedRow
-    const [selectedRow, setSelectedRow] = useState<ProdukRows | null>(null);
+    const [selectedRow, setSelectedRow] = useState<StrukRows | null>(null);
     const [showModal, setShowModal] = useState(false);
 
-    const handleOpenModal = (row: ProdukRows) => {
+    const handleOpenModal = (row: StrukRows) => {
         setSelectedRow(row);
         setShowModal(true);
     };
@@ -129,15 +134,18 @@ const PerProdukPage = () => {
                                 columns={columns}
                                 data={filteredData}
                                 totalRow={totalRow}
-                                keyField="plu"
-                                isRefreshing={isRefreshing}
+                                keyField="struk"
                                 showRowNumber={true}
+                                textHeader="sm"
+                                textFooter="sm"
+                                textBody="sm"
+                                isRefreshing={isRefreshing}
                                 renderHeaderGroup={
                                     <tr>
-                                        <th colSpan={6} className="border border-gray-400 px-2 py-2">
-                                            Produk
+                                        <th colSpan={9} className="border border-gray-400 px-2 py-2">
+                                            Info Struk
                                         </th>
-                                        <th colSpan={7} className="border border-gray-400 px-2 py-2">
+                                        <th colSpan={6} className="border border-gray-400 bg-red-400 px-2 py-2">
                                             Sales
                                         </th>
                                     </tr>
@@ -155,13 +163,12 @@ const PerProdukPage = () => {
                         )}
 
                         {/* Modal detail */}
-                        <DetailProdukModal
+                        <ProdukModal
                             show={showModal}
                             onClose={() => setShowModal(false)}
                             startDate={query.startDate as string}
                             endDate={query.endDate as string}
-                            prdcd={selectedRow?.plu as string}
-                            namaProduk={selectedRow?.nama_produk as string}
+                            struk={selectedRow?.struk || ""}
                         />
                     </>}
             </section>

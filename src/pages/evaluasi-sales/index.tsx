@@ -6,16 +6,11 @@ import { Form } from "@/components/ui/form";
 import { useRouter } from "next/router";
 
 // ⬇️ Tambahan UI dari shadcn
-import {
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
-} from "@/components/ui/select";
 import { Calendar22 } from "@/components/DatePicker";
 import { toast } from "sonner";
 import { FormatTanggal } from "@/utils/formatTanggal";
+import SelectReportType from "@/components/form/evaluasisales/SelectReportType";
+import { Button } from "@/components/ui/button";
 
 const EvaluasiSales = () => {
     const router = useRouter();
@@ -50,8 +45,23 @@ const EvaluasiSales = () => {
             description: `Periode: ${FormatTanggal(data.startDate)} - ${FormatTanggal(data.endDate)}`,
             icon: "📊",
             closeButton: true,
+
         });
     };
+
+    const reportOptions = [
+        { label: "Laporan Per Divisi", value: "per-divisi" },
+        { label: "Laporan Per Departement", value: "per-departement" },
+        { label: "Laporan Per Kategori", value: "per-kategori" },
+        { label: "Laporan Per Produk", value: "per-produk" },
+        { label: "Laporan Per Produk Tanggal", value: "per-produk-tanggal" },
+        { label: "Laporan Per Tanggal", value: "per-tanggal" },
+        { label: "Laporan Per Struk", value: "per-struk" },
+        { label: "Laporan Per Kasir", value: "per-kasir" },
+        { label: "Laporan Per Member", value: "per-member" },
+        { label: "Laporan Per Group Member", value: "per-group-member" },
+        { label: "Laporan Per Supplier", value: "per-supplier" }
+    ];
 
     return (
         <Layout title="Evaluasi Sales">
@@ -63,7 +73,7 @@ const EvaluasiSales = () => {
                     {/* ⬇️ Tambahkan Select untuk Pilih Laporan */}
                     <div>
                         <label className="block mb-1 font-medium">Pilih Jenis Laporan</label>
-
+                        { /* Controller untuk startDate */}
                         <Controller
                             control={methods.control}
                             name="startDate"
@@ -75,7 +85,7 @@ const EvaluasiSales = () => {
                                 />
                             )}
                         />
-
+                        { /* Controller untuk endDate */}
                         <Controller
                             control={methods.control}
                             name="endDate"
@@ -87,30 +97,23 @@ const EvaluasiSales = () => {
                                 />
                             )}
                         />
-
-
-                        <Select
-                            defaultValue="per-divisi"
-                            onValueChange={(val: string) => methods.setValue("selectedReport", val)}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Pilih Laporan" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="per-divisi">Laporan Per Divisi</SelectItem>
-                                <SelectItem value="per-departement">Laporan Per Departement</SelectItem>
-                                <SelectItem value="per-kategori">Laporan Per Kategori</SelectItem>
-                                <SelectItem value="per-produk">Laporan Per Produk</SelectItem>
-                                <SelectItem value="per-produk-tanggal">Laporan Per Produk tanggal</SelectItem>
-                                <SelectItem value="per-tanggal">Laporan Per tanggal</SelectItem>
-                                {/* Tambahkan jenis laporan lainnya di sini */}
-                            </SelectContent>
-                        </Select>
+                        {/* Controller untuk Select Report Type */}
+                        <Controller
+                            control={methods.control}
+                            name="selectedReport"
+                            render={({ field }) => (
+                                <SelectReportType
+                                    value={field.value || ""}
+                                    onChange={field.onChange}
+                                    options={reportOptions}
+                                />
+                            )}
+                        />
                     </div>
 
                     {/* Form fields go here */}
                     <div className="flex justify-end">
-                        <button type="submit" className="btn btn-primary">Submit</button>
+                        <Button type="submit" variant={"outline"}>Submit</Button>
                     </div>
                 </form>
             </Form>

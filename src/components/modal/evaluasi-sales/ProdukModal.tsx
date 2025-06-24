@@ -6,6 +6,7 @@ import { ReportTable } from "@/components/table/ReportTable";
 import { useFilteredData } from "@/hooks/useFilteredData";
 import { useExportToExcel } from "@/hooks/useExportToExcel";
 import { FormatTanggal } from "@/utils/formatTanggal";
+import SkeletonTable from "@/components/SkletonTable";
 
 interface Props {
     show: boolean;
@@ -16,6 +17,7 @@ interface Props {
     dept?: string;
     kat?: string;
     prdcd?: string;
+    struk?: string;
 }
 
 type ProdukRows = {
@@ -42,6 +44,7 @@ export default function ProdukModal({
     dept,
     kat,
     prdcd,
+    struk
 }: Props) {
     const [searchTerm, setSearchTerm] = useState("");
     const queryParams = useMemo(() => {
@@ -53,8 +56,9 @@ export default function ProdukModal({
         if (dept !== undefined) params.dept = dept;
         if (kat !== undefined) params.kat = kat;
         if (prdcd !== undefined) params.plu = prdcd;
+        if (struk !== undefined) params.struk = struk;
         return params;
-    }, [startDate, endDate, div, dept, kat, prdcd]);
+    }, [startDate, endDate, div, dept, kat, prdcd, struk]);
 
     useEffect(() => {
         if (!show) {
@@ -158,9 +162,7 @@ export default function ProdukModal({
     return (
         <Modal show={show} onClose={onClose}>
             {loading ?
-                <div className="flex items-center justify-center h-full">
-                    <p className="text-gray-500">Loading...</p>
-                </div>
+                <SkeletonTable rows={10} columns={columns.length} />
                 :
                 <div className="space-y-4 max-h-[90vh]">
                     <div className="flex justify-between items-center my-2">

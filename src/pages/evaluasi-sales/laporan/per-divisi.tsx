@@ -7,11 +7,12 @@ import SearchInput from "@/components/SearchInput";
 import { useReportPage } from "@/hooks/useReportPage";
 import { ReportTable } from "@/components/table/ReportTable";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import ProdukTanggalModal from "@/components/modal/evaluasi-sales/ProdukTanggalModal";
 import ProdukModal from "@/components/modal/evaluasi-sales/ProdukModal";
 import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
 import LoadingIgr from "@/components/LoadingIgr";
+import RowDropdownMenu from "@/components/RowDropdownMenu";
+import { FileText, PackageSearch, ReceiptText } from "lucide-react";
 
 type DivisiRow = {
     div: string;
@@ -107,6 +108,24 @@ const PerDivisiPage = () => {
         setShowProdukModal(true);
     };
 
+    const actionsRows = [
+        {
+            label: "Produk Per Tanggal",
+            onClick: handleOpenProdukTanggalModal,
+            icon: <PackageSearch size={16} />,
+        },
+        {
+            label: "Produk",
+            onClick: handleOpenProdukModal,
+            icon: <ReceiptText size={16} />,
+        },
+        {
+            label: "Struk",
+            onClick: handleOpenStrukModal,
+            icon: <FileText size={16} />,
+        },
+    ];
+
     return (
         <Layout title={title}>
             <section className="space-y-2 p-2">
@@ -147,48 +166,20 @@ const PerDivisiPage = () => {
                                         <th colSpan={3} className="border border-gray-400 px-2 py-2">
                                             Divisi
                                         </th>
-                                        <th colSpan={8} className="border border-gray-400 px-2 py-2">
+                                        <th colSpan={8} className="border border-gray-400 bg-red-400 px-2 py-2">
                                             Sales
                                         </th>
                                     </tr>
                                 }
                                 renderActions={(row) => (
-                                    <DropdownMenu dir="rtl">
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="link" size={"sm"} className="text-blue-600 hover:cursor-pointer">Detail</Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="start">
-                                            <DropdownMenuGroup>
-                                                <DropdownMenuItem>
-                                                    <Button
-                                                        variant="link"
-                                                        onClick={() => handleOpenProdukTanggalModal(row)}
-                                                        className="text-blue-600 hover:underline hover:cursor-pointer"
-                                                    >
-                                                        Produk Per Tanggal
-                                                    </Button>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem>
-                                                    <Button
-                                                        variant="link"
-                                                        onClick={() => handleOpenProdukModal(row)}
-                                                        className="text-blue-600 hover:underline hover:cursor-pointer"
-                                                    >
-                                                        Produk
-                                                    </Button>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem >
-                                                    <Button
-                                                        variant="link"
-                                                        onClick={() => handleOpenStrukModal(row)}
-                                                        className="text-blue-600 hover:underline hover:cursor-pointer"
-                                                    >
-                                                        Struk
-                                                    </Button>
-                                                </DropdownMenuItem>
-                                            </DropdownMenuGroup>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                    <RowDropdownMenu
+                                        label={`${row.div} - ${row.nama_div}`}
+                                        triggerIconOnly={false}
+                                        actions={actionsRows.map(action => ({
+                                            label: action.label,
+                                            onClick: () => action.onClick(row),
+                                            icon: action.icon,
+                                        }))} />
                                 )}
                             />
                         )}
@@ -199,7 +190,7 @@ const PerDivisiPage = () => {
                             onClose={() => setShowProdukTanggalModal(false)}
                             startDate={query.startDate as string}
                             endDate={query.endDate as string}
-                            div={selectedRow?.div as string}
+                            div={selectedRow?.div}
                         />
 
                         <ProdukModal
@@ -207,7 +198,7 @@ const PerDivisiPage = () => {
                             onClose={() => setShowProdukModal(false)}
                             startDate={query.startDate as string}
                             endDate={query.endDate as string}
-                            div={selectedRow?.div as string}
+                            div={selectedRow?.div}
                         />
 
                         {/* Modal Struk */}
@@ -216,7 +207,7 @@ const PerDivisiPage = () => {
                             onClose={() => setShowStrukModal(false)}
                             startDate={query.startDate as string}
                             endDate={query.endDate as string}
-                            div={selectedRow?.div as string}
+                            div={selectedRow?.div}
                         />
                     </>}
 

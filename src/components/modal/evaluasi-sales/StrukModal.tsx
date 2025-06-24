@@ -6,6 +6,7 @@ import { ReportTable } from "@/components/table/ReportTable";
 import { useFilteredData } from "@/hooks/useFilteredData";
 import { useExportToExcel } from "@/hooks/useExportToExcel";
 import { FormatTanggal } from "@/utils/formatTanggal";
+import SkeletonTable from "@/components/SkletonTable";
 
 interface Props {
     show: boolean;
@@ -160,51 +161,52 @@ export default function StrukModal({
 
     return (
         <Modal show={show} onClose={onClose}>
-            <div className="space-y-4 max-h-[90vh]">
-                <div className="flex justify-between items-center my-2">
-                    <div>
-                        <h1 className="text-2xl font-bold text-green-600">Detail Struk</h1>
-                        <p>{FormatTanggal(startDate)} s/d {FormatTanggal(endDate)}</p>
+            {loading ? <SkeletonTable columns={columns.length} rows={5} /> :
+                <div className="space-y-4 max-h-[90vh]">
+                    <div className="flex justify-between items-center my-2">
+                        <div>
+                            <h1 className="text-2xl font-bold text-green-600">Detail Struk</h1>
+                            <p>{FormatTanggal(startDate)} s/d {FormatTanggal(endDate)}</p>
+                        </div>
+                        <button
+                            onClick={handleExport}
+                            className="text-sm text-blue-600 hover:underline"
+                        >
+                            Export
+                        </button>
                     </div>
-                    <button
-                        onClick={handleExport}
-                        className="text-sm text-blue-600 hover:underline"
-                    >
-                        Export
-                    </button>
-                </div>
 
-                <SearchInput
-                    value={searchTerm}
-                    onChange={setSearchTerm}
-                    placeholder="Cari struk..."
-                />
-
-                {loading && <p>Loading...</p>}
-                {error && <p className="text-red-500">{error}</p>}
-
-                {!loading && !error && (
-                    <ReportTable
-                        columns={columns}
-                        data={numberedData}
-                        totalRow={totalRow}
-                        keyField="struk"
-                        textHeader="sm"
-                        textBody="sm"
-                        textFooter="sm"
-                        renderHeaderGroup={
-                            <tr>
-                                <th colSpan={9} className="bg-blue-400 text-white text-left px-2 py-1 border">
-                                    Info Transaksi
-                                </th>
-                                <th colSpan={4} className="bg-green-400 text-white text-left px-2 py-1 border">
-                                    Penjualan
-                                </th>
-                            </tr>
-                        }
+                    <SearchInput
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                        placeholder="Cari struk..."
                     />
-                )}
-            </div>
+
+                    {error && <p className="text-red-500">{error}</p>}
+
+                    {!loading && !error && (
+                        <ReportTable
+                            columns={columns}
+                            data={numberedData}
+                            totalRow={totalRow}
+                            keyField="struk"
+                            textHeader="sm"
+                            textBody="sm"
+                            textFooter="sm"
+                            renderHeaderGroup={
+                                <tr>
+                                    <th colSpan={9} className="bg-blue-400 text-white text-left px-2 py-1 border">
+                                        Info Transaksi
+                                    </th>
+                                    <th colSpan={4} className="bg-green-400 text-white text-left px-2 py-1 border">
+                                        Penjualan
+                                    </th>
+                                </tr>
+                            }
+                        />
+                    )}
+                </div>
+            }
         </Modal>
     );
 }

@@ -40,7 +40,7 @@ export function ReportTable<T extends Record<string, unknown>>({
 
     return (
         <div className="max-h-[60vh] overflow-y-auto shadow-xl rounded-md">
-            <table className="min-w-full table-auto max-w-fit">
+            <table className="min-w-full table-fixed max-w-fit">
                 <thead className="sticky top-0 z-10 bg-blue-400 border border-collapse border-gray-400">
                     {renderHeaderGroup}
                     <tr className={textHeader ? `text-${textHeader}` : "text-md"}>

@@ -7,11 +7,12 @@ import SearchInput from "@/components/SearchInput";
 import { useReportPage } from "@/hooks/useReportPage";
 import { ReportTable } from "@/components/table/ReportTable";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import ProdukTanggalModal from "@/components/modal/evaluasi-sales/ProdukTanggalModal";
 import ProdukModal from "@/components/modal/evaluasi-sales/ProdukModal";
 import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
 import LoadingIgr from "@/components/LoadingIgr";
+import RowDropdownMenu from "@/components/RowDropdownMenu";
+import { FileText, PackageSearch, ReceiptText } from "lucide-react";
 
 // Tipe data hasil dari API
 type DepartementRows = {
@@ -111,6 +112,24 @@ const PerDepartementPage = () => {
         setShowProdukModal(true);
     };
 
+    const actionsRows = [
+        {
+            label: "Produk Per Tanggal",
+            onClick: handleOpenProdukTanggalModal,
+            icon: <PackageSearch size={16} />,
+        },
+        {
+            label: "Produk",
+            onClick: handleOpenProdukModal,
+            icon: <ReceiptText size={16} />,
+        },
+        {
+            label: "Struk",
+            onClick: handleOpenStrukModal,
+            icon: <FileText size={16} />,
+        },
+    ];
+
     return (
         <Layout title={title}>
             <section className="space-y-2 p-2">
@@ -156,42 +175,20 @@ const PerDepartementPage = () => {
                                     </tr>
                                 }
                                 renderActions={(row) => (
-                                    <DropdownMenu dir="rtl">
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="link" size={"sm"} className="text-blue-600 hover:cursor-pointer">Detail</Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="start">
-                                            <DropdownMenuGroup>
-                                                <DropdownMenuItem>
-                                                    <Button
-                                                        variant="link"
-                                                        onClick={() => handleOpenProdukTanggalModal(row)}
-                                                        className="text-blue-600 hover:underline hover:cursor-pointer"
-                                                    >
-                                                        Produk Per Tanggal
-                                                    </Button>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem>
-                                                    <Button
-                                                        variant="link"
-                                                        onClick={() => handleOpenProdukModal(row)}
-                                                        className="text-blue-600 hover:underline hover:cursor-pointer"
-                                                    >
-                                                        Produk
-                                                    </Button>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem >
-                                                    <Button
-                                                        variant="link"
-                                                        onClick={() => handleOpenStrukModal(row)}
-                                                        className="text-blue-600 hover:underline hover:cursor-pointer"
-                                                    >
-                                                        Struk
-                                                    </Button>
-                                                </DropdownMenuItem>
-                                            </DropdownMenuGroup>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                    <RowDropdownMenu
+                                        label={
+                                            <div>
+                                                <span className="text-xs text-gray-500">Divisi: {row.div}</span>
+                                                <br />
+                                                {row.dept} - {row.nama_dept}
+                                            </div>
+                                        }
+                                        triggerIconOnly={false}
+                                        actions={actionsRows.map(action => ({
+                                            label: action.label,
+                                            onClick: () => action.onClick(row),
+                                            icon: action.icon,
+                                        }))} />
                                 )}
                             />
                         )}
