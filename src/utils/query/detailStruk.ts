@@ -4,8 +4,6 @@ export const DetailStruk = (conditions: string, params: (string | string[])[] = 
     console.log("Conditions:", conditions);
     const startDate = params[0] || null;
     const endDate = params[1] || null;
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
 
     return `
 SELECT
