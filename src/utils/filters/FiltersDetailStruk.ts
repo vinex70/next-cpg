@@ -1,3 +1,4 @@
+// /src/utils/filters/FiltersDetailStruk.ts
 import { FilterDetailStrukInput } from "@/schema/filterDetailStruk";
 
 export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {

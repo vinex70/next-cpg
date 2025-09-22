@@ -1,5 +1,13 @@
 // /src/utils/query/detailStruk.ts
-export const DetailStruk = (conditions: string): string => `
+export const DetailStruk = (conditions: string, params: (string | string[])[] = []): string => {
+
+    console.log("Conditions:", conditions);
+    const startDate = params[0] || null;
+    const endDate = params[1] || null;
+    console.log("Start Date:", startDate);
+    console.log("End Date:", endDate);
+
+    return `
 SELECT
         dtl_rtype,
         dtl_tanggal,
@@ -214,6 +222,7 @@ cast(trjd_noinvoice1 AS VARCHAR) as trjd_noinvoice1,
 cast(trjd_noinvoice2 AS VARCHAR) as trjd_noinvoice2,
 p_qty
 from tbtr_jualdetail
+where date_trunc('day',trjd_transactiondate) between '${startDate ? startDate : 'current_date'}' and '${endDate ? endDate : 'current_date'}'
 union all
 select distinct
 trjd_kodeigr,
@@ -244,7 +253,8 @@ trjd_transactiontype,
 cast(trjd_noinvoice1 AS VARCHAR) as trjd_noinvoice1,
 cast(trjd_noinvoice2 AS VARCHAR) as trjd_noinvoice2,
 p_qty
-from tbtr_jualdetail_interface)s)trjd
+from tbtr_jualdetail_interface
+where date_trunc('day',trjd_transactiondate) between '${startDate ? startDate : 'current_date'}' and '${endDate ? endDate : 'current_date'}')s)trjd
         LEFT JOIN tbmaster_prodmast ON trjd_prdcd = prd_prdcd
         LEFT JOIN tbmaster_tokoigr ON trjd_cus_kodemember = tko_kodecustomer
         LEFT JOIN tbmaster_customer ON trjd_cus_kodemember = cus_kodemember
@@ -284,9 +294,11 @@ from tbtr_jualdetail_interface)s)trjd
         TBTR_VIRTUAL
     where
         vir_transactiontype = 'S'
+        AND date_trunc('day', vir_transactiondate) between '${startDate ? startDate : 'current_date'}' and '${endDate ? endDate : 'current_date'}'
     GROUP BY
     to_char(vir_transactiondate, 'yyyymmdd') || vir_create_by || vir_transactionno || vir_transactiontype,
     vir_method
     ) as vir on key_vir = dtl_struk
      ${conditions ? `${conditions}` : `WHERE date_trunc('day', dtl_tanggal) = current_date`}
 `
+}

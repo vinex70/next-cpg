@@ -1,3 +1,4 @@
+// /src/pages/api/evaluasi-sales/per-divisi.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import pool from "@/lib/db";
 import { FilterDetailStruk } from "@/utils/filters/FiltersDetailStruk"; // pastikan import benar
@@ -32,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             sum(dtl_netto) as total_netto,
             sum(dtl_margin) as total_margin
         FROM
-            (${DetailStruk(conditions)}) as dtl
+            (${DetailStruk(conditions, params)}) as dtl
         GROUP BY dtl_k_div, dtl_nama_div
         HAVING count(dtl_netto) > 0
         ORDER BY dtl_k_div
