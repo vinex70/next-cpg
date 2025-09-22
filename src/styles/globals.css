@@ -135,5 +135,5 @@ body {
 }
 
 .dark body {
-  @apply bg-zinc-900 text-white;
+  @apply bg-background text-foreground;
 }
