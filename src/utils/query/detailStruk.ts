@@ -1,7 +1,6 @@
 // /src/utils/query/detailStruk.ts
 export const DetailStruk = (conditions: string, params: (string | string[])[] = []): string => {
 
-    console.log("Conditions:", conditions);
     const startDate = params[0] || null;
     const endDate = params[1] || null;
 
