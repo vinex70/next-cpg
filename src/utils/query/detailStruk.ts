@@ -219,7 +219,7 @@ cast(trjd_noinvoice1 AS VARCHAR) as trjd_noinvoice1,
 cast(trjd_noinvoice2 AS VARCHAR) as trjd_noinvoice2,
 p_qty
 from tbtr_jualdetail
-where date_trunc('day',trjd_transactiondate) between '${startDate ? startDate : 'current_date'}' and '${endDate ? endDate : 'current_date'}'
+${startDate && endDate ? `where date_trunc('day',trjd_transactiondate) between '${startDate}' and '${endDate}'` : ''}
 union all
 select distinct
 trjd_kodeigr,
@@ -251,7 +251,7 @@ cast(trjd_noinvoice1 AS VARCHAR) as trjd_noinvoice1,
 cast(trjd_noinvoice2 AS VARCHAR) as trjd_noinvoice2,
 p_qty
 from tbtr_jualdetail_interface
-where date_trunc('day',trjd_transactiondate) between '${startDate ? startDate : 'current_date'}' and '${endDate ? endDate : 'current_date'}')s)trjd
+${startDate && endDate ? `where date_trunc('day',trjd_transactiondate) between '${startDate}' and '${endDate}'` : ''})s)trjd
         LEFT JOIN tbmaster_prodmast ON trjd_prdcd = prd_prdcd
         LEFT JOIN tbmaster_tokoigr ON trjd_cus_kodemember = tko_kodecustomer
         LEFT JOIN tbmaster_customer ON trjd_cus_kodemember = cus_kodemember

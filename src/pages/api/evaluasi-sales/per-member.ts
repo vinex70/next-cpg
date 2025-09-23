@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                   else 'OTHER'
             end as jenis_member
         FROM
-            (${DetailStruk(conditions)}) as dtl
+            (${DetailStruk(conditions, params)}) as dtl
         GROUP BY 
             dtl_outlet,
             dtl_suboutlet,

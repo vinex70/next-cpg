@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             sum(dtl_netto) as total_netto,
             sum(dtl_margin) as total_margin
         FROM
-            (${DetailStruk(conditions)}) as dtl
+            (${DetailStruk(conditions, params)}) as dtl
         GROUP BY dtl_k_div, dtl_k_dept, dtl_nama_dept
         HAVING count(dtl_netto) > 0
         ORDER BY dtl_k_div, dtl_k_dept
