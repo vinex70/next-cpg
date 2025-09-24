@@ -18,6 +18,7 @@ interface Props {
     kat?: string;
     prdcd?: string;
     struk?: string;
+    kode_supplier?: string;
 }
 
 type ProdukRows = {
@@ -44,7 +45,8 @@ export default function ProdukModal({
     dept,
     kat,
     prdcd,
-    struk
+    struk,
+    kode_supplier,
 }: Props) {
     const [searchTerm, setSearchTerm] = useState("");
     const queryParams = useMemo(() => {
@@ -57,8 +59,9 @@ export default function ProdukModal({
         if (kat !== undefined) params.kat = kat;
         if (prdcd !== undefined) params.plu = prdcd;
         if (struk !== undefined) params.struk = struk;
+        if (kode_supplier !== undefined) params.kode_supplier = kode_supplier;
         return params;
-    }, [startDate, endDate, div, dept, kat, prdcd, struk]);
+    }, [startDate, endDate, div, dept, kat, prdcd, struk, kode_supplier]);
 
     useEffect(() => {
         if (!show) {

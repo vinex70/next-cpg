@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             dtl_kodesupplier,
             dtl_namasupplier
         HAVING count(dtl_netto) > 0
-        ORDER BY total_netto DESC
+        ORDER BY total_margin DESC
         `;
 
         const resultQuery = await pool.query(query, params);

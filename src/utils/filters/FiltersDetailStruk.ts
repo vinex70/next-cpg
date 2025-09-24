@@ -1,5 +1,6 @@
 // /src/utils/filters/FiltersDetailStruk.ts
 import { FilterDetailStrukInput } from "@/schema/filterDetailStruk";
+import { normalizeToArray } from "@/utils/normalizeToArray";
 
 export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
     const conditions = [];
@@ -190,9 +191,10 @@ export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
         );
     }
     // Filtert Kode supplier
-    if (filters.kode_supplier && filters.kode_supplier.length > 0) {
+    const kodeSuppliers = normalizeToArray(filters.kode_supplier);
+    if (kodeSuppliers.length > 0) {
         conditions.push(`hgb_kodesupplier = ANY($${params.length + 1})`);
-        params.push(filters.kode_supplier);
+        params.push(kodeSuppliers);
     }
     // Filtert Nama Supplier
     if (filters.namaSupplier && filters.namaSupplier !== "") {
@@ -201,7 +203,7 @@ export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
     }
     // Filtert Monitoring Supplier
     if (filters.monitoringSupplier && filters.monitoringSupplier !== "") {
-        conditions.push(`hgb_kodesupplier = ANY(select distinct msu_kodesupplier 
+        conditions.push(`dtl_kodesupplier = ANY(select distinct msu_kodesupplier 
                                            from tbtr_monitoringsupplier 
                                           where msu_kodemonitoring = $${params.length + 1})`);
         params.push(filters.monitoringSupplier);

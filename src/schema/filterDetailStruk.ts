@@ -30,7 +30,7 @@ export const FilterDetailStrukSchema = z.object({
     kasirType: z.enum(["non-kss", "only-kss"]).optional(),
     methodType: z.enum(["kum", "virtual"]).optional(),
     pluLarangan: z.enum(["non-larangan", "larangan"]).optional(),
-    kode_supplier: z.array(z.string()).optional(),
+    kode_supplier: z.union([z.string(), z.array(z.string())]).optional(),
     namaSupplier: z.string().optional(),
     monitoringSupplier: z.string().optional(),
     selectedReport: z.string().optional(),
