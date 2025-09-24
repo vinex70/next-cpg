@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             (${DetailStruk(conditions, params)}) as dtl
         GROUP BY dtl_k_div, dtl_k_dept, dtl_k_katb, dtl_prdcd_ctn, dtl_nama_barang
         HAVING count(dtl_netto) > 0
-        ORDER BY dtl_k_div, dtl_k_dept, dtl_k_katb, dtl_prdcd_ctn
+        ORDER BY dtl_k_div, dtl_k_dept, dtl_k_katb, dtl_prdcd_ctn, total_margin DESC
         `;
 
         const resultQuery = await pool.query(query, params);

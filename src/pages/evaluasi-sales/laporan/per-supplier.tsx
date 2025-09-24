@@ -9,6 +9,7 @@ import ProdukModal from "@/components/modal/evaluasi-sales/ProdukModal";
 import LoadingIgr from "@/components/LoadingIgr";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { ReceiptText } from "lucide-react";
+import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
 
 type SupplierRow = {
     kode_supplier: string;
@@ -87,16 +88,27 @@ const PerSupplierPage = () => {
     // Use a more specific type for selectedRow
     const [selectedRow, setSelectedRow] = useState<SupplierRow | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
+    const [showStrukModal, setShowStrukModal] = useState(false);
 
     const handleOpenProdukModal = (row: SupplierRow) => {
         setSelectedRow(row);
         setShowProdukModal(true);
     };
 
+    const handleOpenStrukModal = (row: SupplierRow) => {
+        setSelectedRow(row);
+        setShowStrukModal(true);
+    };
+
     const actionsRows = [
         {
             label: "Produk",
             onClick: handleOpenProdukModal,
+            icon: <ReceiptText size={16} />,
+        },
+        {
+            label: "Struk",
+            onClick: handleOpenStrukModal,
             icon: <ReceiptText size={16} />,
         },
     ];
@@ -163,6 +175,7 @@ const PerSupplierPage = () => {
                                             onClick: () => action.onClick(row),
                                             icon: action.icon,
                                         }))} />
+
                                 )}
                             />
                         )}
@@ -174,6 +187,15 @@ const PerSupplierPage = () => {
                             startDate={query.startDate as string}
                             endDate={query.endDate as string}
                             kode_supplier={selectedRow?.kode_supplier || ""}
+                        />
+
+                        {/* Modal Struk */}
+                        <StrukModal
+                            show={showStrukModal}
+                            onClose={() => setShowStrukModal(false)}
+                            startDate={query.startDate as string}
+                            endDate={query.endDate as string}
+                            strukSupplier={selectedRow?.kode_supplier || ""}
                         />
                     </>}
             </section>

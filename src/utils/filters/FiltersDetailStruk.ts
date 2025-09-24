@@ -1,6 +1,7 @@
 // /src/utils/filters/FiltersDetailStruk.ts
 import { FilterDetailStrukInput } from "@/schema/filterDetailStruk";
 import { normalizeToArray } from "@/utils/normalizeToArray";
+import { applyStrukFilters } from "./StrukFilters";
 
 export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
     const conditions = [];
@@ -92,10 +93,7 @@ export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
     }
 
     // Filter Struk
-    if (filters.struk && filters.struk !== "") {
-        conditions.push(`dtl_struk = $${params.length + 1}`);
-        params.push(filters.struk);
-    }
+    applyStrukFilters(filters, conditions, params);
 
     // Filter Member Khusus
     if (filters.memberKhusus && filters.memberKhusus !== "") {

@@ -17,6 +17,7 @@ interface Props {
     div?: string;
     dept?: string;
     kat?: string;
+    strukSupplier?: string;
 }
 
 type Struk = {
@@ -43,7 +44,8 @@ export default function StrukModal({
     prdcd,
     div,
     dept,
-    kat
+    kat,
+    strukSupplier,
 }: Props) {
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -56,8 +58,9 @@ export default function StrukModal({
         if (div !== undefined) { params.div = div; }
         if (dept !== undefined) { params.dept = dept; }
         if (kat !== undefined) { params.kat = kat; }
+        if (strukSupplier !== undefined) { params.strukSupplier = strukSupplier; }
         return params;
-    }, [startDate, endDate, prdcd, div, dept, kat]);
+    }, [startDate, endDate, prdcd, div, dept, kat, strukSupplier]);
 
     useEffect(() => {
         if (!show) {
