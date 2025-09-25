@@ -24,6 +24,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         SELECT
             dtl_stat as station,
             dtl_kasir as kasir,
+            username as nama_kasir,
+            count(distinct dtl_struk) as jumlah_struk,
             count(distinct dtl_cusno) as jumlah_member,
             count(distinct dtl_prdcd_ctn) as jumlah_produk,
             sum(dtl_qty) as total_qty,
@@ -32,9 +34,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             sum(dtl_margin) as total_margin
         FROM
             (${DetailStruk(conditions, params)}) as dtl
+        left join tbmaster_user as usr on dtl.dtl_kasir = usr.userid
         GROUP BY 
             dtl_stat,
-            dtl_kasir
+            dtl_kasir,
+            username
         HAVING count(dtl_netto) > 0
         ORDER BY dtl_stat, dtl_kasir
         `;

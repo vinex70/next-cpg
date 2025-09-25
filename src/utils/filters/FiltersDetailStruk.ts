@@ -161,9 +161,15 @@ export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
     }
 
     // Filter Kasir
-    if (filters.kasir && filters.kasir.length > 0) {
-        conditions.push(`dtl_kasir = ANY($${params.length + 1})`);
-        params.push(filters.kasir);
+    const kasirs = normalizeToArray(filters.kasir);
+    if (kasirs.length > 0) {
+        if (kasirs.length === 1) {
+            conditions.push(`dtl_kasir = $${params.length + 1}`);
+            params.push(kasirs[0]);
+        } else {
+            conditions.push(`dtl_kasir = ANY($${params.length + 1})`);
+            params.push(kasirs);
+        }
     }
 
     // Filter Kasir Type
