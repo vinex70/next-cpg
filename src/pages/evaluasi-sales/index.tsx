@@ -60,7 +60,8 @@ const EvaluasiSales = () => {
         { label: "Laporan Per Kasir", value: "per-kasir" },
         { label: "Laporan Per Member", value: "per-member" },
         { label: "Laporan Per Group Member", value: "per-group-member" },
-        { label: "Laporan Per Supplier", value: "per-supplier" }
+        { label: "Laporan Per Supplier", value: "per-supplier" },
+        { label: "Laporan Per Bulan", value: "per-bulan" },
     ];
 
     return (
