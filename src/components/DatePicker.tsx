@@ -41,14 +41,14 @@ export function Calendar22({ label = "Pilih Tanggal", value, onChange }: Calenda
     };
 
     return (
-        <div className="flex flex-col gap-2">
-            <Label htmlFor="date" className="px-1">{label}</Label>
+        <div className="flex flex-col space-y-1">
+            <Label htmlFor="date" className="p-1">{label}</Label>
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                     <Button
                         variant="outline"
                         id="date"
-                        className="w-48 justify-between font-normal"
+                        className="justify-between font-normal"
                     >
                         {date ? format(date, "dd-MMM-yyyy", { locale: id }) : "Pilih tanggal"}
                         <CalendarDays />

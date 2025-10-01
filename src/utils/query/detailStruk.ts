@@ -1,8 +1,25 @@
 // /src/utils/query/detailStruk.ts
-export const DetailStruk = (conditions: string, params: (string | string[])[] = []): string => {
+export const DetailStruk = (
+    conditions: string,
+    params: (string | string[])[] = []
+): string => {
 
     const startDate = params[0] || null;
     const endDate = params[1] || null;
+
+    const buildDateFilter = (alias: string): string => {
+        if (startDate && endDate) {
+            return `date_trunc('day', ${alias}) BETWEEN '${startDate}' AND '${endDate}'`;
+        } else if (startDate) {
+            return `date_trunc('day', ${alias}) >= '${startDate}'`;
+        } else if (endDate) {
+            return `date_trunc('day', ${alias}) = '${endDate}'`;
+        }
+        return "";
+    };
+
+    const jualdetailDateFilter = buildDateFilter("trjd_transactiondate");
+    const virtualDateFilter = buildDateFilter("vir_transactiondate");
 
     return `
 SELECT
@@ -219,7 +236,7 @@ cast(trjd_noinvoice1 AS VARCHAR) as trjd_noinvoice1,
 cast(trjd_noinvoice2 AS VARCHAR) as trjd_noinvoice2,
 p_qty
 from tbtr_jualdetail
-${startDate && endDate ? `where date_trunc('day',trjd_transactiondate) between '${startDate}' and '${endDate}'` : ''}
+${jualdetailDateFilter ? `where ${jualdetailDateFilter}` : ''}
 union all
 select distinct
 trjd_kodeigr,
@@ -251,7 +268,7 @@ cast(trjd_noinvoice1 AS VARCHAR) as trjd_noinvoice1,
 cast(trjd_noinvoice2 AS VARCHAR) as trjd_noinvoice2,
 p_qty
 from tbtr_jualdetail_interface
-${startDate && endDate ? `where date_trunc('day',trjd_transactiondate) between '${startDate}' and '${endDate}'` : ''})s)trjd
+${jualdetailDateFilter ? `where ${jualdetailDateFilter}` : ''})s)trjd
         LEFT JOIN tbmaster_prodmast ON trjd_prdcd = prd_prdcd
         LEFT JOIN tbmaster_tokoigr ON trjd_cus_kodemember = tko_kodecustomer
         LEFT JOIN tbmaster_customer ON trjd_cus_kodemember = cus_kodemember
@@ -291,7 +308,7 @@ ${startDate && endDate ? `where date_trunc('day',trjd_transactiondate) between '
         TBTR_VIRTUAL
     where
         vir_transactiontype = 'S'
-        AND date_trunc('day', vir_transactiondate) between '${startDate ? startDate : 'current_date'}' and '${endDate ? endDate : 'current_date'}'
+        ${virtualDateFilter ? `AND ${virtualDateFilter}` : ""}
     GROUP BY
     to_char(vir_transactiondate, 'yyyymmdd') || vir_create_by || vir_transactionno || vir_transactiontype,
     vir_method

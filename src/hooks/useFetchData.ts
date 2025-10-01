@@ -20,19 +20,15 @@ interface UseFetchDataOptions {
 
 // Custom hook useFetchData untuk mengambil data dari API
 export function useFetchData<T>({ endpoint, queryParams, enabled = true }: UseFetchDataOptions) {
-    // State untuk menyimpan data yang diambil, error jika terjadi kesalahan, dan status loading
     const [data, setData] = useState<T | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
-    // Mengubah queryParams menjadi string untuk menghindari ekspresi kompleks dalam dependency array
     const stringifiedQueryParams = JSON.stringify(queryParams);
 
     useEffect(() => {
-        // Jika tidak diaktifkan atau endpoint tidak ada, hentikan eksekusi
         if (!enabled || !endpoint) return;
 
-        // Fungsi asinkron untuk mengambil data
         const fetchData = async () => {
             setLoading(true);
             setError(null);
@@ -41,7 +37,7 @@ export function useFetchData<T>({ endpoint, queryParams, enabled = true }: UseFe
                 const response = await axiosClient.get(endpoint, {
                     params: queryParams,
                 });
-                setData(response.data.data); // Asumsi respons: { data: ... }
+                setData(response.data.data);
             } catch (err: unknown) {
                 if (err instanceof Error) {
                     console.error("Fetch error:", err.message);
@@ -55,10 +51,8 @@ export function useFetchData<T>({ endpoint, queryParams, enabled = true }: UseFe
             }
         };
 
-        fetchData(); // Memanggil fungsi untuk mengambil data
-    }, [endpoint, stringifiedQueryParams, enabled, queryParams]); // Dependency array
-
-    // Mengembalikan data, error, dan status loading
+        fetchData();
+    }, [endpoint, stringifiedQueryParams, enabled, queryParams]);
     return { data, error, loading };
 }
 
