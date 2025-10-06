@@ -1,6 +1,7 @@
+// src/components/form/evaluasisales/SelectReport.tsx
 import { Controller, Control } from "react-hook-form"
 import { FilterDetailStrukInput } from "@/schema/filterDetailStruk"
-import SelectReportType from "@/components/form/evaluasisales/SelectReportType"
+import SelectReportType from "@/components/SelectType"
 
 type SelectReportProps = {
     control: Control<FilterDetailStrukInput>

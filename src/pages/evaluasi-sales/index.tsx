@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 
 import PeriodeSales from "@/components/form/evaluasisales/PeriodeSales";
 import SelectReport from "@/components/form/evaluasisales/SelectReport";
+import CardMember from "@/components/form/evaluasisales/CardMember";
 
 const EvaluasiSales = () => {
     const router = useRouter();
@@ -52,10 +53,11 @@ const EvaluasiSales = () => {
             <h1 className="text-2xl font-bold text-blue-500 mb-4">Evaluasi Sales</h1>
 
             <Form {...methods}>
-                <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={methods.handleSubmit(onSubmit)} className="flex justify-between gap-4 flex-wrap">
                     {/* Komponen Periode */}
                     <PeriodeSales control={methods.control} />
-
+                    {/* Komponen Member */}
+                    <CardMember />
                     {/* Komponen Select Report */}
                     <SelectReport control={methods.control} />
 

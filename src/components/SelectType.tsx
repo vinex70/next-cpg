@@ -1,3 +1,4 @@
+// src/components/form/SelectType.tsx
 import {
     Select,
     SelectTrigger,
@@ -6,24 +7,32 @@ import {
     SelectItem,
 } from "@/components/ui/select";
 
-interface ReportOption {
+interface Option {
     label: string;
     value: string;
 }
 
-interface SelectReportTypeProps {
+interface SelectTypeProps {
+    label?: string;
+    placeholder?: string;
     value: string;
     onChange: (val: string) => void;
-    options: ReportOption[];
+    options: Option[];
 }
 
-const SelectReportType: React.FC<SelectReportTypeProps> = ({ value, onChange, options }) => {
+const SelectType: React.FC<SelectTypeProps> = ({
+    label,
+    placeholder = "Pilih Opsi",
+    value,
+    onChange,
+    options,
+}) => {
     return (
         <div>
-            <label className="block mb-1 font-medium">Pilih Jenis Laporan</label>
+            {label && <label className="block mb-1 font-medium">{label}</label>}
             <Select value={value} onValueChange={onChange}>
                 <SelectTrigger>
-                    <SelectValue placeholder="Pilih Laporan" />
+                    <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
                 <SelectContent>
                     {options.map((option) => (
@@ -37,4 +46,4 @@ const SelectReportType: React.FC<SelectReportTypeProps> = ({ value, onChange, op
     );
 };
 
-export default SelectReportType;
+export default SelectType;

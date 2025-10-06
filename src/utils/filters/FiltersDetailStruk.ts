@@ -83,10 +83,6 @@ export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
         params.push(filters.barcode);
     }
 
-    if (filters.namaMember && filters.namaMember !== "") {
-        conditions.push(`dtl_namamember like $${params.length + 1}`);
-        params.push(`%${filters.namaMember}%`);
-    }
     // Filter Non Tunai
     if (filters.nonTunai === "true") {
         conditions.push(`vir_method ~ '^(ISAKU|GOPAY|SHOPEEPAY|QRIS-)'`);
