@@ -57,7 +57,7 @@ const EvaluasiSales = () => {
                     {/* Komponen Periode */}
                     <PeriodeSales control={methods.control} />
                     {/* Komponen Member */}
-                    <CardMember />
+                    <CardMember control={methods.control} />
                     {/* Komponen Select Report */}
                     <SelectReport control={methods.control} />
 
