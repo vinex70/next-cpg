@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import PeriodeSales from "@/components/form/evaluasisales/PeriodeSales";
 import SelectReport from "@/components/form/evaluasisales/SelectReport";
 import CardMember from "@/components/form/evaluasisales/CardMember";
+import CardProduk from "@/components/form/evaluasisales/CardProduk";
 
 const EvaluasiSales = () => {
     const router = useRouter();
@@ -58,6 +59,8 @@ const EvaluasiSales = () => {
                     <PeriodeSales control={methods.control} />
                     {/* Komponen Member */}
                     <CardMember control={methods.control} />
+                    {/* Komponen Produk */}
+                    <CardProduk control={methods.control} />
                     {/* Komponen Select Report */}
                     <SelectReport control={methods.control} />
 

@@ -1,5 +1,6 @@
-import { Controller, Control, useWatch } from "react-hook-form";
-import SelectType from "@/components/SelectType";
+// src/components/form/evaluasisales/SelectSubOutletMember.tsx
+import { Control, useWatch } from "react-hook-form";
+import SelectTypeWrapper from "@/components/SelectTypeWrapper";
 import { useFetchData } from "@/hooks/useFetchData";
 import { FilterDetailStrukInput } from "@/schema/filterDetailStruk";
 
@@ -10,10 +11,10 @@ interface SubOutletMember {
     sub_namasuboutlet: string;
 }
 
-type SelectSubOutletProps = {
+interface SelectSubOutletProps {
     control: Control<FilterDetailStrukInput>;
     placeholder?: string;
-};
+}
 
 const SelectSubOutletMember = ({
     control,
@@ -26,81 +27,47 @@ const SelectSubOutletMember = ({
 
     const { data, error, loading } = useFetchData<SubOutletMember[]>({
         endpoint: "/select-suboutlet-member",
-        queryParams: selectedOutlet ? { kodeoutlet: selectedOutlet } : undefined,
+        queryParams: selectedOutlet != null ? { kodeoutlet: selectedOutlet } : undefined,
         enabled: true,
     });
 
-    if (loading) {
-        return (
-            <SelectType
-                value="__loading__"
-                onChange={() => { }}
-                options={[]}
-                placeholder="Loading sub-outlet..."
-                disabled
-            />
-        );
-    }
+    // Default grup "Umum" selalu ada
+    let groupedOptions = [
+        {
+            groupLabel: "Umum",
+            options: [{ label: "All Sub-Outlet", value: "__all__" }],
+        },
+    ];
 
-    if (error) {
-        return (
-            <SelectType
-                value="__error__"
-                onChange={() => { }}
-                options={[]}
-                placeholder="Error loading sub-outlet"
-                disabled
-            />
-        );
+    // Jika data ada → tambahkan grouped options
+    if (data && data.length > 0) {
+        const groupedData = data.reduce<Record<string, SubOutletMember[]>>((acc, item) => {
+            if (!acc[item.sub_kodeoutlet]) acc[item.sub_kodeoutlet] = [];
+            acc[item.sub_kodeoutlet].push(item);
+            return acc;
+        }, {});
+
+        groupedOptions = [
+            ...groupedOptions,
+            ...Object.entries(groupedData).map(([kodeOutlet, subs]) => ({
+                groupLabel: `${kodeOutlet} - ${subs[0]?.out_namaoutlet ?? ""}`,
+                options: subs.map((sub) => ({
+                    label: `${sub.sub_kodesuboutlet} - ${sub.sub_namasuboutlet}`,
+                    value: sub.sub_kodesuboutlet,
+                })),
+            })),
+        ];
     }
 
     return (
-        <Controller
+        <SelectTypeWrapper<FilterDetailStrukInput>
             control={control}
             name="subOutlet"
-            render={({ field }) => {
-                if (!data || data.length === 0) {
-                    return (
-                        <SelectType
-                            value={field.value || "__all__"}
-                            onChange={(val) => field.onChange(val === "__all__" ? "" : val)}
-                            placeholder="Tidak ada data sub-outlet"
-                            options={[{ label: "Semua Sub-Outlet", value: "__all__" }]}
-                        />
-                    );
-                }
-
-                // Group data berdasarkan kode outlet
-                const groupedData = data.reduce<Record<string, SubOutletMember[]>>((acc, item) => {
-                    if (!acc[item.sub_kodeoutlet]) acc[item.sub_kodeoutlet] = [];
-                    acc[item.sub_kodeoutlet].push(item);
-                    return acc;
-                }, {});
-
-                // Siapkan data untuk SelectType
-                const groupedOptions = [
-                    {
-                        groupLabel: "Umum",
-                        options: [{ label: "All Sub-Outlet", value: "__all__" }],
-                    },
-                    ...Object.entries(groupedData).map(([kodeOutlet, subs]) => ({
-                        groupLabel: `${kodeOutlet} - ${subs[0]?.out_namaoutlet || ""}`,
-                        options: subs.map((sub) => ({
-                            label: `${sub.sub_kodesuboutlet} - ${sub.sub_namasuboutlet}`,
-                            value: sub.sub_kodesuboutlet,
-                        })),
-                    })),
-                ];
-
-                return (
-                    <SelectType
-                        value={field.value || "__all__"}
-                        onChange={(val) => field.onChange(val === "__all__" ? "" : val)}
-                        options={groupedOptions}
-                        placeholder={placeholder}
-                    />
-                );
-            }}
+            data={groupedOptions}
+            loading={loading}
+            error={!!error}
+            placeholder={placeholder}
+            valueKeyTransform={(val) => (val === "__all__" ? "" : val)}
         />
     );
 };

@@ -1,42 +1,42 @@
-// src/components/form/evaluasisales/SelectOutletMember.tsx
+// src/components/form/evaluasisales/SelectDivisi.tsx
 import { Control } from "react-hook-form";
 import SelectTypeWrapper from "@/components/SelectTypeWrapper";
 import { useFetchData } from "@/hooks/useFetchData";
 import { FilterDetailStrukInput } from "@/schema/filterDetailStruk";
 
-interface OutletMember {
-    out_kodeoutlet: string;
-    out_namaoutlet: string;
+interface Divisi {
+    div_kodedivisi: string;
+    div_namadivisi: string;
 }
 
-interface SelectOutletProps {
+interface SelectDivisiProps {
     control: Control<FilterDetailStrukInput>;
     placeholder?: string;
 }
 
-const SelectOutletMember = ({
+const SelectDivisi = ({
     control,
-    placeholder = "All Outlet",
-}: SelectOutletProps) => {
-    const { data, error, loading } = useFetchData<OutletMember[]>({
-        endpoint: "/select-outlet-member",
+    placeholder = "All Divisi",
+}: SelectDivisiProps) => {
+    const { data, error, loading } = useFetchData<Divisi[]>({
+        endpoint: "/select-divisi",
     });
 
     const options =
         data && data.length > 0
             ? [
-                { label: "All Outlet", value: "__ALL__" },
-                ...data.map((outlet) => ({
-                    label: `${outlet.out_kodeoutlet} - ${outlet.out_namaoutlet}`,
-                    value: outlet.out_kodeoutlet,
+                { label: "All Divisi", value: "__ALL__" },
+                ...data.map((divisi) => ({
+                    label: `${divisi.div_kodedivisi} - ${divisi.div_namadivisi}`,
+                    value: divisi.div_kodedivisi,
                 })),
             ]
-            : [{ label: "All Outlet", value: "__ALL__" }];
+            : [{ label: "All Divisi", value: "__ALL__" }];
 
     return (
         <SelectTypeWrapper<FilterDetailStrukInput>
             control={control}
-            name="outlet"
+            name="div"
             data={options}
             loading={loading}
             error={!!error}
@@ -46,4 +46,4 @@ const SelectOutletMember = ({
     );
 };
 
-export default SelectOutletMember;
+export default SelectDivisi;

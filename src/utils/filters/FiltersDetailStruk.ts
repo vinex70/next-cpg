@@ -63,6 +63,11 @@ export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
         params.push(filters.prdcd);
     }
 
+    if (filters.monitoringPlu && filters.monitoringPlu !== "") {
+        conditions.push(`dtl_prdcd_ctn = ANY(select distinct mpl_prdcd from tbtr_monitoringplu where mpl_kodemonitoring = $${params.length + 1})`);
+        params.push(filters.monitoringPlu);
+    }
+
     // Filter Grup PLU
     if (filters.prdcdGrup && filters.prdcdGrup.length > 0) {
         conditions.push(`dtl_prdcd_ctn = ANY($${params.length + 1})`);

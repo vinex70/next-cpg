@@ -1,4 +1,4 @@
-// src/pages/api/select-outlet-member.ts
+// src/pages/api/select-divisi.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import pool from "@/lib/db";
 
@@ -6,12 +6,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
         const query = `
             SELECT
-                out_kodeoutlet,
-                out_namaoutlet
+                div_kodedivisi,
+                div_namadivisi
             FROM
-                tbmaster_outlet
+                tbmaster_divisi
             ORDER BY
-                out_kodeoutlet
+                div_kodedivisi
         `;
 
         const result = await pool.query(query);
@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             data: result.rows,
         });
     } catch (error) {
-        console.error("Error fetching outlet members:", error);
+        console.error("Error fetching divisions:", error);
         return res.status(500).json({
             success: false,
             message: "Internal server error",

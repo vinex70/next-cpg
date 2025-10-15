@@ -13,6 +13,7 @@ export const FilterDetailStrukSchema = z.object({
     tag: z.string().optional(),
     prdcd: z.union([z.string(), z.array(z.string())]).optional(),
     prdcdGrup: z.array(z.string()).optional(),
+    monitoringPlu: z.string().toUpperCase().optional(),
     namaBarang: z.string().optional(),
     barcode: z.string().optional(),
     nonTunai: z.enum(["true", "false"]).optional(),
