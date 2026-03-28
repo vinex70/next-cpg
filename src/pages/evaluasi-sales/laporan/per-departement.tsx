@@ -43,6 +43,7 @@ const PerDepartementPage = () => {
         isRefreshing,
         handleRefresh,
     } = useReportPage<DepartementRows>({
+        basePath: "evaluasi-sales",
         searchableFields: ["div", "dept", "nama_dept"],
         numericFields: [
             "jumlah_member",
@@ -200,7 +201,7 @@ const PerDepartementPage = () => {
                             startDate={query.startDate as string}
                             endDate={query.endDate as string}
                             div={selectedRow?.div as string}
-                            dept={selectedRow?.div as string + selectedRow?.dept as string}
+                            dept={`${selectedRow?.div}${selectedRow?.dept}`}
                         />
                         {/* Modal Produk */}
                         <ProdukModal
@@ -209,7 +210,7 @@ const PerDepartementPage = () => {
                             startDate={query.startDate as string}
                             endDate={query.endDate as string}
                             div={selectedRow?.div as string}
-                            dept={selectedRow?.div as string + selectedRow?.dept as string}
+                            dept={`${selectedRow?.div}${selectedRow?.dept}`}
                         />
 
                         {/* Modal Struk */}
@@ -219,7 +220,7 @@ const PerDepartementPage = () => {
                             startDate={query.startDate as string}
                             endDate={query.endDate as string}
                             div={selectedRow?.div as string}
-                            dept={selectedRow?.div as string + selectedRow?.dept as string}
+                            dept={`${selectedRow?.div}${selectedRow?.dept}`}
                         />
                     </>
                 }

@@ -10,23 +10,23 @@ import LoadingIgr from "@/components/LoadingIgr";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { ReceiptText } from "lucide-react";
 
-type StrukRows = {
-    tanggal: string;
-    struk: string;
-    station: string;
-    kasir: string;
+type MemberRows = {
+    outlet: string;
+    suboutlet: string;
     kd_member: string;
     nama_member: string;
+    jumlah_struk: number;
     jumlah_produk: number;
     total_qty: number;
     total_gross: number;
     total_netto: number;
     total_margin: number;
-    metode_pembayaran: string;
+    tgl_mulai: string;
+    tgl_akhir: string;
     jenis_member: string;
 };
 
-const PerProdukPage = () => {
+const PerMemberPage = () => {
     const {
         query,
         searchTerm,
@@ -40,10 +40,26 @@ const PerProdukPage = () => {
         handleExport,
         isRefreshing,
         handleRefresh,
-    } = useReportPage<StrukRows>({
+    } = useReportPage<MemberRows>({
         basePath: "evaluasi-sales",
-        searchableFields: ["tanggal", "struk", "station", "kasir", "kd_member", "nama_member", "jenis_member", "metode_pembayaran"],
+        allFields: [
+            "outlet",
+            "suboutlet",
+            "kd_member",
+            "nama_member",
+            "jumlah_struk",
+            "jumlah_produk",
+            "total_qty",
+            "total_gross",
+            "total_netto",
+            "total_margin",
+            "tgl_mulai",
+            "tgl_akhir",
+            "jenis_member",
+        ],
+        searchableFields: ["outlet", "suboutlet", "kd_member", "nama_member"],
         numericFields: [
+            "jumlah_struk",
             "jumlah_produk",
             "total_qty",
             "total_gross",
@@ -51,57 +67,60 @@ const PerProdukPage = () => {
             "total_margin",
         ],
         headers: [
-            "Tanggal",
-            "Struk",
-            "Station",
-            "Kasir",
-            "Kode Member",
-            "Nama Member",
-            "Jenis Member",
-            "Metode Pembayaran",
-            "Jumlah Produk",
-            "Total Qty",
-            "Total Gross",
-            "Total Netto",
-            "Total Margin",
+            "outlet",
+            "suboutlet",
+            "kd_member",
+            "nama_member",
+            "jumlah_struk",
+            "jumlah_produk",
+            "total_qty",
+            "total_gross",
+            "total_netto",
+            "total_margin",
+            "tgl_mulai",
+            "tgl_akhir",
+            "jenis_member",
         ],
         mapRow: (row) => [
-            row.tanggal,
-            row.struk,
-            row.station,
-            row.kasir,
+            row.outlet,
+            row.suboutlet,
             row.kd_member,
             row.nama_member,
+            Number(row.jumlah_struk),
             Number(row.jumlah_produk),
             Number(row.total_qty),
             Number(row.total_gross),
             Number(row.total_netto),
             Number(row.total_margin),
+            row.tgl_mulai,
+            row.tgl_akhir,
+            row.jenis_member,
         ],
     });
 
-    const columns: { field: keyof StrukRows; label: string; isNumeric?: boolean }[] = [
-        { field: "tanggal", label: "Tanggal" },
-        { field: "struk", label: "Struk" },
-        { field: "station", label: "Station" },
-        { field: "kasir", label: "Kasir" },
-        { field: "kd_member", label: "Kd Mem" },
-        { field: "nama_member", label: "Nama Mem" },
-        { field: "jenis_member", label: "Jenis Mem" },
-        { field: "metode_pembayaran", label: "Metode Pembayaran" },
+    const columns: { field: keyof MemberRows; label: string; isNumeric?: boolean }[] = [
+        { field: "outlet", label: "Outlet" },
+        { field: "suboutlet", label: "Sub Outlet" },
+        { field: "kd_member", label: "Kode Member" },
+        { field: "nama_member", label: "Nama Member" },
+        { field: "jumlah_struk", label: "Jumlah Struk", isNumeric: true },
         { field: "jumlah_produk", label: "Jumlah Produk", isNumeric: true },
-        { field: "total_qty", label: "Qty", isNumeric: true },
-        { field: "total_gross", label: "Gross", isNumeric: true },
-        { field: "total_netto", label: "Netto", isNumeric: true },
-        { field: "total_margin", label: "Margin", isNumeric: true },
+        { field: "total_qty", label: "Total Qty", isNumeric: true },
+        { field: "total_gross", label: "Total Gross", isNumeric: true },
+        { field: "total_netto", label: "Total Netto", isNumeric: true },
+        { field: "total_margin", label: "Total Margin", isNumeric: true },
+        { field: "tgl_mulai", label: "Tanggal Mulai" },
+        { field: "tgl_akhir", label: "Tanggal Akhir" },
+        { field: "jenis_member", label: "Jenis Member" },
+
     ];
 
     // State for modal
     // Use a more specific type for selectedRow
-    const [selectedRow, setSelectedRow] = useState<StrukRows | null>(null);
+    const [selectedRow, setSelectedRow] = useState<MemberRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
 
-    const handleOpenProdukModal = (row: StrukRows) => {
+    const handleOpenProdukModal = (row: MemberRows) => {
         setSelectedRow(row);
         setShowProdukModal(true);
     };
@@ -145,7 +164,7 @@ const PerProdukPage = () => {
                                 columns={columns}
                                 data={filteredData}
                                 totalRow={totalRow}
-                                keyField="struk"
+                                keyField="kd_member"
                                 showRowNumber={true}
                                 textHeader="sm"
                                 textFooter="sm"
@@ -153,10 +172,10 @@ const PerProdukPage = () => {
                                 isRefreshing={isRefreshing}
                                 renderHeaderGroup={
                                     <tr>
-                                        <th colSpan={9} className="border border-gray-400 px-2 py-2">
-                                            Info Struk
+                                        <th colSpan={5} className="border border-gray-400 px-2 py-2">
+                                            Info Member
                                         </th>
-                                        <th colSpan={6} className="border border-gray-400 bg-red-400 px-2 py-2">
+                                        <th colSpan={10} className="border border-gray-400 bg-red-400 px-2 py-2">
                                             Sales
                                         </th>
                                     </tr>
@@ -165,9 +184,9 @@ const PerProdukPage = () => {
                                     <RowDropdownMenu
                                         label={
                                             <div>
-                                                <span className="text-xs text-gray-500">Struk: {row.struk}</span>
+                                                <span className="text-xs text-gray-500">Kode: {row.kd_member}</span>
                                                 <br />
-                                                {row.kd_member} - {row.nama_member}
+                                                {row.nama_member && <span className="text-xs text-gray-500">Nama: {row.nama_member}</span>}
                                             </div>
                                         }
                                         triggerIconOnly={false}
@@ -186,7 +205,7 @@ const PerProdukPage = () => {
                             onClose={() => setShowProdukModal(false)}
                             startDate={query.startDate as string}
                             endDate={query.endDate as string}
-                            struk={selectedRow?.struk || ""}
+                            noMember={selectedRow?.kd_member || ""}
                         />
                     </>}
             </section>
@@ -194,4 +213,4 @@ const PerProdukPage = () => {
     );
 };
 
-export default PerProdukPage;
+export default PerMemberPage;

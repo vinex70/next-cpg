@@ -38,6 +38,7 @@ const PerSupplierPage = () => {
         isRefreshing,
         handleRefresh,
     } = useReportPage<SupplierRow>({
+        basePath: "evaluasi-sales",
         searchableFields: ["kode_supplier", "nama_supplier"],
         numericFields: [
             "jumlah_member",

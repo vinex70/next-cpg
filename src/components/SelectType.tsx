@@ -55,7 +55,7 @@ const SelectType: React.FC<SelectTypeProps> = ({
                     {isGrouped
                         ? (options as GroupedOption[]).map((group) => (
                             <SelectGroup key={group.groupLabel}>
-                                <SelectLabel className="text-gray-700 dark:text-gray-300 font-semibold">
+                                <SelectLabel className="text-gray-700 dark:text-gray-300 font-semibold text-lg">
                                     {group.groupLabel}
                                 </SelectLabel>
                                 {group.options.map((opt) => (
@@ -66,7 +66,7 @@ const SelectType: React.FC<SelectTypeProps> = ({
                             </SelectGroup>
                         ))
                         : (options as Option[]).map((opt) => (
-                            <SelectItem key={opt.value || `opt-${opt.label}`} value={opt.value}>
+                            <SelectItem key={opt.value || `opt-${opt.label}`} value={opt.value} >
                                 {opt.label}
                             </SelectItem>
                         ))}

@@ -1,5 +1,5 @@
 // File: src/hooks/useFetchData.ts
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import axiosClient from "@/lib/axiosClient";
 
 interface UseFetchDataOptions {
@@ -25,48 +25,49 @@ export function useFetchData<T>({
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
-    // ✅ Gunakan useMemo agar queryParams tidak berubah referensi setiap render
-    const stableParams = useMemo(() => queryParams, [JSON.stringify(queryParams)]);
+    const paramsString = useMemo(
+        () => (queryParams ? JSON.stringify(queryParams) : ""),
+        [queryParams]
+    );
+
+    const stableParams = useMemo(
+        () =>
+            paramsString
+                ? (JSON.parse(paramsString) as Record<string, string | number | boolean>)
+                : undefined,
+        [paramsString]
+    );
+
+    const fetchData = useCallback(async () => {
+        if (!endpoint) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await axiosClient.get(endpoint, {
+                params: stableParams,
+            });
+
+            setData(response.data.data);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                console.error("Fetch error:", err.message);
+                setError(err.message);
+            } else {
+                console.error("Unknown error", err);
+                setError("Unknown error occurred");
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, [endpoint, stableParams]);
 
     useEffect(() => {
-        if (!enabled || !endpoint) return;
-
-        let isMounted = true; // untuk mencegah update state setelah unmount
-
-        const fetchData = async () => {
-            setLoading(true);
-            setError(null);
-
-            try {
-                const response = await axiosClient.get(endpoint, {
-                    params: stableParams,
-                });
-
-                // Cek apakah komponen masih mounted
-                if (isMounted) {
-                    setData(response.data.data);
-                }
-            } catch (err: unknown) {
-                if (isMounted) {
-                    if (err instanceof Error) {
-                        console.error("Fetch error:", err.message);
-                        setError(err.message);
-                    } else {
-                        console.error("Unknown error", err);
-                        setError("Unknown error occurred");
-                    }
-                }
-            } finally {
-                if (isMounted) setLoading(false);
-            }
-        };
-
+        if (!enabled) return;
         fetchData();
+    }, [endpoint, stableParams, enabled, fetchData]);
 
-        return () => {
-            isMounted = false;
-        };
-    }, [endpoint, stableParams, enabled]);
-
-    return { data, error, loading };
+    // ✅ RETURN refetch
+    return { data, error, loading, refetch: fetchData };
 }

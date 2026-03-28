@@ -43,6 +43,7 @@ const PerKategoriPage = () => {
         isRefreshing,
         handleRefresh,
     } = useReportPage<KategoriRows>({
+        basePath: "evaluasi-sales",
         searchableFields: ["div", "dept", "kategori", "nama_kategori"],
         numericFields: [
             "jumlah_member",

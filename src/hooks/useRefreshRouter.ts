@@ -1,14 +1,14 @@
-// hooks/useRefreshRouter.ts
-import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-export const useRefreshRouter = (loading: boolean) => {
-    const router = useRouter();
+export const useRefreshRouter = (
+    loading: boolean,
+    refetch: () => Promise<void>
+) => {
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     const handleRefresh = async () => {
         setIsRefreshing(true);
-        await router.replace(router.asPath);
+        await refetch(); // ✅ langsung fetch ulang
     };
 
     useEffect(() => {

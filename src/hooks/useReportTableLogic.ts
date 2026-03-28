@@ -9,7 +9,8 @@ export const useReportTableLogic = <T extends object>(
     data: T[] | undefined,
     searchTerm: string,
     excludeTotalFields: (keyof T)[],
-    totalFields: (keyof T)[]
+    totalFields: (keyof T)[],
+    allFields: (keyof T)[]
 ) => {
     const filteredData = useFilteredData(data ?? undefined, searchTerm);
     const title = useTitleFromQuery();
@@ -23,7 +24,8 @@ export const useReportTableLogic = <T extends object>(
     const totalRow = useTotalRow<T>(
         filteredData,
         excludeTotalFields,
-        totalFields
+        totalFields,
+        allFields
     );
 
     return { filteredData, title, periode, totalRow };

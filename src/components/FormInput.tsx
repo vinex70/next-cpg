@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input"
 type FormInputProps = {
     name: string
     placeholder?: string
+    onBlur?: () => void
 }
 
-const FormInput = ({ name, placeholder }: FormInputProps) => {
+const FormInput = ({ name, placeholder, onBlur }: FormInputProps) => {
     const { control } = useFormContext()
 
     return (
@@ -15,7 +16,7 @@ const FormInput = ({ name, placeholder }: FormInputProps) => {
             control={control}
             name={name}
             render={({ field }) => (
-                <Input {...field} placeholder={placeholder} />
+                <Input {...field} placeholder={placeholder} onBlur={onBlur} />
             )}
         />
     )

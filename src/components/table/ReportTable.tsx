@@ -97,52 +97,55 @@ export function ReportTable<T extends Record<string, unknown>>({
                             </tr>
                         ))
                     }
-
-
                 </tbody>
                 <tfoot>
                     <tr className={`font-semibold bg-white ${textFooter ? `text-${textFooter}` : "text-md"}`}>
-                        {
-                            isRefreshing ? null :
-                                (() => {
-                                    const nonNumericCols = columns.filter((col) => !col.isNumeric);
-                                    const numericCols = columns.filter((col) => col.isNumeric);
-                                    const totalRowArray = isArrayTotal ? (totalRow as (string | number)[]) : [];
+                        {!isRefreshing && (
+                            (() => {
+                                const totalRowArray = isArrayTotal ? (totalRow as (string | number)[]) : [];
+                                const firstNumericIndex = columns.findIndex(col => col.isNumeric);
 
-                                    return (
-                                        <>
-                                            {showRowNumber && (
-                                                <td className="border border-gray-400 px-2 py-2 dark:bg-blue-400" />
-                                            )}
+                                return (
+                                    <>
+
+                                        <td
+                                            colSpan={showRowNumber ? firstNumericIndex + 1 : firstNumericIndex}
+                                            className="border border-gray-400 px-2 py-2 text-center dark:bg-blue-400"
+                                        >
+                                            TOTAL
+                                        </td>
+                                        {columns.map((col, idx) => {
+                                            if (!col.isNumeric) return null;
+
+                                            const value = isArrayTotal
+                                                ? totalRowArray[idx]
+                                                : (totalRow as T)[col.field];
+
+                                            return (
+                                                <td
+                                                    key={col.field as string}
+                                                    className="border border-gray-400 px-2 py-2 text-end dark:bg-blue-400"
+                                                >
+                                                    {typeof value === "number" && !isNaN(value)
+                                                        ? formatNumber(value)
+                                                        : String(value ?? "")}
+                                                </td>
+                                            );
+                                        })}
+                                        {/* Render empty cells untuk kolom non-numeric setelah numeric */}
+                                        {columns.slice(firstNumericIndex + columns.filter(c => c.isNumeric).length).map((col) => (
                                             <td
-                                                colSpan={nonNumericCols.length}
-                                                className="border border-gray-400 px-2 py-2 text-center dark:bg-blue-400"
-                                            >
-                                                TOTAL
-                                            </td>
-                                            {numericCols.map((col, idx) => {
-                                                const value = isArrayTotal
-                                                    ? totalRowArray[nonNumericCols.length + idx]
-                                                    : (totalRow as T)[col.field];
-
-                                                const isValidNumber =
-                                                    col.isNumeric && typeof value === "number" && !isNaN(value);
-
-                                                return (
-                                                    <td
-                                                        key={col.field as string}
-                                                        className="border border-gray-400 px-2 py-2 text-end dark:bg-blue-400"
-                                                    >
-                                                        {isValidNumber ? formatNumber(value as number) : String(value ?? "")}
-                                                    </td>
-                                                );
-                                            })}
-                                            {renderActions && (
-                                                <td className="border border-gray-400 px-2 py-2 dark:bg-blue-400" />
-                                            )}
-                                        </>
-                                    );
-                                })()}
+                                                key={`empty-${String(col.field)}`}
+                                                className="border border-gray-400 px-2 py-2 dark:bg-blue-400"
+                                            />
+                                        ))}
+                                        {renderActions && (
+                                            <td className="border border-gray-400 px-2 py-2 dark:bg-blue-400" />
+                                        )}
+                                    </>
+                                );
+                            })()
+                        )}
                     </tr>
                 </tfoot>
             </table>

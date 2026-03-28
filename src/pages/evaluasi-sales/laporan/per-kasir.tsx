@@ -38,6 +38,7 @@ const PerProdukPage = () => {
         isRefreshing,
         handleRefresh,
     } = useReportPage<KasirRows>({
+        basePath: "evaluasi-sales",
         searchableFields: ["kasir", "station", "nama_kasir"],
         numericFields: [
             "jumlah_struk",

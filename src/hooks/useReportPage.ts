@@ -1,3 +1,5 @@
+// hooks/useReportPage.ts
+
 import { useState } from "react";
 import { useFetchData } from "@/hooks/useFetchData";
 import { useRefreshRouter } from "@/hooks/useRefreshRouter";
@@ -6,33 +8,36 @@ import { useReportTableLogic } from "@/hooks/useReportTableLogic";
 import { useExportToExcel } from "@/hooks/useExportToExcel";
 
 interface UseReportPageOptions<T> {
+    basePath: string;
     searchableFields: (keyof T)[];
     numericFields: (keyof T)[];
     headers: string[];
     mapRow: (row: T) => (string | number | null)[];
+    allFields: (keyof T)[];
 }
 
 export function useReportPage<T extends object>(
     options: UseReportPageOptions<T>
 ) {
-    const { searchableFields, numericFields, headers, mapRow } = options;
+    const { basePath, searchableFields, numericFields, headers, mapRow, allFields } = options;
 
-    const { query, endpoint } = useReportQueryEndpoint();
+    const { query, endpoint } = useReportQueryEndpoint({ basePath });
     const [searchTerm, setSearchTerm] = useState("");
 
-    const { data, loading, error } = useFetchData<T[]>({
+    const { data, loading, error, refetch } = useFetchData<T[]>({
         endpoint,
         queryParams: query as Record<string, string>,
-        enabled: !!query.selectedReport,
+        enabled: !!endpoint, // hanya fetch jika endpoint sudah tersedia
     });
 
-    const { isRefreshing, handleRefresh } = useRefreshRouter(loading);
+    const { isRefreshing, handleRefresh } = useRefreshRouter(loading, refetch);
 
     const { filteredData, title, periode, totalRow } = useReportTableLogic<T>(
         data ?? [],
         searchTerm,
         searchableFields,
-        numericFields
+        numericFields,
+        allFields
     );
 
     const { handleExport } = useExportToExcel<T>({

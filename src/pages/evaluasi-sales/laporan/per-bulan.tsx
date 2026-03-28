@@ -36,6 +36,7 @@ const PerBulanPage = () => {
         isRefreshing,
         handleRefresh,
     } = useReportPage<BulanRows>({
+        basePath: "evaluasi-sales",
         searchableFields: ["bulan", "nama_bulan"],
         numericFields: [
             "jumlah_member",

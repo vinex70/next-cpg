@@ -36,6 +36,7 @@ const PerTanggalPage = () => {
         isRefreshing,
         handleRefresh,
     } = useReportPage<TanggalRows>({
+        basePath: "evaluasi-sales",
         searchableFields: ["tanggal"],
         numericFields: [
             "jumlah_member",

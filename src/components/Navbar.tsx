@@ -62,8 +62,8 @@ const Navbar = () => {
                                 </li>
                                 <li>
                                     <NavigationMenuLink asChild>
-                                        <Link href="/" className="text-sm hover:underline">
-                                            Cabang 2
+                                        <Link href="/informasi-promosi" className="text-sm hover:underline">
+                                            Informasi Promosi
                                         </Link>
                                     </NavigationMenuLink>
                                 </li>

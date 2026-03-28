@@ -31,7 +31,7 @@ export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
     }
     // Filter Nama Member
     if (filters.namaMember && filters.namaMember !== "") {
-        conditions.push(`dtl_namamember LIKE $${params.length + 1}`);
+        conditions.push(`dtl_namamember ILIKE $${params.length + 1}`);
         params.push(`%${filters.namaMember}%`);
     }
 
@@ -59,19 +59,15 @@ export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
     }
     // Filter PLU
     if (filters.prdcd && filters.prdcd !== "") {
-        conditions.push(`dtl_prdcd_ctn = $${params.length + 1}`);
+        conditions.push(`dtl_prdcd_ctn = ANY(string_to_array($${params.length + 1}, ','))`);
         params.push(filters.prdcd);
     }
 
     if (filters.monitoringPlu && filters.monitoringPlu !== "") {
-        conditions.push(`dtl_prdcd_ctn = ANY(select distinct mpl_prdcd from tbtr_monitoringplu where mpl_kodemonitoring = $${params.length + 1})`);
+        conditions.push(`dtl_prdcd_ctn IN (
+                        SELECT unnest(string_to_array($1, ','))
+                )`);
         params.push(filters.monitoringPlu);
-    }
-
-    // Filter Grup PLU
-    if (filters.prdcdGrup && filters.prdcdGrup.length > 0) {
-        conditions.push(`dtl_prdcd_ctn = ANY($${params.length + 1})`);
-        params.push(filters.prdcdGrup);
     }
 
     // Filter Nama Barang
@@ -103,8 +99,12 @@ export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
     }
     // Filter Outlet
     if (filters.outlet && filters.outlet !== "") {
-        conditions.push(`dtl_outlet = $${params.length + 1}`);
-        params.push(filters.outlet);
+        if (filters.outlet === "7") {
+            conditions.push(`dtl_tipemember = 'TMI'`);
+        } else {
+            conditions.push(`dtl_outlet = $${params.length + 1}`);
+            params.push(filters.outlet);
+        }
     }
     // Filter Sub Outlet
     if (filters.subOutlet && filters.subOutlet !== "") {

@@ -11,8 +11,13 @@ export const FilterDetailStrukSchema = z.object({
     dept: z.string().optional(),
     kat: z.string().optional(),
     tag: z.string().optional(),
-    prdcd: z.union([z.string(), z.array(z.string())]).optional(),
-    prdcdGrup: z.array(z.string()).optional(),
+    prdcd: z
+        .string()
+        .optional()
+        .refine((v) => {
+            if (!v) return true;
+            return /^[0-9,]+$/.test(v); // hanya angka & koma
+        }, { message: "Format PLU tidak valid" }),
     monitoringPlu: z.string().toUpperCase().optional(),
     namaBarang: z.string().optional(),
     barcode: z.string().optional(),

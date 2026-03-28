@@ -40,6 +40,7 @@ const PerProdukTanggalPage = () => {
         isRefreshing,
         handleRefresh,
     } = useReportPage<ProdukRows>({
+        basePath: "evaluasi-sales",
         searchableFields: ["div", "dept", "kategori", "plu", "nama_produk", "tanggal"],
         numericFields: [
             "jumlah_member",

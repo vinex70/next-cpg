@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             count(distinct dtl_cusno) as jumlah_member,
             count(distinct dtl_struk) as jumlah_struk,
             count(distinct dtl_prdcd_ctn) as jumlah_produk,
-            sum(dtl_qty) as total_qty,
+            sum(dtl_qty_pcs) as total_qty,
             sum(dtl_gross) as total_gross,
             sum(dtl_netto) as total_netto,
             sum(dtl_margin) as total_margin

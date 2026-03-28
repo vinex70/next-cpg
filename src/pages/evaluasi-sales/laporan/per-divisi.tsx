@@ -41,6 +41,7 @@ const PerDivisiPage = () => {
         isRefreshing,
         handleRefresh,
     } = useReportPage<DivisiRow>({
+        basePath: "evaluasi-sales",
         searchableFields: ["div", "nama_div"],
         numericFields: [
             "jumlah_member",
