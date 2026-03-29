@@ -1,40 +1,62 @@
 import Image from "next/image"
 
 const LoadingIgr = () => {
-    return (
-        <>
-            {/* Container untuk spinner dan teks */}
-            <div className="flex flex-col justify-center items-center min-h-[80vh]">
-                {/* Spinner Animation */}
-                <div className="relative flex justify-center items-center">
-                    {/* Spinner Background */}
-                    <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-blue-500"></div>
 
-                    {/* Logo dengan z-index lebih tinggi */}
+    const skeletonRows = 13;
+    const skeletonCols = 10;
+
+    return (
+        <div className="relative w-full">
+
+            {/* 🔥 SKELETON */}
+            <div className="overflow-hidden border rounded-md">
+                <table className="min-w-full table-fixed">
+                    <thead>
+                        <tr>
+                            {Array.from({ length: skeletonCols }).map((_, i) => (
+                                <th key={i} className="border px-4 py-4 h-20">
+                                    <div className="h-4 bg-gray-200 animate-pulse rounded w-3/4 mx-auto" />
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {Array.from({ length: skeletonRows }).map((_, rowIdx) => (
+                            <tr key={rowIdx}>
+                                {Array.from({ length: skeletonCols }).map((_, colIdx) => (
+                                    <td key={colIdx} className="border px-2 py-2 h-10">
+                                        <div className="h-4 bg-gray-200 animate-pulse rounded" />
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* 🔥 OVERLAY LOGO + SPINNER */}
+            <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
+
+                <div className="relative flex justify-center items-center">
+
+                    {/* Spinner */}
+                    <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-blue-500 z-20"></div>
+
+                    {/* Logo */}
                     <Image
                         src="/images/loading.jpg"
-                        width={150}
-                        height={150}
+                        width={100}
+                        height={100}
                         priority
                         alt="IGR Logo"
-                        className="rounded-full h-28 w-28 relative z-10"
+                        className="rounded-full z-10 object-cover"
                     />
                 </div>
 
-                {/* Teks Animasi */}
-                <div className="flex justify-center items-center mt-8"> {/* mt-8 untuk memberikan jarak */}
-                    {["C", "I", "P", "I", "N", "A", "N", "G"].map((char, index) => (
-                        <span
-                            key={index}
-                            className="px-1 bg-gradient-to-b from-blue-500 to-red-500 text-white rounded-full animate-ping text-6xl font-bold items-center"
-                            style={{ animationDelay: `${index * 0.2}s`, animationDuration: "2s" }}
-                        >
-                            {char}
-                        </span>
-                    ))}
-                </div>
             </div>
-        </>
+
+        </div>
     )
 }
 

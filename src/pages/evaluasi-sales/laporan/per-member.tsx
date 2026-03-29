@@ -1,3 +1,5 @@
+// pages/per-member.tsx
+
 import Layout from "@/components/Layout";
 import ReportHeader from "@/components/ReportHeader";
 import SearchInput from "@/components/SearchInput";
@@ -10,23 +12,13 @@ import LoadingIgr from "@/components/LoadingIgr";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { ReceiptText } from "lucide-react";
 
-type MemberRows = {
-    outlet: string;
-    suboutlet: string;
-    kd_member: string;
-    nama_member: string;
-    jumlah_struk: number;
-    jumlah_produk: number;
-    total_qty: number;
-    total_gross: number;
-    total_netto: number;
-    total_margin: number;
-    tgl_mulai: string;
-    tgl_akhir: string;
-    jenis_member: string;
-};
+import { buildReport } from "@/utils/reportBuilder";
+import { perMemberColumns, MemberRows } from "@/configs/evaluasi-sales/perMemberConfig";
 
 const PerMemberPage = () => {
+    // 🔥 semua config auto dari sini
+    const config = buildReport<MemberRows>(perMemberColumns);
+
     const {
         query,
         searchTerm,
@@ -42,81 +34,9 @@ const PerMemberPage = () => {
         handleRefresh,
     } = useReportPage<MemberRows>({
         basePath: "evaluasi-sales",
-        allFields: [
-            "outlet",
-            "suboutlet",
-            "kd_member",
-            "nama_member",
-            "jumlah_struk",
-            "jumlah_produk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-            "tgl_mulai",
-            "tgl_akhir",
-            "jenis_member",
-        ],
-        searchableFields: ["outlet", "suboutlet", "kd_member", "nama_member"],
-        numericFields: [
-            "jumlah_struk",
-            "jumlah_produk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-        ],
-        headers: [
-            "outlet",
-            "suboutlet",
-            "kd_member",
-            "nama_member",
-            "jumlah_struk",
-            "jumlah_produk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-            "tgl_mulai",
-            "tgl_akhir",
-            "jenis_member",
-        ],
-        mapRow: (row) => [
-            row.outlet,
-            row.suboutlet,
-            row.kd_member,
-            row.nama_member,
-            Number(row.jumlah_struk),
-            Number(row.jumlah_produk),
-            Number(row.total_qty),
-            Number(row.total_gross),
-            Number(row.total_netto),
-            Number(row.total_margin),
-            row.tgl_mulai,
-            row.tgl_akhir,
-            row.jenis_member,
-        ],
+        ...config,
     });
 
-    const columns: { field: keyof MemberRows; label: string; isNumeric?: boolean }[] = [
-        { field: "outlet", label: "Outlet" },
-        { field: "suboutlet", label: "Sub Outlet" },
-        { field: "kd_member", label: "Kode Member" },
-        { field: "nama_member", label: "Nama Member" },
-        { field: "jumlah_struk", label: "Jumlah Struk", isNumeric: true },
-        { field: "jumlah_produk", label: "Jumlah Produk", isNumeric: true },
-        { field: "total_qty", label: "Total Qty", isNumeric: true },
-        { field: "total_gross", label: "Total Gross", isNumeric: true },
-        { field: "total_netto", label: "Total Netto", isNumeric: true },
-        { field: "total_margin", label: "Total Margin", isNumeric: true },
-        { field: "tgl_mulai", label: "Tanggal Mulai" },
-        { field: "tgl_akhir", label: "Tanggal Akhir" },
-        { field: "jenis_member", label: "Jenis Member" },
-
-    ];
-
-    // State for modal
-    // Use a more specific type for selectedRow
     const [selectedRow, setSelectedRow] = useState<MemberRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
 
@@ -124,14 +44,7 @@ const PerMemberPage = () => {
         setSelectedRow(row);
         setShowProdukModal(true);
     };
-
-    const actionsRows = [
-        {
-            label: "Produk",
-            onClick: handleOpenProdukModal,
-            icon: <ReceiptText size={16} />,
-        },
-    ];
+    const handleReset = () => setSearchTerm("");
 
     return (
         <Layout title={title}>
@@ -149,22 +62,27 @@ const PerMemberPage = () => {
                         <div className="flex space-x-2 justify-end">
                             <Button
                                 variant="outline"
-                                onClick={() => setSearchTerm("")}
-                                className="text-sm h-8 bg-red-400 dark:bg-red-400 dark:hover:bg-red-500 dark:hover:text-black hover:bg-red-500 text-white shadow-2xl hover:cursor-pointer"
+                                onClick={handleReset}
+                                className="text-sm h-8 bg-red-400 hover:bg-red-500 text-white"
                             >
                                 Reset
                             </Button>
-                            <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Cari..." />
+
+                            <SearchInput
+                                value={searchTerm}
+                                onChange={setSearchTerm}
+                                placeholder="Cari..."
+                            />
                         </div>
 
                         {error && <p className="text-red-500">{error}</p>}
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={columns}
+                                columns={config.tableColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
-                                keyField="kd_member"
+                                keyField={(row) => `${row.kd_member}-${row.outlet}`}
                                 showRowNumber={true}
                                 textHeader="sm"
                                 textFooter="sm"
@@ -172,10 +90,16 @@ const PerMemberPage = () => {
                                 isRefreshing={isRefreshing}
                                 renderHeaderGroup={
                                     <tr>
-                                        <th colSpan={5} className="border border-gray-400 px-2 py-2">
+                                        {/* 🔥 Row Number */}
+                                        <th className="border px-2 py-2 bg-gray-200"></th>
+
+                                        {/* 🔥 Info Member */}
+                                        <th colSpan={4} className="border px-2 py-2 text-center bg-gray-200">
                                             Info Member
                                         </th>
-                                        <th colSpan={10} className="border border-gray-400 bg-red-400 px-2 py-2">
+
+                                        {/* 🔥 Sales */}
+                                        <th colSpan={10} className="border px-2 py-2 text-center bg-red-400 text-white">
                                             Sales
                                         </th>
                                     </tr>
@@ -184,24 +108,29 @@ const PerMemberPage = () => {
                                     <RowDropdownMenu
                                         label={
                                             <div>
-                                                <span className="text-xs text-gray-500">Kode: {row.kd_member}</span>
+                                                <span className="text-xs text-gray-500">
+                                                    Kode: {row.kd_member}
+                                                </span>
                                                 <br />
-                                                {row.nama_member && <span className="text-xs text-gray-500">Nama: {row.nama_member}</span>}
+                                                <span className="text-xs text-gray-500">
+                                                    Nama: {row.nama_member}
+                                                </span>
                                             </div>
                                         }
-                                        triggerIconOnly={false}
-                                        actions={actionsRows.map(action => ({
-                                            label: action.label,
-                                            onClick: () => action.onClick(row),
-                                            icon: action.icon,
-                                        }))} />
+                                        actions={[
+                                            {
+                                                label: "Produk",
+                                                onClick: () => handleOpenProdukModal(row),
+                                                icon: <ReceiptText size={16} />,
+                                            },
+                                        ]}
+                                    />
                                 )}
                             />
                         )}
 
-                        {/* Modal detail */}
                         <ProdukModal
-                            show={showProdukModal}
+                            show={showProdukModal && !!selectedRow}
                             onClose={() => setShowProdukModal(false)}
                             startDate={query.startDate as string}
                             endDate={query.endDate as string}

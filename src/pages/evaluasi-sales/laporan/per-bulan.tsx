@@ -11,18 +11,11 @@ import LoadingIgr from "@/components/LoadingIgr";
 import { FileText, ReceiptText } from "lucide-react";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 
-type BulanRows = {
-    bulan: string;
-    nama_bulan: string;
-    jumlah_member: number;
-    jumlah_struk: number;
-    total_qty: number;
-    total_gross: number;
-    total_netto: number;
-    total_margin: number;
-};
+import { PerBulanRows, perBulanColumns } from "@/configs/evaluasi-sales/perBulanConfig";
+import { buildReport } from "@/utils/reportBuilder";
 
 const PerBulanPage = () => {
+    const config = buildReport<PerBulanRows>(perBulanColumns);
     const {
         searchTerm,
         setSearchTerm,
@@ -35,48 +28,12 @@ const PerBulanPage = () => {
         handleExport,
         isRefreshing,
         handleRefresh,
-    } = useReportPage<BulanRows>({
+    } = useReportPage<PerBulanRows>({
         basePath: "evaluasi-sales",
-        searchableFields: ["bulan", "nama_bulan"],
-        numericFields: [
-            "jumlah_member",
-            "jumlah_struk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-        ],
-        headers: [
-            "bulan",
-            "Jumlah Member",
-            "Jumlah Struk",
-            "Total Qty",
-            "Total Gross",
-            "Total Netto",
-            "Total Margin",
-        ],
-        mapRow: (row) => [
-            row.nama_bulan,
-            Number(row.jumlah_member),
-            Number(row.jumlah_struk),
-            Number(row.total_qty),
-            Number(row.total_gross),
-            Number(row.total_netto),
-            Number(row.total_margin),
-        ],
+        ...config,
     });
 
-    const columns: { field: keyof BulanRows; label: string; isNumeric?: boolean }[] = [
-        { field: "nama_bulan", label: "Bulan" },
-        { field: "jumlah_member", label: "Member", isNumeric: true },
-        { field: "jumlah_struk", label: "Struk", isNumeric: true },
-        { field: "total_qty", label: "Qty", isNumeric: true },
-        { field: "total_gross", label: "Gross", isNumeric: true },
-        { field: "total_netto", label: "Netto", isNumeric: true },
-        { field: "total_margin", label: "Margin", isNumeric: true },
-    ];
-
-    const [selectedRow, setSelectedRow] = useState<BulanRows | null>(null);
+    const [selectedRow, setSelectedRow] = useState<PerBulanRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
     const [showStrukModal, setShowStrukModal] = useState(false);
 
@@ -115,12 +72,12 @@ const PerBulanPage = () => {
     const monthRange = getMonthRange(selectedRow?.bulan);
 
 
-    const handleOpenStrukModal = (row: BulanRows) => {
+    const handleOpenStrukModal = (row: PerBulanRows) => {
         setSelectedRow(row);
         setShowStrukModal(true);
     };
 
-    const handleOpenProdukModal = (row: BulanRows) => {
+    const handleOpenProdukModal = (row: PerBulanRows) => {
         setSelectedRow(row);
         setShowProdukModal(true);
     };
@@ -167,7 +124,7 @@ const PerBulanPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={columns}
+                                columns={config.tableColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="bulan"
@@ -177,10 +134,13 @@ const PerBulanPage = () => {
                                 textFooter="sm"
                                 renderHeaderGroup={
                                     <tr>
-                                        <th colSpan={2} className="border border-gray-400 px-2 py-2">
-                                            Info
+                                        {/* 🔥 Info Member */}
+                                        <th colSpan={3} className="border px-2 py-2 text-center bg-gray-200">
+                                            Info Bulan
                                         </th>
-                                        <th colSpan={7} className="border border-gray-400 px-2 py-2 bg-red-400">
+
+                                        {/* 🔥 Sales */}
+                                        <th colSpan={7} className="border px-2 py-2 text-center bg-red-400 text-white">
                                             Sales
                                         </th>
                                     </tr>
@@ -200,7 +160,7 @@ const PerBulanPage = () => {
 
                         {/* Modal Produk */}
                         <ProdukModal
-                            show={showProdukModal}
+                            show={showProdukModal && !!selectedRow}
                             onClose={() => setShowProdukModal(false)}
                             startDate={monthRange.startDate}
                             endDate={monthRange.endDate}
@@ -208,7 +168,7 @@ const PerBulanPage = () => {
 
                         {/* Modal Struk */}
                         <StrukModal
-                            show={showStrukModal}
+                            show={showStrukModal && !!selectedRow}
                             onClose={() => setShowStrukModal(false)}
                             startDate={monthRange.startDate}
                             endDate={monthRange.endDate}

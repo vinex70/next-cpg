@@ -4,6 +4,12 @@ import { FilterDetailStruk } from "@/utils/filters/FiltersDetailStruk"; // pasti
 import { FilterDetailStrukSchema } from "@/schema/filterDetailStruk"; // pastikan import benar
 import { DetailStruk } from "@/utils/query/detailStruk";
 
+
+export const config = {
+    api: {
+        responseLimit: '10mb',
+    },
+}
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
         // Ambil semua query string dan validasi pakai Zod
