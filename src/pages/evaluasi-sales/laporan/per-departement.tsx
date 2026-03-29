@@ -15,20 +15,10 @@ import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { FileText, PackageSearch, ReceiptText } from "lucide-react";
 
 // Tipe data hasil dari API
-type DepartementRows = {
-    div: string;
-    dept: string;
-    nama_dept: string;
-    jumlah_member: number;
-    jumlah_struk: number;
-    jumlah_produk: number;
-    total_qty: number;
-    total_gross: number;
-    total_netto: number;
-    total_margin: number;
-};
-
+import { PerDepartementRows, perDepartementColumns } from "@/configs/evaluasi-sales/perDepartementConfig";
+import { buildReport } from "@/utils/reportBuilder";
 const PerDepartementPage = () => {
+    const config = buildReport<PerDepartementRows>(perDepartementColumns);
     const {
         query,
         searchTerm,
@@ -42,45 +32,12 @@ const PerDepartementPage = () => {
         handleExport,
         isRefreshing,
         handleRefresh,
-    } = useReportPage<DepartementRows>({
+    } = useReportPage<PerDepartementRows>({
         basePath: "evaluasi-sales",
-        searchableFields: ["div", "dept", "nama_dept"],
-        numericFields: [
-            "jumlah_member",
-            "jumlah_struk",
-            "jumlah_produk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-        ],
-        headers: [
-            "div",
-            "dept",
-            "nama_dept",
-            "member",
-            "struk",
-            "produk",
-            "qty",
-            "gross",
-            "netto",
-            "margin",
-        ],
-        mapRow: (row) => [
-            row.div,
-            row.dept,
-            row.nama_dept,
-            Number(row.jumlah_member),
-            Number(row.jumlah_struk),
-            Number(row.jumlah_produk),
-            Number(row.total_qty),
-            Number(row.total_gross),
-            Number(row.total_netto),
-            Number(row.total_margin),
-        ]
+        ...config,
     })
 
-    const columns: { field: keyof DepartementRows; label: string; isNumeric?: boolean }[] = [
+    const columns: { field: keyof PerDepartementRows; label: string; isNumeric?: boolean }[] = [
         { field: "div", label: "Div" },
         { field: "dept", label: "Dept" },
         { field: "nama_dept", label: "Nama" },
@@ -93,22 +50,22 @@ const PerDepartementPage = () => {
         { field: "total_margin", label: "Margin", isNumeric: true },
     ]
 
-    const [selectedRow, setSelectedRow] = useState<DepartementRows | null>(null);
+    const [selectedRow, setSelectedRow] = useState<PerDepartementRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
     const [showProdukTanggalModal, setShowProdukTanggalModal] = useState(false);
     const [showStrukModal, setShowStrukModal] = useState(false);
 
-    const handleOpenProdukTanggalModal = (row: DepartementRows) => {
+    const handleOpenProdukTanggalModal = (row: PerDepartementRows) => {
         setSelectedRow(row);
         setShowProdukTanggalModal(true);
     };
 
-    const handleOpenStrukModal = (row: DepartementRows) => {
+    const handleOpenStrukModal = (row: PerDepartementRows) => {
         setSelectedRow(row);
         setShowStrukModal(true);
     };
 
-    const handleOpenProdukModal = (row: DepartementRows) => {
+    const handleOpenProdukModal = (row: PerDepartementRows) => {
         setSelectedRow(row);
         setShowProdukModal(true);
     };

@@ -22,6 +22,23 @@ interface ReportTableProps<T> {
     isRefreshing?: boolean;
 }
 
+/**
+ * ReportTable Component
+ * @param columns - Array of column definitions
+ * @param data - Array of data objects to display
+ * @param totalRow - Object or array representing the total row values
+ * @param renderHeaderGroup - Optional React component to render the header group
+ * @param keyField - Optional field to use as the key for each row
+ * @param renderActions - Optional function to render actions for each row
+ * @param actionHeaderLabel - Optional label for the actions header
+ * @param showRowNumber - Optional flag to show row number column
+ * @param textHeader - Optional text size for header
+ * @param textBody - Optional text size for body
+ * @param textFooter - Optional text size for footer
+ * @param isRefreshing - Optional flag to indicate if the table is refreshing
+ * @returns {JSX.Element} - The ReportTable component
+ */
+
 export function ReportTable<T extends Record<string, unknown>>({
     columns,
     data,
@@ -89,7 +106,7 @@ export function ReportTable<T extends Record<string, unknown>>({
                         Array.from({ length: 5 }).map((_, rowIdx) => (
                             <tr key={`skeleton-${rowIdx}`}>
                                 {Array.from({ length: totalColumns }).map((_, colIdx) => (
-                                    <td key={colIdx} className="border px-2 py-2">
+                                    <td key={colIdx} className="border px-2 py-2 ">
                                         <div className="h-4 bg-gray-200 animate-pulse rounded" />
                                     </td>
                                 ))}
@@ -111,7 +128,7 @@ export function ReportTable<T extends Record<string, unknown>>({
                                             : String(row[keyField])
                                         : rowIndex
                                 }
-                                className={`text-${textBody} hover:bg-gray-50`}
+                                className={`text-${textBody} hover:bg-gray-50 dark:hover:text-black dark:hover:bg-gray-300 cursor-pointer`}
                             >
                                 {showRowNumber && (
                                     <td className="border px-2 py-2 text-center">
@@ -152,7 +169,7 @@ export function ReportTable<T extends Record<string, unknown>>({
                                     (showRowNumber ? 1 : 0) +
                                     (firstNumericIndex >= 0 ? firstNumericIndex : columns.length)
                                 }
-                                className="border px-2 py-2 text-center bg-blue-200 font-bold"
+                                className="border px-2 py-2 text-center bg-blue-400 font-bold"
                             >
                                 TOTAL
                             </td>
@@ -168,7 +185,7 @@ export function ReportTable<T extends Record<string, unknown>>({
                                 return (
                                     <td
                                         key={`num-${String(col.field)}`}
-                                        className="border px-2 py-2 text-right bg-blue-200"
+                                        className="border px-2 py-2 text-right bg-blue-400"
                                     >
                                         {typeof value === "number"
                                             ? formatNumber(value)
@@ -186,13 +203,13 @@ export function ReportTable<T extends Record<string, unknown>>({
                                 .map((col) => (
                                     <td
                                         key={`empty-${String(col.field)}`}
-                                        className="border px-2 py-2 bg-blue-200"
+                                        className="border px-2 py-2 bg-blue-400"
                                     />
                                 ))}
 
                             {/* 🔥 ACTION */}
                             {renderActions && (
-                                <td className="border px-2 py-2 bg-blue-200" />
+                                <td className="border px-2 py-2 bg-blue-400" />
                             )}
                         </tr>
                     )}
