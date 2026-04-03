@@ -9,21 +9,11 @@ import ProdukModal from "@/components/modal/evaluasi-sales/ProdukModal";
 import LoadingIgr from "@/components/LoadingIgr";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { ReceiptText } from "lucide-react";
-
-type KasirRows = {
-    kasir: string;
-    nama_kasir: string;
-    station: string;
-    jumlah_struk: string;
-    jumlah_member: number;
-    jumlah_produk: number;
-    total_qty: number;
-    total_gross: number;
-    total_netto: number;
-    total_margin: number;
-};
+import { PerKasirRows, perKasirColumns } from "@/configs/evaluasi-sales/perKasirConfig";
+import { buildReport } from "@/utils/reportBuilder";
 
 const PerProdukPage = () => {
+    const config = buildReport<PerKasirRows>(perKasirColumns);
     const {
         query,
         searchTerm,
@@ -37,63 +27,19 @@ const PerProdukPage = () => {
         handleExport,
         isRefreshing,
         handleRefresh,
-    } = useReportPage<KasirRows>({
+    } = useReportPage<PerKasirRows>({
         basePath: "evaluasi-sales",
-        searchableFields: ["kasir", "station", "nama_kasir"],
-        numericFields: [
-            "jumlah_struk",
-            "jumlah_member",
-            "jumlah_produk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-        ],
-        headers: [
-            "kasir",
-            "nama_kasir",
-            "station",
-            "jumlah_struk",
-            "jumlah_member",
-            "jumlah_produk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-        ],
-        mapRow: (row) => [
-            row.kasir,
-            row.nama_kasir,
-            row.station,
-            Number(row.jumlah_struk),
-            Number(row.jumlah_member),
-            Number(row.jumlah_produk),
-            Number(row.total_qty),
-            Number(row.total_gross),
-            Number(row.total_netto),
-            Number(row.total_margin),
-        ],
+        ...config,
     });
 
-    const columns: { field: keyof KasirRows; label: string; isNumeric?: boolean }[] = [
-        { field: "kasir", label: "Kasir" },
-        { field: "nama_kasir", label: "Nama Kasir" },
-        { field: "station", label: "Station" },
-        { field: "jumlah_struk", label: "Jumlah Struk", isNumeric: true },
-        { field: "jumlah_member", label: "Jumlah Member", isNumeric: true },
-        { field: "jumlah_produk", label: "Jumlah Produk", isNumeric: true },
-        { field: "total_qty", label: "Qty", isNumeric: true },
-        { field: "total_gross", label: "Gross", isNumeric: true },
-        { field: "total_netto", label: "Netto", isNumeric: true },
-        { field: "total_margin", label: "Margin", isNumeric: true },
-    ];
+    const columns = perKasirColumns
 
     // State for modal
     // Use a more specific type for selectedRow
-    const [selectedRow, setSelectedRow] = useState<KasirRows | null>(null);
+    const [selectedRow, setSelectedRow] = useState<PerKasirRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
 
-    const handleOpenProdukModal = (row: KasirRows) => {
+    const handleOpenProdukModal = (row: PerKasirRows) => {
         setSelectedRow(row);
         setShowProdukModal(true);
     };

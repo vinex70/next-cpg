@@ -67,6 +67,13 @@ const Navbar = () => {
                                         </Link>
                                     </NavigationMenuLink>
                                 </li>
+                                <li>
+                                    <NavigationMenuLink asChild>
+                                        <Link href="/form-so-harian" className="text-sm hover:underline">
+                                            Form SO Harian
+                                        </Link>
+                                    </NavigationMenuLink>
+                                </li>
                             </ul>
                         </NavigationMenuContent>
                     </NavigationMenuItem>

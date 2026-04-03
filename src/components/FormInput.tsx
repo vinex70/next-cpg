@@ -1,11 +1,10 @@
-// src/components/form/FormInput.tsx
 import { Controller, useFormContext } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 
 type FormInputProps = {
     name: string
     placeholder?: string
-    onBlur?: () => void
+    onBlur?: (value: string) => void // 🔥 kirim value
 }
 
 const FormInput = ({ name, placeholder, onBlur }: FormInputProps) => {
@@ -16,7 +15,17 @@ const FormInput = ({ name, placeholder, onBlur }: FormInputProps) => {
             control={control}
             name={name}
             render={({ field }) => (
-                <Input {...field} placeholder={placeholder} onBlur={onBlur} />
+                <Input
+                    {...field}
+                    placeholder={placeholder}
+                    onBlur={(e) => {
+                        field.onBlur(); // ✅ tetap panggil RHF
+
+                        if (onBlur) {
+                            onBlur(e.target.value); // ✅ kirim value ke parent
+                        }
+                    }}
+                />
             )}
         />
     )

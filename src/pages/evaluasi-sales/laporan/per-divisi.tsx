@@ -13,20 +13,13 @@ import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
 import LoadingIgr from "@/components/LoadingIgr";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { FileText, PackageSearch, ReceiptText } from "lucide-react";
+import { perDivisiColumns, PerDivisiRows } from "@/configs/evaluasi-sales/perDivisiConfig";
+import { buildReport } from "@/utils/reportBuilder";
 
-type DivisiRow = {
-    div: string;
-    nama_div: string;
-    jumlah_member: number;
-    jumlah_struk: number;
-    jumlah_produk: number;
-    total_qty: number;
-    total_gross: number;
-    total_netto: number;
-    total_margin: number;
-};
 
 const PerDivisiPage = () => {
+
+    const config = buildReport<PerDivisiRows>(perDivisiColumns);
     const {
         query,
         searchTerm,
@@ -40,71 +33,29 @@ const PerDivisiPage = () => {
         handleExport,
         isRefreshing,
         handleRefresh,
-    } = useReportPage<DivisiRow>({
+    } = useReportPage<PerDivisiRows>({
         basePath: "evaluasi-sales",
-        searchableFields: ["div", "nama_div"],
-        numericFields: [
-            "jumlah_member",
-            "jumlah_struk",
-            "jumlah_produk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-        ],
-        headers: [
-            "Div",
-            "Nama Div",
-            "Member",
-            "Struk",
-            "Produk",
-            "Qty",
-            "Gross",
-            "Netto",
-            "Margin",
-        ],
-
-        mapRow: (row) => [
-            row.div,
-            row.nama_div,
-            Number(row.jumlah_member),
-            Number(row.jumlah_struk),
-            Number(row.jumlah_produk),
-            Number(row.total_qty),
-            Number(row.total_gross),
-            Number(row.total_netto),
-            Number(row.total_margin),
-        ]
+        ...config,
     })
 
-    const columns: { field: keyof DivisiRow; label: string; isNumeric?: boolean }[] = [
-        { field: "div", label: "Div" },
-        { field: "nama_div", label: "Nama Div" },
-        { field: "jumlah_member", label: "Member", isNumeric: true },
-        { field: "jumlah_struk", label: "Struk", isNumeric: true },
-        { field: "jumlah_produk", label: "Produk", isNumeric: true },
-        { field: "total_qty", label: "Qty", isNumeric: true },
-        { field: "total_gross", label: "Gross", isNumeric: true },
-        { field: "total_netto", label: "Netto", isNumeric: true },
-        { field: "total_margin", label: "Margin", isNumeric: true },
-    ]
+    const columns = perDivisiColumns;
 
-    const [selectedRow, setSelectedRow] = useState<DivisiRow | null>(null);
+    const [selectedRow, setSelectedRow] = useState<PerDivisiRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
     const [showProdukTanggalModal, setShowProdukTanggalModal] = useState(false);
     const [showStrukModal, setShowStrukModal] = useState(false);
 
-    const handleOpenProdukTanggalModal = (row: DivisiRow) => {
+    const handleOpenProdukTanggalModal = (row: PerDivisiRows) => {
         setSelectedRow(row);
         setShowProdukTanggalModal(true);
     };
 
-    const handleOpenStrukModal = (row: DivisiRow) => {
+    const handleOpenStrukModal = (row: PerDivisiRows) => {
         setSelectedRow(row);
         setShowStrukModal(true);
     };
 
-    const handleOpenProdukModal = (row: DivisiRow) => {
+    const handleOpenProdukModal = (row: PerDivisiRows) => {
         setSelectedRow(row);
         setShowProdukModal(true);
     };

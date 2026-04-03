@@ -10,7 +10,8 @@ interface Column<T> {
 interface ReportTableProps<T> {
     columns: Column<T>[];
     data: T[];
-    totalRow: T | (string | number)[];
+    totalRow?: T | (string | number)[];
+    customFooter?: (data: T[]) => React.ReactNode;
     renderHeaderGroup?: React.ReactNode;
     keyField?: keyof T | ((row: T) => string);
     renderActions?: (row: T) => React.ReactNode;
@@ -43,6 +44,7 @@ export function ReportTable<T extends Record<string, unknown>>({
     columns,
     data,
     totalRow,
+    customFooter,
     renderHeaderGroup,
     keyField,
     renderActions,
@@ -161,57 +163,61 @@ export function ReportTable<T extends Record<string, unknown>>({
                 {/* ================= FOOTER ================= */}
                 <tfoot className="sticky bottom-0 z-10">
                     {!isRefreshing && data.length > 0 && (
-                        <tr className={`font-semibold bg-white text-${textFooter}`}>
+                        customFooter ? (
+                            customFooter(data)
+                        ) : totalRow ? (
+                            <tr className={`font-semibold bg-white text-${textFooter}`}>
 
-                            {/* 🔥 TOTAL LABEL */}
-                            <td
-                                colSpan={
-                                    (showRowNumber ? 1 : 0) +
-                                    (firstNumericIndex >= 0 ? firstNumericIndex : columns.length)
-                                }
-                                className="border px-2 py-2 text-center bg-blue-400 font-bold"
-                            >
-                                TOTAL
-                            </td>
+                                {/* 🔥 TOTAL LABEL */}
+                                <td
+                                    colSpan={
+                                        (showRowNumber ? 1 : 0) +
+                                        (firstNumericIndex >= 0 ? firstNumericIndex : columns.length)
+                                    }
+                                    className="border px-2 py-2 text-center bg-blue-400 font-bold"
+                                >
+                                    TOTAL
+                                </td>
 
-                            {/* 🔥 NUMERIC VALUES */}
-                            {columns.map((col, idx) => {
-                                if (!col.isNumeric) return null;
+                                {/* 🔥 NUMERIC VALUES */}
+                                {columns.map((col, idx) => {
+                                    if (!col.isNumeric) return null;
 
-                                const value = isArrayTotal
-                                    ? (totalRow as (string | number)[])[idx]
-                                    : (totalRow as T)[col.field];
+                                    const value = isArrayTotal
+                                        ? (totalRow as (string | number)[])[idx]
+                                        : (totalRow as T)[col.field];
 
-                                return (
-                                    <td
-                                        key={`num-${String(col.field)}`}
-                                        className="border px-2 py-2 text-right bg-blue-400"
-                                    >
-                                        {typeof value === "number"
-                                            ? formatNumber(value)
-                                            : String(value ?? "")}
-                                    </td>
-                                );
-                            })}
+                                    return (
+                                        <td
+                                            key={`num-${String(col.field)}`}
+                                            className="border px-2 py-2 text-right bg-blue-400"
+                                        >
+                                            {typeof value === "number"
+                                                ? formatNumber(value)
+                                                : String(value ?? "")}
+                                        </td>
+                                    );
+                                })}
 
-                            {/* 🔥 KOLOM NON-NUMERIC SETELAH NUMERIC */}
-                            {columns
-                                .slice(
-                                    firstNumericIndex +
-                                    columns.filter(c => c.isNumeric).length
-                                )
-                                .map((col) => (
-                                    <td
-                                        key={`empty-${String(col.field)}`}
-                                        className="border px-2 py-2 bg-blue-400"
-                                    />
-                                ))}
+                                {/* 🔥 KOLOM NON-NUMERIC SETELAH NUMERIC */}
+                                {columns
+                                    .slice(
+                                        firstNumericIndex +
+                                        columns.filter(c => c.isNumeric).length
+                                    )
+                                    .map((col) => (
+                                        <td
+                                            key={`empty-${String(col.field)}`}
+                                            className="border px-2 py-2 bg-blue-400"
+                                        />
+                                    ))}
 
-                            {/* 🔥 ACTION */}
-                            {renderActions && (
-                                <td className="border px-2 py-2 bg-blue-400" />
-                            )}
-                        </tr>
+                                {/* 🔥 ACTION */}
+                                {renderActions && (
+                                    <td className="border px-2 py-2 bg-blue-400" />
+                                )}
+                            </tr>
+                        ) : null
                     )}
                 </tfoot>
 

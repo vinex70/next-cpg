@@ -14,20 +14,23 @@ interface UseReportPageOptions<T> {
     headers: string[];
     mapRow: (row: T) => (string | number | null)[];
     allFields: (keyof T)[];
+    enabled?: boolean;
 }
 
 export function useReportPage<T extends object>(
     options: UseReportPageOptions<T>
 ) {
-    const { basePath, searchableFields, numericFields, headers, mapRow, allFields } = options;
+    const { basePath, searchableFields, numericFields, headers, mapRow, allFields, enabled } = options;
 
     const { query, endpoint } = useReportQueryEndpoint({ basePath });
+    console.log("QUERY:", query);
+    console.log("ENDPOINT:", endpoint);
     const [searchTerm, setSearchTerm] = useState("");
 
     const { data, loading, error, refetch } = useFetchData<T[]>({
         endpoint,
         queryParams: query as Record<string, string>,
-        enabled: !!endpoint, // hanya fetch jika endpoint sudah tersedia
+        enabled: enabled !== undefined ? enabled : !!endpoint, // hanya fetch jika endpoint sudah tersedia
     });
 
     const { isRefreshing, handleRefresh } = useRefreshRouter(loading, refetch);

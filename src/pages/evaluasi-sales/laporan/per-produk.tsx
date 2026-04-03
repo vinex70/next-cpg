@@ -9,22 +9,11 @@ import LoadingIgr from "@/components/LoadingIgr";
 import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { FileText } from "lucide-react";
-
-type ProdukRows = {
-    div: string;
-    dept: string;
-    kategori: string;
-    plu: string;
-    nama_produk: string;
-    jumlah_member: number;
-    jumlah_struk: number;
-    total_qty: number;
-    total_gross: number;
-    total_netto: number;
-    total_margin: number;
-};
+import { buildReport } from "@/utils/reportBuilder";
+import { perProdukColumns, PerProdukRows } from "@/configs/evaluasi-sales/perProdukConfig";
 
 const PerProdukPage = () => {
+    const config = buildReport<PerProdukRows>(perProdukColumns)
     const {
         query,
         searchTerm,
@@ -38,65 +27,16 @@ const PerProdukPage = () => {
         handleExport,
         isRefreshing,
         handleRefresh,
-    } = useReportPage<ProdukRows>({
+    } = useReportPage<PerProdukRows>({
         basePath: "evaluasi-sales",
-        searchableFields: ["div", "dept", "kategori", "plu", "nama_produk"],
-        numericFields: [
-            "jumlah_member",
-            "jumlah_struk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-        ],
-        headers: [
-            "Div",
-            "Dept",
-            "Kat",
-            "PLU",
-            "Nama Produk",
-            "Jumlah Member",
-            "Jumlah Struk",
-            "Total Qty",
-            "Total Gross",
-            "Total Netto",
-            "Total Margin",
-        ],
-        mapRow: (row) => [
-            row.div,
-            row.dept,
-            row.kategori,
-            row.plu,
-            row.nama_produk,
-            Number(row.jumlah_member),
-            Number(row.jumlah_struk),
-            Number(row.total_qty),
-            Number(row.total_gross),
-            Number(row.total_netto),
-            Number(row.total_margin),
-        ],
+        ...config
     });
-
-    const columns: { field: keyof ProdukRows; label: string; isNumeric?: boolean }[] = [
-        { field: "div", label: "Div" },
-        { field: "dept", label: "Dept" },
-        { field: "kategori", label: "Kat" },
-        { field: "plu", label: "PLU" },
-        { field: "nama_produk", label: "Nama" },
-        { field: "jumlah_member", label: "Member", isNumeric: true },
-        { field: "jumlah_struk", label: "Struk", isNumeric: true },
-        { field: "total_qty", label: "Qty", isNumeric: true },
-        { field: "total_gross", label: "Gross", isNumeric: true },
-        { field: "total_netto", label: "Netto", isNumeric: true },
-        { field: "total_margin", label: "Margin", isNumeric: true },
-    ];
-
     // State for modal
     // Use a more specific type for selectedRow
-    const [selectedRow, setSelectedRow] = useState<ProdukRows | null>(null);
+    const [selectedRow, setSelectedRow] = useState<PerProdukRows | null>(null);
     const [showStrukModal, setShowStrukModal] = useState(false);
 
-    const handleOpenStrukModal = (row: ProdukRows) => {
+    const handleOpenStrukModal = (row: PerProdukRows) => {
         setSelectedRow(row);
         setShowStrukModal(true);
     };
@@ -137,7 +77,7 @@ const PerProdukPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={columns}
+                                columns={config.tableColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="plu"

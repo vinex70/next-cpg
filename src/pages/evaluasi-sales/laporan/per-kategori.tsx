@@ -9,26 +9,15 @@ import RowDropdownMenu from "@/components/RowDropdownMenu";
 import SearchInput from "@/components/SearchInput";
 import { ReportTable } from "@/components/table/ReportTable";
 import { Button } from "@/components/ui/button";
+import { perKategoriColumns, PerKategoriRows } from "@/configs/evaluasi-sales/perKategoriConfig";
 import { useReportPage } from "@/hooks/useReportPage";
+import { buildReport } from "@/utils/reportBuilder";
 import { FileText, PackageSearch, ReceiptText } from "lucide-react";
 import { useState } from "react";
 
-// Tipe data hasil dari API
-type KategoriRows = {
-    div: string;
-    dept: string;
-    kategori: string;
-    nama_kategori: string;
-    jumlah_member: number;
-    jumlah_struk: number;
-    jumlah_produk: number;
-    total_qty: number;
-    total_gross: number;
-    total_netto: number;
-    total_margin: number;
-};
-
 const PerKategoriPage = () => {
+
+    const config = buildReport<PerKategoriRows>(perKategoriColumns)
     const {
         query,
         searchTerm,
@@ -42,47 +31,12 @@ const PerKategoriPage = () => {
         handleExport,
         isRefreshing,
         handleRefresh,
-    } = useReportPage<KategoriRows>({
+    } = useReportPage<PerKategoriRows>({
         basePath: "evaluasi-sales",
-        searchableFields: ["div", "dept", "kategori", "nama_kategori"],
-        numericFields: [
-            "jumlah_member",
-            "jumlah_struk",
-            "jumlah_produk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-        ],
-        headers: [
-            "Div",
-            "Dept",
-            "Kat",
-            "Nama Kategori",
-            "Member",
-            "Struk",
-            "Produk",
-            "Qty",
-            "Gross",
-            "Netto",
-            "Margin",
-        ],
-        mapRow: (row) => [
-            row.div,
-            row.dept,
-            row.kategori,
-            row.nama_kategori,
-            Number(row.jumlah_member),
-            Number(row.jumlah_struk),
-            Number(row.jumlah_produk),
-            Number(row.total_qty),
-            Number(row.total_gross),
-            Number(row.total_netto),
-            Number(row.total_margin),
-        ]
+        ...config,
     })
 
-    const columns: { field: keyof KategoriRows; label: string; isNumeric?: boolean }[] = [
+    const columns: { field: keyof PerKategoriRows; label: string; isNumeric?: boolean }[] = [
         { field: "div", label: "Div" },
         { field: "dept", label: "Dept" },
         { field: "kategori", label: "Katb" },
@@ -96,22 +50,22 @@ const PerKategoriPage = () => {
         { field: "total_margin", label: "Margin", isNumeric: true },
     ]
 
-    const [selectedRow, setSelectedRow] = useState<KategoriRows | null>(null);
+    const [selectedRow, setSelectedRow] = useState<PerKategoriRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
     const [showProdukTanggalModal, setShowProdukTanggalModal] = useState(false);
     const [showStrukModal, setShowStrukModal] = useState(false);
 
-    const handleOpenProdukTanggalModal = (row: KategoriRows) => {
+    const handleOpenProdukTanggalModal = (row: PerKategoriRows) => {
         setSelectedRow(row);
         setShowProdukTanggalModal(true);
     };
 
-    const handleOpenStrukModal = (row: KategoriRows) => {
+    const handleOpenStrukModal = (row: PerKategoriRows) => {
         setSelectedRow(row);
         setShowStrukModal(true);
     };
 
-    const handleOpenProdukModal = (row: KategoriRows) => {
+    const handleOpenProdukModal = (row: PerKategoriRows) => {
         setSelectedRow(row);
         setShowProdukModal(true);
     };

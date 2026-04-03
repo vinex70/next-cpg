@@ -37,18 +37,7 @@ const PerDepartementPage = () => {
         ...config,
     })
 
-    const columns: { field: keyof PerDepartementRows; label: string; isNumeric?: boolean }[] = [
-        { field: "div", label: "Div" },
-        { field: "dept", label: "Dept" },
-        { field: "nama_dept", label: "Nama" },
-        { field: "jumlah_member", label: "Member", isNumeric: true },
-        { field: "jumlah_struk", label: "Struk", isNumeric: true },
-        { field: "jumlah_produk", label: "Produk", isNumeric: true },
-        { field: "total_qty", label: "Qty", isNumeric: true },
-        { field: "total_gross", label: "Gross", isNumeric: true },
-        { field: "total_netto", label: "Netto", isNumeric: true },
-        { field: "total_margin", label: "Margin", isNumeric: true },
-    ]
+    const columns = perDepartementColumns;
 
     const [selectedRow, setSelectedRow] = useState<PerDepartementRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);

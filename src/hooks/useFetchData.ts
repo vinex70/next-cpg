@@ -15,6 +15,12 @@ interface UseFetchDataOptions {
  * @param queryParams Objek query parameters
  * @param enabled Boolean untuk kontrol trigger
  * @returns Objek berisi data, error, dan loading
+ * Contoh penggunaan:
+ * const { data, error, loading } = useFetchData({
+ *   endpoint: "/api/data",
+ *   queryParams: { param1: "value1", param2: "value2" },
+ * });
+ * 
  */
 export function useFetchData<T>({
     endpoint,
