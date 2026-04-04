@@ -37,8 +37,6 @@ const PerDepartementPage = () => {
         ...config,
     })
 
-    const columns = perDepartementColumns;
-
     const [selectedRow, setSelectedRow] = useState<PerDepartementRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
     const [showProdukTanggalModal, setShowProdukTanggalModal] = useState(false);
@@ -105,7 +103,7 @@ const PerDepartementPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={columns}
+                                columns={perDepartementColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField={(row) => `${row.div}-${row.dept}`}

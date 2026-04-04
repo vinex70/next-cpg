@@ -11,18 +11,11 @@ import ProdukModal from "@/components/modal/evaluasi-sales/ProdukModal";
 import LoadingIgr from "@/components/LoadingIgr";
 import { FileText, PackageSearch, ReceiptText } from "lucide-react";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
-
-type TanggalRows = {
-    tanggal: string;
-    jumlah_member: number;
-    jumlah_struk: number;
-    total_qty: number;
-    total_gross: number;
-    total_netto: number;
-    total_margin: number;
-};
+import { buildReport } from "@/utils/reportBuilder";
+import { perTanggalColumns, PerTanggalRows } from "@/configs/evaluasi-sales/perTanggal";
 
 const PerTanggalPage = () => {
+    const config = buildReport<PerTanggalRows>(perTanggalColumns);
     const {
         searchTerm,
         setSearchTerm,
@@ -35,68 +28,32 @@ const PerTanggalPage = () => {
         handleExport,
         isRefreshing,
         handleRefresh,
-    } = useReportPage<TanggalRows>({
+    } = useReportPage<PerTanggalRows>({
         basePath: "evaluasi-sales",
-        searchableFields: ["tanggal"],
-        numericFields: [
-            "jumlah_member",
-            "jumlah_struk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-        ],
-        headers: [
-            "Tgl",
-            "Jumlah Member",
-            "Jumlah Struk",
-            "Total Qty",
-            "Total Gross",
-            "Total Netto",
-            "Total Margin",
-        ],
-        mapRow: (row) => [
-            row.tanggal,
-            Number(row.jumlah_member),
-            Number(row.jumlah_struk),
-            Number(row.total_qty),
-            Number(row.total_gross),
-            Number(row.total_netto),
-            Number(row.total_margin),
-        ],
+        ...config
     });
-
-    const columns: { field: keyof TanggalRows; label: string; isNumeric?: boolean }[] = [
-        { field: "tanggal", label: "Tgl" },
-        { field: "jumlah_member", label: "Member", isNumeric: true },
-        { field: "jumlah_struk", label: "Struk", isNumeric: true },
-        { field: "total_qty", label: "Qty", isNumeric: true },
-        { field: "total_gross", label: "Gross", isNumeric: true },
-        { field: "total_netto", label: "Netto", isNumeric: true },
-        { field: "total_margin", label: "Margin", isNumeric: true },
-    ];
 
     const convertToISODate = (dateStr: string): string => {
         const [day, month, year] = dateStr.split("-");
         return `${year}-${month}-${day}`;
     };
 
-    const [selectedRow, setSelectedRow] = useState<TanggalRows | null>(null);
+    const [selectedRow, setSelectedRow] = useState<PerTanggalRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
     const [showProdukTanggalModal, setShowProdukTanggalModal] = useState(false);
     const [showStrukModal, setShowStrukModal] = useState(false);
 
-    const handleOpenProdukTanggalModal = (row: TanggalRows) => {
+    const handleOpenProdukTanggalModal = (row: PerTanggalRows) => {
         setSelectedRow(row);
         setShowProdukTanggalModal(true);
     };
 
-    const handleOpenStrukModal = (row: TanggalRows) => {
+    const handleOpenStrukModal = (row: PerTanggalRows) => {
         setSelectedRow(row);
         setShowStrukModal(true);
     };
 
-    const handleOpenProdukModal = (row: TanggalRows) => {
+    const handleOpenProdukModal = (row: PerTanggalRows) => {
         setSelectedRow(row);
         setShowProdukModal(true);
     };
@@ -148,7 +105,7 @@ const PerTanggalPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={columns}
+                                columns={perTanggalColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="tanggal"

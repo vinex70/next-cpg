@@ -10,20 +10,11 @@ import LoadingIgr from "@/components/LoadingIgr";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { ReceiptText } from "lucide-react";
 import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
-
-type SupplierRow = {
-    kode_supplier: string;
-    nama_supplier: string;
-    jumlah_member: number;
-    jumlah_struk: number;
-    jumlah_produk: number;
-    total_qty: number;
-    total_gross: number;
-    total_netto: number;
-    total_margin: number;
-};
+import { buildReport } from "@/utils/reportBuilder";
+import { perSupplierColumns, PerSupplierRows } from "@/configs/evaluasi-sales/perSupplier";
 
 const PerSupplierPage = () => {
+    const config = buildReport<PerSupplierRows>(perSupplierColumns);
     const {
         query,
         searchTerm,
@@ -37,66 +28,23 @@ const PerSupplierPage = () => {
         handleExport,
         isRefreshing,
         handleRefresh,
-    } = useReportPage<SupplierRow>({
+    } = useReportPage<PerSupplierRows>({
         basePath: "evaluasi-sales",
-        searchableFields: ["kode_supplier", "nama_supplier"],
-        numericFields: [
-            "jumlah_member",
-            "jumlah_struk",
-            "jumlah_produk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-        ],
-        headers: [
-            "Kode Supplier",
-            "Nama Supplier",
-            "Member",
-            "Struk",
-            "Produk",
-            "Qty",
-            "Gross",
-            "Netto",
-            "Margin",
-        ],
-        mapRow: (row) => [
-            row.kode_supplier,
-            row.nama_supplier,
-            Number(row.jumlah_member),
-            Number(row.jumlah_struk),
-            Number(row.jumlah_produk),
-            Number(row.total_qty),
-            Number(row.total_gross),
-            Number(row.total_netto),
-            Number(row.total_margin),
-        ],
+        ...config
     });
-
-    const columns: { field: keyof SupplierRow; label: string; isNumeric?: boolean }[] = [
-        { field: "kode_supplier", label: "Kode Supplier" },
-        { field: "nama_supplier", label: "Nama Supplier" },
-        { field: "jumlah_member", label: "Jumlah Member", isNumeric: true },
-        { field: "jumlah_struk", label: "Jumlah Struk", isNumeric: true },
-        { field: "jumlah_produk", label: "Jumlah Produk", isNumeric: true },
-        { field: "total_qty", label: "Qty", isNumeric: true },
-        { field: "total_gross", label: "Gross", isNumeric: true },
-        { field: "total_netto", label: "Netto", isNumeric: true },
-        { field: "total_margin", label: "Margin", isNumeric: true },
-    ];
 
     // State for modal
     // Use a more specific type for selectedRow
-    const [selectedRow, setSelectedRow] = useState<SupplierRow | null>(null);
+    const [selectedRow, setSelectedRow] = useState<PerSupplierRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
     const [showStrukModal, setShowStrukModal] = useState(false);
 
-    const handleOpenProdukModal = (row: SupplierRow) => {
+    const handleOpenProdukModal = (row: PerSupplierRows) => {
         setSelectedRow(row);
         setShowProdukModal(true);
     };
 
-    const handleOpenStrukModal = (row: SupplierRow) => {
+    const handleOpenStrukModal = (row: PerSupplierRows) => {
         setSelectedRow(row);
         setShowStrukModal(true);
     };
@@ -142,7 +90,7 @@ const PerSupplierPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={columns}
+                                columns={perSupplierColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="kode_supplier"

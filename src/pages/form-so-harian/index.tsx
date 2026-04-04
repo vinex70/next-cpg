@@ -86,7 +86,9 @@ export default function FormSoHarian() {
                 query: { plu: formattedPlu },
             });
         } catch (err) {
-            console.error(err);
+            if (err instanceof Error) {
+                alert(err.message);
+            }
         }
     };
 
@@ -138,9 +140,14 @@ export default function FormSoHarian() {
                     onSubmit={methods.handleSubmit(onSubmit)}
                     className="flex gap-4"
                 >
+
                     <FormInput
                         name="plu"
-                        placeholder="Contoh: 60410,79630"
+                        placeholder="Input PLU"
+                        required
+                        onInvalid={() => {
+                            alert("PLU tidak boleh kosong!");
+                        }}
                         onBlur={(value: string) => {
                             try {
                                 const formatted = formatPluGrup(value);

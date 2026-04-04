@@ -77,7 +77,7 @@ const PerProdukPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={config.tableColumns}
+                                columns={perProdukColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="plu"

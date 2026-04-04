@@ -9,24 +9,12 @@ import ProdukModal from "@/components/modal/evaluasi-sales/ProdukModal";
 import LoadingIgr from "@/components/LoadingIgr";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { ReceiptText } from "lucide-react";
-
-type StrukRows = {
-    tanggal: string;
-    struk: string;
-    station: string;
-    kasir: string;
-    kd_member: string;
-    nama_member: string;
-    jumlah_produk: number;
-    total_qty: number;
-    total_gross: number;
-    total_netto: number;
-    total_margin: number;
-    metode_pembayaran: string;
-    jenis_member: string;
-};
+import { buildReport } from "@/utils/reportBuilder";
+import { perStrukColumns, PerStrukRows } from "@/configs/evaluasi-sales/perStruk";
 
 const PerProdukPage = () => {
+    const config = buildReport<PerStrukRows>(perStrukColumns)
+
     const {
         query,
         searchTerm,
@@ -40,68 +28,16 @@ const PerProdukPage = () => {
         handleExport,
         isRefreshing,
         handleRefresh,
-    } = useReportPage<StrukRows>({
+    } = useReportPage<PerStrukRows>({
         basePath: "evaluasi-sales",
-        searchableFields: ["tanggal", "struk", "station", "kasir", "kd_member", "nama_member", "jenis_member", "metode_pembayaran"],
-        numericFields: [
-            "jumlah_produk",
-            "total_qty",
-            "total_gross",
-            "total_netto",
-            "total_margin",
-        ],
-        headers: [
-            "Tanggal",
-            "Struk",
-            "Station",
-            "Kasir",
-            "Kode Member",
-            "Nama Member",
-            "Jenis Member",
-            "Metode Pembayaran",
-            "Jumlah Produk",
-            "Total Qty",
-            "Total Gross",
-            "Total Netto",
-            "Total Margin",
-        ],
-        mapRow: (row) => [
-            row.tanggal,
-            row.struk,
-            row.station,
-            row.kasir,
-            row.kd_member,
-            row.nama_member,
-            Number(row.jumlah_produk),
-            Number(row.total_qty),
-            Number(row.total_gross),
-            Number(row.total_netto),
-            Number(row.total_margin),
-        ],
+        ...config
     });
-
-    const columns: { field: keyof StrukRows; label: string; isNumeric?: boolean }[] = [
-        { field: "tanggal", label: "Tanggal" },
-        { field: "struk", label: "Struk" },
-        { field: "station", label: "Station" },
-        { field: "kasir", label: "Kasir" },
-        { field: "kd_member", label: "Kd Mem" },
-        { field: "nama_member", label: "Nama Mem" },
-        { field: "jenis_member", label: "Jenis Mem" },
-        { field: "metode_pembayaran", label: "Metode Pembayaran" },
-        { field: "jumlah_produk", label: "Jumlah Produk", isNumeric: true },
-        { field: "total_qty", label: "Qty", isNumeric: true },
-        { field: "total_gross", label: "Gross", isNumeric: true },
-        { field: "total_netto", label: "Netto", isNumeric: true },
-        { field: "total_margin", label: "Margin", isNumeric: true },
-    ];
-
     // State for modal
     // Use a more specific type for selectedRow
-    const [selectedRow, setSelectedRow] = useState<StrukRows | null>(null);
+    const [selectedRow, setSelectedRow] = useState<PerStrukRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
 
-    const handleOpenProdukModal = (row: StrukRows) => {
+    const handleOpenProdukModal = (row: PerStrukRows) => {
         setSelectedRow(row);
         setShowProdukModal(true);
     };
@@ -142,7 +78,7 @@ const PerProdukPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={columns}
+                                columns={perStrukColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="struk"
@@ -153,10 +89,10 @@ const PerProdukPage = () => {
                                 isRefreshing={isRefreshing}
                                 renderHeaderGroup={
                                     <tr>
-                                        <th colSpan={9} className="border border-gray-400 px-2 py-2">
+                                        <th colSpan={7} className="border border-gray-400 px-2 py-2">
                                             Info Struk
                                         </th>
-                                        <th colSpan={6} className="border border-gray-400 bg-red-400 px-2 py-2">
+                                        <th colSpan={8} className="border border-gray-400 bg-red-400 px-2 py-2">
                                             Sales
                                         </th>
                                     </tr>

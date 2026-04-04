@@ -23,8 +23,7 @@ export function useReportPage<T extends object>(
     const { basePath, searchableFields, numericFields, headers, mapRow, allFields, enabled } = options;
 
     const { query, endpoint } = useReportQueryEndpoint({ basePath });
-    console.log("QUERY:", query);
-    console.log("ENDPOINT:", endpoint);
+
     const [searchTerm, setSearchTerm] = useState("");
 
     const { data, loading, error, refetch } = useFetchData<T[]>({
@@ -49,6 +48,11 @@ export function useReportPage<T extends object>(
         data: filteredData ?? [],
         mapRow: (row: T) => mapRow(row).map(cell => cell === null ? "" : cell),
         totalRow,
+        columns: allFields.map((field) => ({
+            field,
+            label: headers[allFields.indexOf(field)],
+            isNumeric: numericFields.includes(field),
+        })),
     });
 
     return {

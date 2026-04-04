@@ -31,9 +31,6 @@ const PerProdukPage = () => {
         basePath: "evaluasi-sales",
         ...config,
     });
-
-    const columns = perKasirColumns
-
     // State for modal
     // Use a more specific type for selectedRow
     const [selectedRow, setSelectedRow] = useState<PerKasirRows | null>(null);
@@ -80,7 +77,7 @@ const PerProdukPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={columns}
+                                columns={perKasirColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="kasir"

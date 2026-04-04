@@ -79,7 +79,7 @@ const PerMemberPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={config.tableColumns}
+                                columns={perMemberColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField={(row) => `${row.kd_member}-${row.outlet}`}

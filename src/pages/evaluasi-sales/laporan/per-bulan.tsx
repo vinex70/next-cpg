@@ -124,7 +124,7 @@ const PerBulanPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={config.tableColumns}
+                                columns={perBulanColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="bulan"

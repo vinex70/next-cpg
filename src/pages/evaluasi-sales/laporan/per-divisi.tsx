@@ -38,8 +38,6 @@ const PerDivisiPage = () => {
         ...config,
     })
 
-    const columns = perDivisiColumns;
-
     const [selectedRow, setSelectedRow] = useState<PerDivisiRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
     const [showProdukTanggalModal, setShowProdukTanggalModal] = useState(false);
@@ -107,7 +105,7 @@ const PerDivisiPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={columns}
+                                columns={perDivisiColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField={(row) => `${row.div}-${row.nama_div}`}

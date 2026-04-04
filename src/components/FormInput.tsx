@@ -5,9 +5,11 @@ type FormInputProps = {
     name: string
     placeholder?: string
     onBlur?: (value: string) => void // 🔥 kirim value
+    required?: boolean
+    onInvalid?: () => void
 }
 
-const FormInput = ({ name, placeholder, onBlur }: FormInputProps) => {
+const FormInput = ({ name, placeholder, onBlur, required, onInvalid }: FormInputProps) => {
     const { control } = useFormContext()
 
     return (
@@ -18,6 +20,12 @@ const FormInput = ({ name, placeholder, onBlur }: FormInputProps) => {
                 <Input
                     {...field}
                     placeholder={placeholder}
+                    required={required}
+                    onInvalid={() => {
+                        if (required) {
+                            onInvalid?.(); // ✅ panggil onInvalid jika ada
+                        }
+                    }}
                     onBlur={(e) => {
                         field.onBlur(); // ✅ tetap panggil RHF
 
@@ -25,6 +33,7 @@ const FormInput = ({ name, placeholder, onBlur }: FormInputProps) => {
                             onBlur(e.target.value); // ✅ kirim value ke parent
                         }
                     }}
+
                 />
             )}
         />

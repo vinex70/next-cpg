@@ -2,29 +2,34 @@
 import { useMemo } from "react";
 import { formatNumber } from "@/utils/formatNumber";
 
+
 export function useTotalRow<T>(
     data: T[] | undefined,
     identityFields: (keyof T)[],
     numericFields: (keyof T)[],
-    allFields: (keyof T)[] // ✅ Tambah parameter ini
+    allFields: (keyof T)[]
 ): (string | number)[] {
     return useMemo(() => {
         if (!data || data.length === 0) return [];
 
-        const totalRow: (string | number)[] = [
-            "TOTAL",
-            // Empty untuk identity fields (selain yang pertama)
-            ...identityFields.slice(1).map(() => ""),
-            // Numeric totals
-            ...numericFields.map((key) =>
-                formatNumber(data.reduce((acc, row) => acc + Number(row[key] ?? 0), 0))
-            ),
-            // ✅ Empty untuk sisa kolom non-numeric di akhir
-            ...allFields
-                .filter((field) => !identityFields.includes(field) && !numericFields.includes(field))
-                .map(() => ""),
-        ];
+        return allFields.map((field, index) => {
+            // Kolom pertama → TOTAL
+            if (index === 0) return "TOTAL";
 
-        return totalRow;
+            // Identity field → kosong
+            if (identityFields.includes(field)) return "";
+
+            // Numeric field → hitung total
+            if (numericFields.includes(field)) {
+                const total = data.reduce(
+                    (acc, row) => acc + Number(row[field] ?? 0),
+                    0
+                );
+                return formatNumber(total);
+            }
+
+            // Sisanya → kosong
+            return "";
+        });
     }, [data, identityFields, numericFields, allFields]);
 }

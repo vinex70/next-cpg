@@ -36,20 +36,6 @@ const PerKategoriPage = () => {
         ...config,
     })
 
-    const columns: { field: keyof PerKategoriRows; label: string; isNumeric?: boolean }[] = [
-        { field: "div", label: "Div" },
-        { field: "dept", label: "Dept" },
-        { field: "kategori", label: "Katb" },
-        { field: "nama_kategori", label: "Nama" },
-        { field: "jumlah_member", label: "Member", isNumeric: true },
-        { field: "jumlah_struk", label: "Struk", isNumeric: true },
-        { field: "jumlah_produk", label: "Produk", isNumeric: true },
-        { field: "total_qty", label: "Qty", isNumeric: true },
-        { field: "total_gross", label: "Gross", isNumeric: true },
-        { field: "total_netto", label: "Netto", isNumeric: true },
-        { field: "total_margin", label: "Margin", isNumeric: true },
-    ]
-
     const [selectedRow, setSelectedRow] = useState<PerKategoriRows | null>(null);
     const [showProdukModal, setShowProdukModal] = useState(false);
     const [showProdukTanggalModal, setShowProdukTanggalModal] = useState(false);
@@ -116,7 +102,7 @@ const PerKategoriPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={columns}
+                                columns={perKategoriColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField={(row) => `${row.div}-${row.dept}-${row.kategori}`}

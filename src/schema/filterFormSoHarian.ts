@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const FilterFormSoHarianSchema = z.object({
-    plu: z.string().optional(),
+    plu: z.string().min(1, "PLU tidak boleh kosong"),
     // Tambahkan fields lain sesuai kebutuhan
 });
 
