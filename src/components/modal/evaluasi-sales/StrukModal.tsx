@@ -136,7 +136,7 @@ export default function StrukModal({
     // ✅ Gunakan useExportToExcel
     const { handleExport } = useExportToExcel<Struk>({
         title: `Detail Struk`,
-        headers: columns.map(col => col.label),
+        columns,
         data: numberedData,
         mapRow: (row) => [
             row.no ?? "",

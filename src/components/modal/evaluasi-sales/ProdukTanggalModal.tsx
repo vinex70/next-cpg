@@ -135,7 +135,7 @@ export default function ProdukTanggalModal({
     // ✅ Gunakan useExportToExcel
     const { handleExport } = useExportToExcel<ProdukRows>({
         title: `Detail Produk Per Tanggal`,
-        headers: columns.map(col => col.label),
+        columns,
         data: numberedData,
         mapRow: (row) => [
             row.no ?? "",

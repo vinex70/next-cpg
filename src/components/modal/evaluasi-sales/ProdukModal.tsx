@@ -53,34 +53,38 @@ export default function ProdukModal({
     noMember,
 }: Props) {
     const [searchTerm, setSearchTerm] = useState("");
+
+    // ================= QUERY PARAMS =================
     const queryParams = useMemo(() => {
         const params: Record<string, string | number | boolean> = {
             startDate,
             endDate,
         };
-        if (div !== undefined) params.div = div;
-        if (dept !== undefined) params.dept = dept;
-        if (kat !== undefined) params.kat = kat;
-        if (prdcd !== undefined) params.plu = prdcd;
-        if (struk !== undefined) params.struk = struk;
-        if (kode_supplier !== undefined) params.kode_supplier = kode_supplier;
-        if (kasir !== undefined) params.kasir = kasir;
-        if (noMember !== undefined) params.noMember = noMember;
+
+        if (div) params.div = div;
+        if (dept) params.dept = dept;
+        if (kat) params.kat = kat;
+        if (prdcd) params.plu = prdcd;
+        if (struk) params.struk = struk;
+        if (kode_supplier) params.kode_supplier = kode_supplier;
+        if (kasir) params.kasir = kasir;
+        if (noMember) params.noMember = noMember;
+
         return params;
     }, [startDate, endDate, div, dept, kat, prdcd, struk, kode_supplier, kasir, noMember]);
 
     useEffect(() => {
-        if (!show) {
-            setSearchTerm("");
-        }
+        if (!show) setSearchTerm("");
     }, [show]);
 
+    // ================= FETCH =================
     const { data, error, loading } = useFetchData<ProdukRows[]>({
         endpoint: "/evaluasi-sales/per-produk",
         queryParams,
         enabled: show,
     });
 
+    // ================= FILTER =================
     const filteredData = useFilteredData(data ?? [], searchTerm, [
         "div",
         "dept",
@@ -89,6 +93,7 @@ export default function ProdukModal({
         "nama_produk",
     ]);
 
+    // ================= ADD ROW NUMBER =================
     const numberedData = useMemo(() => {
         return (filteredData ?? []).map((item, index) => ({
             ...item,
@@ -96,6 +101,7 @@ export default function ProdukModal({
         }));
     }, [filteredData]);
 
+    // ================= COLUMNS =================
     const columns = useMemo<
         { field: keyof ProdukRows; label: string; isNumeric?: boolean }[]
     >(() => [
@@ -113,72 +119,52 @@ export default function ProdukModal({
         { field: "total_margin", label: "Total Margin", isNumeric: true },
     ], []);
 
+    // ================= TOTAL ROW (🔥 AUTO DYNAMIC) =================
     const totalRow = useMemo(() => {
-        const init: ProdukRows = {
-            no: 0,
-            div: "",
-            dept: "",
-            kategori: "",
-            plu: "",
-            nama_produk: "",
-            jumlah_member: 0,
-            jumlah_struk: 0,
-            total_qty: 0,
-            total_gross: 0,
-            total_netto: 0,
-            total_margin: 0,
-        };
+        if (!filteredData?.length) return [];
 
-        return (filteredData ?? []).reduce((acc, cur) => ({
-            ...acc,
-            jumlah_member: Number(acc.jumlah_member) + Number(cur.jumlah_member),
-            jumlah_struk: Number(acc.jumlah_struk) + Number(cur.jumlah_struk),
-            total_qty: Number(acc.total_qty) + Number(cur.total_qty),
-            total_gross: Number(acc.total_gross) + Number(cur.total_gross),
-            total_netto: Number(acc.total_netto) + Number(cur.total_netto),
-            total_margin: Number(acc.total_margin) + Number(cur.total_margin),
-        }), init);
-    }, [filteredData]);
+        return columns.map((col, idx) => {
+            if (idx === 0) return "TOTAL";
 
-    // ✅ Gunakan useExportToExcel
+            if (col.isNumeric) {
+                return filteredData.reduce(
+                    (acc, row) => acc + Number(row[col.field] ?? 0),
+                    0
+                );
+            }
+
+            return "";
+        });
+    }, [filteredData, columns]);
+
+    // ================= EXPORT =================
     const { handleExport } = useExportToExcel<ProdukRows>({
-        title: `Detail Produk`,
-        headers: columns.map(col => col.label),
+        title: "Detail Produk",
+        columns, // 🔥 pakai columns langsung
         data: numberedData,
-        mapRow: (row) => [
-            row.no ?? "",
-            row.div,
-            row.dept,
-            row.kategori,
-            row.plu,
-            row.nama_produk,
-            Number(row.jumlah_member),
-            Number(row.jumlah_struk),
-            Number(row.total_qty),
-            Number(row.total_gross),
-            Number(row.total_netto),
-            Number(row.total_margin),
-        ],
-        totalRow: [
-            "TOTAL", "", "", "", "", "", "", "", "", // padding kolom string
-            Number(totalRow.total_qty),
-            Number(totalRow.total_gross),
-            Number(totalRow.total_netto),
-            Number(totalRow.total_margin),
-        ],
+        mapRow: (row) =>
+            columns.map((col) => row[col.field] as string | number | null),
+        totalRow, // 🔥 langsung pakai
     });
 
     return (
         <Modal show={show} onClose={onClose}>
-            {loading ?
+            {loading ? (
                 <SkeletonTable rows={10} columns={columns.length} />
-                :
+            ) : (
                 <div className="space-y-4 max-h-[90vh]">
+                    {/* ================= HEADER ================= */}
                     <div className="flex justify-between items-center my-2">
                         <div>
-                            <h1 className="text-2xl font-bold text-green-600">Detail Produk</h1>
-                            <p>{FormatTanggal(startDate)} s/d {FormatTanggal(endDate)}</p>
+                            <h1 className="text-2xl font-bold text-green-600">
+                                Detail Produk
+                            </h1>
+                            <p>
+                                {FormatTanggal(startDate)} s/d{" "}
+                                {FormatTanggal(endDate)}
+                            </p>
                         </div>
+
                         <button
                             onClick={handleExport}
                             className="text-sm text-blue-600 hover:underline"
@@ -187,6 +173,7 @@ export default function ProdukModal({
                         </button>
                     </div>
 
+                    {/* ================= SEARCH ================= */}
                     <SearchInput
                         value={searchTerm}
                         onChange={setSearchTerm}
@@ -195,18 +182,21 @@ export default function ProdukModal({
 
                     {error && <p className="text-red-500">{error}</p>}
 
+                    {/* ================= TABLE ================= */}
                     {!loading && !error && (
                         <ReportTable
                             columns={columns}
                             data={numberedData}
                             totalRow={totalRow}
-                            keyField={(row) => `${row.div}${row.dept}${row.kategori}${row.plu}`}
+                            keyField={(row) =>
+                                `${row.div}${row.dept}${row.kategori}${row.plu}`
+                            }
                             renderHeaderGroup={
                                 <tr>
-                                    <th colSpan={7} className="bg-blue-400 text-white text-left px-2 py-1 border">
-                                        Info Transaksi
+                                    <th colSpan={6} className="bg-blue-400 text-white border px-2 py-1">
+                                        Info Produk
                                     </th>
-                                    <th colSpan={6} className="bg-green-400 text-white text-left px-2 py-1 border">
+                                    <th colSpan={6} className="bg-green-400 text-white border px-2 py-1">
                                         Penjualan
                                     </th>
                                 </tr>
@@ -214,8 +204,7 @@ export default function ProdukModal({
                         />
                     )}
                 </div>
-            }
-
+            )}
         </Modal>
     );
 }

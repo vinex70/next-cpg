@@ -10,7 +10,6 @@ export const useExportToExcel = <T extends object>({
     columns,
 }: {
     title: string;
-    headers: string[];
     data: T[];
     mapRow: (row: T) => (string | number | null)[];
     totalRow?: (string | number | null)[];
