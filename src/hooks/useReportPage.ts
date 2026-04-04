@@ -44,7 +44,6 @@ export function useReportPage<T extends object>(
 
     const { handleExport } = useExportToExcel<T>({
         title,
-        headers,
         data: filteredData ?? [],
         mapRow: (row: T) => mapRow(row).map(cell => cell === null ? "" : cell),
         totalRow,
