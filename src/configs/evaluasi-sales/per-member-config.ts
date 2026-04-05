@@ -36,19 +36,19 @@ export type MemberRows = {
 
 export const perMemberColumns: ColumnConfig<MemberRows>[] = [
 
-    { field: "outlet", label: "Outlet", isSearchable: true, group: "Info Member" },
-    { field: "suboutlet", label: "Sub Outlet", isSearchable: true, group: "Info Member" },
-    { field: "kd_member", label: "Kode Member", isSearchable: true, group: "Info Member" },
-    { field: "nama_member", label: "Nama Member", isSearchable: true, group: "Info Member" },
+    { field: "outlet", label: "Outlet", isSearchable: true, group: "Info Member", groupColor: "bg-green-400" },
+    { field: "suboutlet", label: "Sub Outlet", isSearchable: true, group: "Info Member", groupColor: "bg-green-400" },
+    { field: "kd_member", label: "Kode Member", isSearchable: true, group: "Info Member", groupColor: "bg-green-400" },
+    { field: "nama_member", label: "Nama Member", isSearchable: true, group: "Info Member", groupColor: "bg-green-400" },
 
-    { field: "jumlah_struk", label: "Jumlah Struk", isNumeric: true, group: "Sales" },
-    { field: "jumlah_produk", label: "Jumlah Produk", isNumeric: true, group: "Sales" },
-    { field: "total_qty", label: "Total Qty", isNumeric: true, group: "Sales" },
-    { field: "total_gross", label: "Total Gross", isNumeric: true, group: "Sales" },
-    { field: "total_netto", label: "Total Netto", isNumeric: true, group: "Sales" },
-    { field: "total_margin", label: "Total Margin", isNumeric: true, group: "Sales" },
+    { field: "jumlah_struk", label: "Jumlah Struk", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
+    { field: "jumlah_produk", label: "Jumlah Produk", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
+    { field: "total_qty", label: "Total Qty", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
+    { field: "total_gross", label: "Total Gross", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
+    { field: "total_netto", label: "Total Netto", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
+    { field: "total_margin", label: "Total Margin", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
 
-    { field: "tgl_mulai", label: "Tanggal Mulai", group: "Sales" },
-    { field: "tgl_akhir", label: "Tanggal Akhir", group: "Sales" },
-    { field: "jenis_member", label: "Jenis Member", group: "Sales" },
+    { field: "tgl_mulai", label: "Tanggal Mulai", group: "Sales", groupColor: "bg-red-400" },
+    { field: "tgl_akhir", label: "Tanggal Akhir", group: "Sales", groupColor: "bg-red-400" },
+    { field: "jenis_member", label: "Jenis Member", group: "Sales", groupColor: "bg-red-400" },
 ];

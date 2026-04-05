@@ -10,7 +10,7 @@ import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { FileText } from "lucide-react";
 import { buildReport } from "@/utils/reportBuilder";
-import { perProdukTanggalColumns, PerProdukTanggalRows } from "@/configs/evaluasi-sales/perProdukTanggalConfig";
+import { perProdukTanggalColumns, PerProdukTanggalRows } from "@/configs/evaluasi-sales/per-produk-tanggal-config";
 
 const PerProdukTanggalPage = () => {
     const config = buildReport<PerProdukTanggalRows>(perProdukTanggalColumns)
@@ -79,22 +79,13 @@ const PerProdukTanggalPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={perProdukTanggalColumns}
+                                columns={config.tableColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="plu"
                                 showRowNumber={true}
                                 isRefreshing={isRefreshing}
-                                renderHeaderGroup={
-                                    <tr>
-                                        <th colSpan={7} className="border border-gray-400 px-2 py-2">
-                                            Produk
-                                        </th>
-                                        <th colSpan={7} className="border border-gray-400 px-2 py-2 bg-red-400">
-                                            Sales
-                                        </th>
-                                    </tr>
-                                }
+                                headerGroups={config.headerGroups}
                                 renderActions={(row) => (
                                     <RowDropdownMenu
                                         label={

@@ -13,7 +13,7 @@ import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
 import LoadingIgr from "@/components/LoadingIgr";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { FileText, PackageSearch, ReceiptText } from "lucide-react";
-import { perDivisiColumns, PerDivisiRows } from "@/configs/evaluasi-sales/perDivisiConfig";
+import { perDivisiColumns, PerDivisiRows } from "@/configs/evaluasi-sales/per-divisi-config";
 import { buildReport } from "@/utils/reportBuilder";
 
 
@@ -105,22 +105,13 @@ const PerDivisiPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={perDivisiColumns}
+                                columns={config.tableColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField={(row) => `${row.div}-${row.nama_div}`}
                                 showRowNumber={true}
                                 isRefreshing={isRefreshing}
-                                renderHeaderGroup={
-                                    <tr>
-                                        <th colSpan={3} className="border border-gray-400 px-2 py-2">
-                                            Divisi
-                                        </th>
-                                        <th colSpan={8} className="border border-gray-400 bg-red-400 px-2 py-2">
-                                            Sales
-                                        </th>
-                                    </tr>
-                                }
+                                headerGroups={config.headerGroups}
                                 renderActions={(row) => (
                                     <RowDropdownMenu
                                         label={`${row.div} - ${row.nama_div}`}

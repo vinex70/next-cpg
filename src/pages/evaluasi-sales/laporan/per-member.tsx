@@ -13,7 +13,7 @@ import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { ReceiptText } from "lucide-react";
 
 import { buildReport } from "@/utils/reportBuilder";
-import { perMemberColumns, MemberRows } from "@/configs/evaluasi-sales/perMemberConfig";
+import { perMemberColumns, MemberRows } from "@/configs/evaluasi-sales/per-member-config";
 
 const PerMemberPage = () => {
     // 🔥 semua config auto dari sini
@@ -79,7 +79,7 @@ const PerMemberPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={perMemberColumns}
+                                columns={config.tableColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField={(row) => `${row.kd_member}-${row.outlet}`}
@@ -88,22 +88,7 @@ const PerMemberPage = () => {
                                 textFooter="sm"
                                 textBody="xs"
                                 isRefreshing={isRefreshing}
-                                renderHeaderGroup={
-                                    <tr>
-                                        {/* 🔥 Row Number */}
-                                        <th className="border px-2 py-2 bg-gray-200"></th>
-
-                                        {/* 🔥 Info Member */}
-                                        <th colSpan={4} className="border px-2 py-2 text-center bg-gray-200">
-                                            Info Member
-                                        </th>
-
-                                        {/* 🔥 Sales */}
-                                        <th colSpan={10} className="border px-2 py-2 text-center bg-red-400 text-white">
-                                            Sales
-                                        </th>
-                                    </tr>
-                                }
+                                headerGroups={config.headerGroups}
                                 renderActions={(row) => (
                                     <RowDropdownMenu
                                         label={

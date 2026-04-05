@@ -12,7 +12,7 @@ import LoadingIgr from "@/components/LoadingIgr";
 import { FileText, PackageSearch, ReceiptText } from "lucide-react";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { buildReport } from "@/utils/reportBuilder";
-import { perTanggalColumns, PerTanggalRows } from "@/configs/evaluasi-sales/perTanggal";
+import { perTanggalColumns, PerTanggalRows } from "@/configs/evaluasi-sales/per-tanggal-config";
 
 const PerTanggalPage = () => {
     const config = buildReport<PerTanggalRows>(perTanggalColumns);
@@ -105,7 +105,7 @@ const PerTanggalPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={perTanggalColumns}
+                                columns={config.tableColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="tanggal"
@@ -113,16 +113,7 @@ const PerTanggalPage = () => {
                                 isRefreshing={isRefreshing}
                                 textHeader="sm"
                                 textFooter="sm"
-                                renderHeaderGroup={
-                                    <tr>
-                                        <th colSpan={2} className="border border-gray-400 px-2 py-2">
-                                            Info
-                                        </th>
-                                        <th colSpan={7} className="border border-gray-400 px-2 py-2 bg-red-400">
-                                            Sales
-                                        </th>
-                                    </tr>
-                                }
+                                headerGroups={config.headerGroups}
                                 renderActions={(row) => (
                                     <RowDropdownMenu
                                         label={`Tgl: ${row.tanggal}`}

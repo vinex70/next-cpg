@@ -5,6 +5,7 @@ interface Column<T> {
     field: keyof T;
     label: string;
     isNumeric?: boolean;
+    group?: string; // Optional group for header grouping
 }
 
 interface ReportTableProps<T> {
@@ -12,7 +13,7 @@ interface ReportTableProps<T> {
     data: T[];
     totalRow?: T | (string | number)[];
     customFooter?: (data: T[]) => React.ReactNode;
-    renderHeaderGroup?: React.ReactNode;
+    headerGroups?: { name: string; span: number; color?: string }[];
     keyField?: keyof T | ((row: T) => string);
     renderActions?: (row: T) => React.ReactNode;
     actionHeaderLabel?: string;
@@ -45,7 +46,7 @@ export function ReportTable<T extends Record<string, unknown>>({
     data,
     totalRow,
     customFooter,
-    renderHeaderGroup,
+    headerGroups = [],
     keyField,
     renderActions,
     actionHeaderLabel = "Actions",
@@ -75,7 +76,19 @@ export function ReportTable<T extends Record<string, unknown>>({
                 <thead className="sticky top-0 z-10 bg-blue-400 border border-gray-400">
 
                     {/* GROUP HEADER */}
-                    {renderHeaderGroup}
+                    {headerGroups && (
+                        <tr>
+                            {headerGroups.map((group, idx) => (
+                                <th
+                                    key={idx}
+                                    colSpan={group.span + (showRowNumber ? 1 : 0)}
+                                    className={`border px-2 py-2 text-center font-bold text-white ${group.color || "bg-gray-400"}`}
+                                >
+                                    {group.name}
+                                </th>
+                            ))}
+                        </tr>
+                    )}
 
                     {/* COLUMN HEADER */}
                     <tr className={`text-${textHeader}`}>

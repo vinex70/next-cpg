@@ -9,7 +9,7 @@ import RowDropdownMenu from "@/components/RowDropdownMenu";
 import SearchInput from "@/components/SearchInput";
 import { ReportTable } from "@/components/table/ReportTable";
 import { Button } from "@/components/ui/button";
-import { perKategoriColumns, PerKategoriRows } from "@/configs/evaluasi-sales/perKategoriConfig";
+import { perKategoriColumns, PerKategoriRows } from "@/configs/evaluasi-sales/per-kategori-config";
 import { useReportPage } from "@/hooks/useReportPage";
 import { buildReport } from "@/utils/reportBuilder";
 import { FileText, PackageSearch, ReceiptText } from "lucide-react";
@@ -102,22 +102,13 @@ const PerKategoriPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={perKategoriColumns}
+                                columns={config.tableColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField={(row) => `${row.div}-${row.dept}-${row.kategori}`}
                                 showRowNumber={true}
                                 isRefreshing={isRefreshing}
-                                renderHeaderGroup={
-                                    <tr>
-                                        <th colSpan={5} className="border border-gray-400 px-2 py-2">
-                                            Kategori
-                                        </th>
-                                        <th colSpan={8} className="border border-gray-400 px-2 py-2">
-                                            Sales
-                                        </th>
-                                    </tr>
-                                }
+                                headerGroups={config.headerGroups}
                                 renderActions={(row) => (
                                     <RowDropdownMenu
                                         label={

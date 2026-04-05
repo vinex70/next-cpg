@@ -11,7 +11,7 @@ import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { ReceiptText } from "lucide-react";
 import StrukModal from "@/components/modal/evaluasi-sales/StrukModal";
 import { buildReport } from "@/utils/reportBuilder";
-import { perSupplierColumns, PerSupplierRows } from "@/configs/evaluasi-sales/perSupplier";
+import { perSupplierColumns, PerSupplierRows } from "@/configs/evaluasi-sales/per-supplier-config";
 
 const PerSupplierPage = () => {
     const config = buildReport<PerSupplierRows>(perSupplierColumns);
@@ -90,7 +90,7 @@ const PerSupplierPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={perSupplierColumns}
+                                columns={config.tableColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="kode_supplier"
@@ -99,16 +99,7 @@ const PerSupplierPage = () => {
                                 textFooter="sm"
                                 textBody="xs"
                                 isRefreshing={isRefreshing}
-                                renderHeaderGroup={
-                                    <tr>
-                                        <th colSpan={3} className="border border-gray-400 px-2 py-2">
-                                            Info Supplier
-                                        </th>
-                                        <th colSpan={8} className="border border-gray-400 bg-red-400 px-2 py-2">
-                                            Sales
-                                        </th>
-                                    </tr>
-                                }
+                                headerGroups={config.headerGroups}
                                 renderActions={(row) => (
                                     <RowDropdownMenu
                                         label={

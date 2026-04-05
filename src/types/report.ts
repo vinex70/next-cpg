@@ -5,5 +5,6 @@ export type ColumnConfig<T> = {
     label: string;
     isNumeric?: boolean;
     isSearchable?: boolean;
-    group?: string; // untuk header grouping
+    group?: string;
+    groupColor?: string; // 🔥 tambah ini
 };

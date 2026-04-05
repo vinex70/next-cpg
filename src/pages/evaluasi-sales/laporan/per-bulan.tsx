@@ -11,7 +11,7 @@ import LoadingIgr from "@/components/LoadingIgr";
 import { FileText, ReceiptText } from "lucide-react";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 
-import { PerBulanRows, perBulanColumns } from "@/configs/evaluasi-sales/perBulanConfig";
+import { PerBulanRows, perBulanColumns } from "@/configs/evaluasi-sales/per-bulan-config";
 import { buildReport } from "@/utils/reportBuilder";
 
 const PerBulanPage = () => {
@@ -124,7 +124,7 @@ const PerBulanPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={perBulanColumns}
+                                columns={config.tableColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="bulan"
@@ -132,19 +132,7 @@ const PerBulanPage = () => {
                                 isRefreshing={isRefreshing}
                                 textHeader="sm"
                                 textFooter="sm"
-                                renderHeaderGroup={
-                                    <tr>
-                                        {/* 🔥 Info Member */}
-                                        <th colSpan={3} className="border px-2 py-2 text-center bg-gray-200">
-                                            Info Bulan
-                                        </th>
-
-                                        {/* 🔥 Sales */}
-                                        <th colSpan={7} className="border px-2 py-2 text-center bg-red-400 text-white">
-                                            Sales
-                                        </th>
-                                    </tr>
-                                }
+                                headerGroups={config.headerGroups}
                                 renderActions={(row) => (
                                     <RowDropdownMenu
                                         label={`Tgl: ${row.bulan}`}

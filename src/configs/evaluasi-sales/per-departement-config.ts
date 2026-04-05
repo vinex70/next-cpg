@@ -32,14 +32,14 @@ export type PerDepartementRows = {
  */
 
 export const perDepartementColumns: ColumnConfig<PerDepartementRows>[] = [
-    { field: "div", label: "Divisi", isSearchable: true, group: "Info Departement" },
-    { field: "dept", label: "Departement", isSearchable: true, group: "Info Departement" },
-    { field: "nama_dept", label: "Nama Departement", isSearchable: true, group: "Info Departement" },
-    { field: "jumlah_member", label: "Jumlah Member", isNumeric: true, group: "Sales" },
-    { field: "jumlah_struk", label: "Jumlah Struk", isNumeric: true, group: "Sales" },
-    { field: "jumlah_produk", label: "Jumlah Produk", isNumeric: true, group: "Sales" },
-    { field: "total_qty", label: "Total Qty", isNumeric: true, group: "Sales" },
-    { field: "total_gross", label: "Total Gross", isNumeric: true, group: "Sales" },
-    { field: "total_netto", label: "Total Netto", isNumeric: true, group: "Sales" },
-    { field: "total_margin", label: "Total Margin", isNumeric: true, group: "Sales" },
+    { field: "div", label: "Divisi", isSearchable: true, group: "Info Departement", groupColor: "bg-green-400" },
+    { field: "dept", label: "Departement", isSearchable: true, group: "Info Departement", groupColor: "bg-green-400" },
+    { field: "nama_dept", label: "Nama Departement", isSearchable: true, group: "Info Departement", groupColor: "bg-green-400" },
+    { field: "jumlah_member", label: "Jumlah Member", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
+    { field: "jumlah_struk", label: "Jumlah Struk", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
+    { field: "jumlah_produk", label: "Jumlah Produk", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
+    { field: "total_qty", label: "Total Qty", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
+    { field: "total_gross", label: "Total Gross", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
+    { field: "total_netto", label: "Total Netto", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
+    { field: "total_margin", label: "Total Margin", isNumeric: true, group: "Sales", groupColor: "bg-red-400" },
 ];  

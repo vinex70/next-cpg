@@ -1,11 +1,11 @@
 import Modal from "@/components/modal";
 import SearchInput from "@/components/SearchInput";
-import { useFetchData } from "@/hooks/useFetchData";
-import { useEffect, useMemo, useState } from "react";
-import { ReportTable } from "@/components/table/ReportTable";
-import { useFilteredData } from "@/hooks/useFilteredData";
-import { useExportToExcel } from "@/hooks/useExportToExcel";
+import { useEffect, useMemo } from "react";
 import { FormatTanggal } from "@/utils/formatTanggal";
+import { buildReport } from "@/utils/reportBuilder";
+import { perProdukTanggalColumns, PerProdukTanggalRows } from "@/configs/evaluasi-sales/per-produk-tanggal-config";
+import { useReportPage } from "@/hooks/useReportPage";
+import { ReportTable } from "@/components/table/ReportTable";
 import SkeletonTable from "@/components/SkletonTable";
 
 interface Props {
@@ -19,22 +19,6 @@ interface Props {
     prdcd?: string;
 }
 
-type ProdukRows = {
-    no?: number;
-    tanggal: string;
-    div: string;
-    dept: string;
-    kategori: string;
-    plu: string;
-    nama_produk: string;
-    jumlah_member: number;
-    jumlah_struk: number;
-    total_qty: number;
-    total_gross: number;
-    total_netto: number;
-    total_margin: number;
-};
-
 export default function ProdukTanggalModal({
     show,
     onClose,
@@ -45,125 +29,48 @@ export default function ProdukTanggalModal({
     kat,
     prdcd,
 }: Props) {
-    const [searchTerm, setSearchTerm] = useState("");
-    const queryParams = useMemo(() => {
-        const params: Record<string, string | number | boolean> = {
-            startDate,
-            endDate,
-        };
-        if (div !== undefined) params.div = div;
-        if (dept !== undefined) params.dept = dept;
-        if (kat !== undefined) params.kat = kat;
-        if (prdcd !== undefined) params.plu = prdcd;
-        return params;
-    }, [startDate, endDate, div, dept, kat, prdcd]);
+    const config = buildReport<PerProdukTanggalRows>(perProdukTanggalColumns);
+
+    // ================= QUERY PARAMS =================
+    const queryParams = useMemo(() => ({
+        startDate,
+        endDate,
+        ...(div && { div }),
+        ...(dept && { dept }),
+        ...(kat && { kat }),
+        ...(prdcd && { plu: prdcd }),
+    }), [startDate, endDate, div, dept, kat, prdcd]);
+
+    // ================= USE REPORT PAGE =================
+    const {
+        searchTerm,
+        setSearchTerm,
+        filteredData,
+        loading,
+        error,
+        totalRow,
+        handleExport,
+    } = useReportPage<PerProdukTanggalRows>({
+        basePath: "evaluasi-sales", // tetap wajib (dipakai hook internal)
+        ...config,
+        customFetch: {
+            endpoint: "evaluasi-sales/per-produk-tanggal",
+            queryParams,
+            enabled: show,
+        },
+    });
 
     useEffect(() => {
         if (!show) {
             setSearchTerm("");
         }
-    }, [show]);
+    }, [show, setSearchTerm]);
 
-    const { data, error, loading } = useFetchData<ProdukRows[]>({
-        endpoint: "/evaluasi-sales/per-produk-tanggal",
-        queryParams,
-        enabled: show,
-    });
-
-    const filteredData = useFilteredData(data ?? [], searchTerm, [
-        "tanggal",
-        "div",
-        "dept",
-        "kategori",
-        "plu",
-        "nama_produk",
-    ]);
-
-    const numberedData = useMemo(() => {
-        return (filteredData ?? []).map((item, index) => ({
-            ...item,
-            no: index + 1,
-        }));
-    }, [filteredData]);
-
-    const columns = useMemo<
-        { field: keyof ProdukRows; label: string; isNumeric?: boolean }[]
-    >(() => [
-        { field: "no", label: "No" },
-        { field: "tanggal", label: "Tanggal" },
-        { field: "div", label: "Div" },
-        { field: "dept", label: "Dept" },
-        { field: "kategori", label: "Kat" },
-        { field: "plu", label: "PLU" },
-        { field: "nama_produk", label: "Nama Produk" },
-        { field: "jumlah_member", label: "Jumlah Member", isNumeric: true },
-        { field: "jumlah_struk", label: "Jumlah Struk", isNumeric: true },
-        { field: "total_qty", label: "Total Qty", isNumeric: true },
-        { field: "total_gross", label: "Total Gross", isNumeric: true },
-        { field: "total_netto", label: "Total Netto", isNumeric: true },
-        { field: "total_margin", label: "Total Margin", isNumeric: true },
-    ], []);
-
-    const totalRow = useMemo(() => {
-        const init: ProdukRows = {
-            no: 0,
-            tanggal: "",
-            div: "",
-            dept: "",
-            kategori: "",
-            plu: "",
-            nama_produk: "",
-            jumlah_member: 0,
-            jumlah_struk: 0,
-            total_qty: 0,
-            total_gross: 0,
-            total_netto: 0,
-            total_margin: 0,
-        };
-
-        return (filteredData ?? []).reduce((acc, cur) => ({
-            ...acc,
-            jumlah_member: Number(acc.jumlah_member) + Number(cur.jumlah_member),
-            jumlah_struk: Number(acc.jumlah_struk) + Number(cur.jumlah_struk),
-            total_qty: Number(acc.total_qty) + Number(cur.total_qty),
-            total_gross: Number(acc.total_gross) + Number(cur.total_gross),
-            total_netto: Number(acc.total_netto) + Number(cur.total_netto),
-            total_margin: Number(acc.total_margin) + Number(cur.total_margin),
-        }), init);
-    }, [filteredData]);
-
-    // ✅ Gunakan useExportToExcel
-    const { handleExport } = useExportToExcel<ProdukRows>({
-        title: `Detail Produk Per Tanggal`,
-        columns,
-        data: numberedData,
-        mapRow: (row) => [
-            row.no ?? "",
-            row.tanggal,
-            row.div,
-            row.dept,
-            row.kategori,
-            row.plu,
-            row.nama_produk,
-            Number(row.jumlah_member),
-            Number(row.jumlah_struk),
-            Number(row.total_qty),
-            Number(row.total_gross),
-            Number(row.total_netto),
-            Number(row.total_margin),
-        ],
-        totalRow: [
-            "TOTAL", "", "", "", "", "", "", "", "", // padding kolom string
-            Number(totalRow.total_qty),
-            Number(totalRow.total_gross),
-            Number(totalRow.total_netto),
-            Number(totalRow.total_margin),
-        ],
-    });
+    const dataClean = filteredData as PerProdukTanggalRows[];
 
     return (
         <Modal show={show} onClose={onClose}>
-            {loading ? <SkeletonTable rows={5} columns={columns.length} /> :
+            {loading ? <SkeletonTable rows={5} columns={config.tableColumns.length} /> :
                 <div className="space-y-4 max-h-[90vh]">
                     <div className="flex justify-between items-center my-2">
                         <div>
@@ -188,24 +95,16 @@ export default function ProdukTanggalModal({
 
                     {!loading && !error && (
                         <ReportTable
-                            columns={columns}
-                            data={numberedData}
+                            columns={config.tableColumns}
+                            data={dataClean}
                             totalRow={totalRow}
                             keyField={(row) => `${row.tanggal}${row.div}${row.dept}${row.kategori}${row.plu}`}
-                            renderHeaderGroup={
-                                <tr>
-                                    <th colSpan={7} className="bg-blue-400 text-white text-left px-2 py-1 border">
-                                        Info Transaksi
-                                    </th>
-                                    <th colSpan={6} className="bg-green-400 text-white text-left px-2 py-1 border">
-                                        Penjualan
-                                    </th>
-                                </tr>
-                            }
+                            headerGroups={config.headerGroups}
                         />
                     )}
                 </div>
             }
         </Modal>
     );
-}
+
+};

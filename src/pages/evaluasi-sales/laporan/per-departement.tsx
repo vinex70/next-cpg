@@ -15,7 +15,7 @@ import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { FileText, PackageSearch, ReceiptText } from "lucide-react";
 
 // Tipe data hasil dari API
-import { PerDepartementRows, perDepartementColumns } from "@/configs/evaluasi-sales/perDepartementConfig";
+import { PerDepartementRows, perDepartementColumns } from "@/configs/evaluasi-sales/per-departement-config";
 import { buildReport } from "@/utils/reportBuilder";
 const PerDepartementPage = () => {
     const config = buildReport<PerDepartementRows>(perDepartementColumns);
@@ -103,22 +103,13 @@ const PerDepartementPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={perDepartementColumns}
+                                columns={config.tableColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField={(row) => `${row.div}-${row.dept}`}
                                 showRowNumber={true}
                                 isRefreshing={isRefreshing}
-                                renderHeaderGroup={
-                                    <tr>
-                                        <th colSpan={4} className="border border-gray-400 px-2 py-2">
-                                            Depertement
-                                        </th>
-                                        <th colSpan={8} className="border border-gray-400 px-2 py-2">
-                                            Sales
-                                        </th>
-                                    </tr>
-                                }
+                                headerGroups={config.headerGroups}
                                 renderActions={(row) => (
                                     <RowDropdownMenu
                                         label={

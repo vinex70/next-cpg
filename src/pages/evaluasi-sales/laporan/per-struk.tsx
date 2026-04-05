@@ -10,7 +10,7 @@ import LoadingIgr from "@/components/LoadingIgr";
 import RowDropdownMenu from "@/components/RowDropdownMenu";
 import { ReceiptText } from "lucide-react";
 import { buildReport } from "@/utils/reportBuilder";
-import { perStrukColumns, PerStrukRows } from "@/configs/evaluasi-sales/perStruk";
+import { perStrukColumns, PerStrukRows } from "@/configs/evaluasi-sales/per-struk-config";
 
 const PerProdukPage = () => {
     const config = buildReport<PerStrukRows>(perStrukColumns)
@@ -78,7 +78,7 @@ const PerProdukPage = () => {
 
                         {!error && filteredData && (
                             <ReportTable
-                                columns={perStrukColumns}
+                                columns={config.tableColumns}
                                 data={filteredData}
                                 totalRow={totalRow}
                                 keyField="struk"
@@ -87,16 +87,7 @@ const PerProdukPage = () => {
                                 textFooter="sm"
                                 textBody="xs"
                                 isRefreshing={isRefreshing}
-                                renderHeaderGroup={
-                                    <tr>
-                                        <th colSpan={7} className="border border-gray-400 px-2 py-2">
-                                            Info Struk
-                                        </th>
-                                        <th colSpan={8} className="border border-gray-400 bg-red-400 px-2 py-2">
-                                            Sales
-                                        </th>
-                                    </tr>
-                                }
+                                headerGroups={config.headerGroups}
                                 renderActions={(row) => (
                                     <RowDropdownMenu
                                         label={

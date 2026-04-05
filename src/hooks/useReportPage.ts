@@ -18,18 +18,38 @@ interface UseReportPageOptions<T> {
 }
 
 export function useReportPage<T extends object>(
-    options: UseReportPageOptions<T>
+    options: UseReportPageOptions<T> & {
+        customFetch?: {
+            endpoint: string;
+            queryParams?: Record<string, string>;
+            enabled?: boolean;
+        };
+    }
 ) {
-    const { basePath, searchableFields, numericFields, headers, mapRow, allFields, enabled } = options;
+    const {
+        basePath,
+        searchableFields,
+        numericFields,
+        headers,
+        mapRow,
+        allFields,
+        enabled,
+        customFetch
+    } = options;
 
-    const { query, endpoint } = useReportQueryEndpoint({ basePath });
+    // ✅ SELALU DIPANGGIL (fix error React Hook)
+    const routerResult = useReportQueryEndpoint({ basePath });
+
+    // ✅ pilih data setelah hook dipanggil
+    const endpoint = customFetch?.endpoint ?? routerResult.endpoint;
+    const query = customFetch?.queryParams ?? routerResult.query;
 
     const [searchTerm, setSearchTerm] = useState("");
 
     const { data, loading, error, refetch } = useFetchData<T[]>({
         endpoint,
         queryParams: query as Record<string, string>,
-        enabled: enabled !== undefined ? enabled : !!endpoint, // hanya fetch jika endpoint sudah tersedia
+        enabled: customFetch?.enabled ?? (enabled !== undefined ? enabled : !!endpoint),
     });
 
     const { isRefreshing, handleRefresh } = useRefreshRouter(loading, refetch);
@@ -45,7 +65,7 @@ export function useReportPage<T extends object>(
     const { handleExport } = useExportToExcel<T>({
         title,
         data: filteredData ?? [],
-        mapRow: (row: T) => mapRow(row).map(cell => cell === null ? "" : cell),
+        mapRow: (row: T) => mapRow(row).map(cell => cell ?? ""),
         totalRow,
         columns: allFields.map((field) => ({
             field,

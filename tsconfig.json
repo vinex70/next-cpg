@@ -17,6 +17,13 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "scripts/create-page.js",
+    "scripts/create-page.js",
+    "src/scripts/create-page.js"
+  ],
   "exclude": ["node_modules"]
 }

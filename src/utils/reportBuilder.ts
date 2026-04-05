@@ -40,27 +40,37 @@ export function buildReport<T>(columns: ColumnConfig<T>[]) {
 }
 
 function buildHeaderGroups<T>(columns: ColumnConfig<T>[]) {
-    const groups: { name: string; span: number }[] = [];
+    const groups: { name: string; span: number; color?: string }[] = [];
 
     let currentGroup = "";
     let count = 0;
+    let currentColor = "";
 
     columns.forEach((col, index) => {
         const group = col.group || "Others";
+        const color = col.groupColor || "bg-gray-300";
 
         if (group !== currentGroup) {
             if (currentGroup) {
-                groups.push({ name: currentGroup, span: count });
+                groups.push({
+                    name: currentGroup,
+                    span: count,
+                    color: currentColor,
+                });
             }
             currentGroup = group;
+            currentColor = color;
             count = 1;
         } else {
             count++;
         }
 
-        // push last
         if (index === columns.length - 1) {
-            groups.push({ name: group, span: count });
+            groups.push({
+                name: group,
+                span: count,
+                color,
+            });
         }
     });
 
