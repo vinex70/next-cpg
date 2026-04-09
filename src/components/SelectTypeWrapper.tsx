@@ -23,6 +23,7 @@ interface SelectTypeWrapperProps<T extends FieldValues> {
      * Fungsi opsional untuk mengubah nilai yang dipilih (contoh: "__ALL__" → "")
      */
     valueKeyTransform?: (val: string) => string;
+    enableSearch?: boolean
 }
 
 /**
@@ -40,6 +41,7 @@ const SelectTypeWrapper = <T extends FieldValues>({
     placeholder = "Pilih Opsi",
     disabled = false,
     valueKeyTransform = (val) => val,
+    enableSearch = false
 }: SelectTypeWrapperProps<T>) => {
     if (loading) {
         return (
@@ -49,6 +51,7 @@ const SelectTypeWrapper = <T extends FieldValues>({
                 options={[]}
                 placeholder="Loading..."
                 disabled
+                enableSearch={enableSearch}
             />
         );
     }
@@ -61,6 +64,7 @@ const SelectTypeWrapper = <T extends FieldValues>({
                 options={[]}
                 placeholder="Error loading data"
                 disabled
+                enableSearch={enableSearch}
             />
         );
     }
@@ -76,6 +80,7 @@ const SelectTypeWrapper = <T extends FieldValues>({
                     options={data}
                     placeholder={placeholder}
                     disabled={disabled}
+                    enableSearch={enableSearch}
                 />
             )}
         />

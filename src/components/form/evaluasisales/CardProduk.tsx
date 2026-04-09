@@ -5,6 +5,7 @@ import { Control } from "react-hook-form";
 import { FilterDetailStrukInput } from "@/schema/filterDetailStruk";
 import SelectDivisi from "./SelectDivisi";
 import InputPluGrup from "./InputPluGrup";
+import SelectDepartement from "@/components/form/evaluasisales/SelectDepartement";
 
 type CardProdukProps = {
     control: Control<FilterDetailStrukInput>;
@@ -23,6 +24,7 @@ const CardProduk = ({ control }: CardProdukProps) => {
                 <FormInput name="barcode" placeholder="Barcode" />
                 <FormInput name="monitoringPlu" placeholder="Kode Monitoring PLU" />
                 <SelectDivisi control={control} />
+                <SelectDepartement control={control} />
             </CardContent>
         </CardFieldset>
     );

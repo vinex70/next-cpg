@@ -80,11 +80,12 @@ const EvaluasiSales = () => {
                     onSubmit={methods.handleSubmit(onSubmit)}
                     className="flex justify-between gap-4 flex-wrap"
                 >
-                    {/* Periode */}
-                    <PeriodeSales control={methods.control} />
-
-                    {/* Member */}
-                    <CardMember control={methods.control} />
+                    <div className="space-y-4">
+                        {/* Periode */}
+                        <PeriodeSales control={methods.control} />
+                        {/* Member */}
+                        <CardMember control={methods.control} />
+                    </div>
 
                     {/* Produk */}
                     <CardProduk control={methods.control} />

@@ -1,8 +1,8 @@
 // src/components/form/evaluasisales/SelectDivisi.tsx
 import { Control } from "react-hook-form";
 import SelectTypeWrapper from "@/components/SelectTypeWrapper";
-import { useFetchData } from "@/hooks/useFetchData";
 import { FilterDetailStrukInput } from "@/schema/filterDetailStruk";
+import { useQueryData } from "@/hooks/useQueryData";
 
 interface Divisi {
     div_kodedivisi: string;
@@ -18,7 +18,7 @@ const SelectDivisi = ({
     control,
     placeholder = "All Divisi",
 }: SelectDivisiProps) => {
-    const { data, error, loading } = useFetchData<Divisi[]>({
+    const { data, error, isLoading } = useQueryData<Divisi[]>({
         endpoint: "/select-divisi",
     });
 
@@ -38,10 +38,11 @@ const SelectDivisi = ({
             control={control}
             name="div"
             data={options}
-            loading={loading}
+            loading={isLoading}
             error={!!error}
             placeholder={placeholder}
             valueKeyTransform={(val) => (val === "__ALL__" ? "" : val)}
+            enableSearch
         />
     );
 };

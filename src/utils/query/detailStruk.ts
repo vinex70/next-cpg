@@ -9,7 +9,7 @@ export const DetailStruk = (
 
     const buildDateFilter = (alias: string): string => {
         if (startDate && endDate) {
-            return `date_trunc('day', ${alias}) BETWEEN '${startDate}' AND '${endDate}'`;
+            return `${alias} >= '${startDate}' AND  ${alias} < '${endDate}'`;
         } else if (startDate) {
             return `date_trunc('day', ${alias}) >= '${startDate}'`;
         } else if (endDate) {
@@ -134,35 +134,9 @@ SELECT
             ELSE trjd_nominalamt
             END as dtl_gross,
             CASE
-                WHEN trjd_divisioncode = '5' AND substr(trjd_division, 1, 2) = '39' THEN
-                    CASE
-                        WHEN 'Y' = 'Y' THEN trjd_nominalamt
-                    END
-                ELSE
-                    CASE
-                        WHEN coalesce(tko_kodesbu, 'z') IN ('O', 'I') THEN
-                            CASE
-                                WHEN tko_tipeomi IN ('HE', 'HG') THEN trjd_nominalamt - (
-                                    CASE
-                                        WHEN trjd_flagtax1 = 'Y' AND coalesce(trjd_flagtax2, 'z') IN ('Y', 'z') AND coalesce(prd_kodetag, 'zz') <> 'Q' THEN
-                                            (trjd_nominalamt - (trjd_nominalamt / (1 + (coalesce(prd_ppn, 10) / 100))))
-                                        ELSE 0
-                                    END
-                                )
-                                ELSE trjd_nominalamt
-                            END
-                        ELSE trjd_nominalamt - (
-                            CASE
-                                WHEN substr(trjd_create_by, 1, 2) = 'EX' THEN 0
-                                ELSE
-                                    CASE
-                                        WHEN trjd_flagtax1 = 'Y' AND coalesce(trjd_flagtax2, 'z') IN ('Y', 'z') AND coalesce(prd_kodetag, 'zz') <> 'Q' THEN
-                                            (trjd_nominalamt - (trjd_nominalamt / (1 + (coalesce(prd_ppn, 10) / 100))))
-                                        ELSE 0
-                                    END
-                            END
-                        )
-                    END
+                WHEN trjd_flagtax2 LIKE 'Y%' THEN (trjd_nominalamt / 111) * 100
+                WHEN trjd_flagtax2 <> 'Y' THEN (trjd_nominalamt)
+                ELSE (trjd_nominalamt) * - 1
             END as dtl_netto,
             CASE
             WHEN trjd_divisioncode = '5' AND substr(trjd_division, 1, 2) = '39' THEN
@@ -206,7 +180,7 @@ trjd_noinvoice1,
 trjd_noinvoice2,
 p_qty
 from
-    (select distinct
+(select
 trjd_kodeigr,
 trjd_recordid,
 trjd_transactionno,
@@ -238,7 +212,7 @@ p_qty
 from tbtr_jualdetail
 ${jualdetailDateFilter ? `where ${jualdetailDateFilter}` : ''}
 union all
-select distinct
+select
 trjd_kodeigr,
 trjd_recordid,
 trjd_transactionno,
