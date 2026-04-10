@@ -60,7 +60,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
                         id="date"
                         variant="outline"
                         className={cn(
-                            "w-[320px] justify-start text-left font-normal",
+                            "w-[320px] justify-start text-left font-bold",
                             !date && "text-muted-foreground"
                         )}
                     >
@@ -79,7 +79,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
                         )}
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-2 space-y-3" align="start">
+                <PopoverContent className="w-auto p-2 space-y-2" align="start">
                     {/* 🔼 Dropdown Bulan & Tahun */}
                     <div className="flex items-center justify-center gap-2 px-2">
                         <select

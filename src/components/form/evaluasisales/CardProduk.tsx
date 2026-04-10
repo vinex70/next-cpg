@@ -6,6 +6,7 @@ import { FilterDetailStrukInput } from "@/schema/filterDetailStruk";
 import SelectDivisi from "./SelectDivisi";
 import InputPluGrup from "./InputPluGrup";
 import SelectDepartement from "@/components/form/evaluasisales/SelectDepartement";
+import Selectkategori from "./Selectkategori";
 
 type CardProdukProps = {
     control: Control<FilterDetailStrukInput>;
@@ -25,6 +26,7 @@ const CardProduk = ({ control }: CardProdukProps) => {
                 <FormInput name="monitoringPlu" placeholder="Kode Monitoring PLU" />
                 <SelectDivisi control={control} />
                 <SelectDepartement control={control} />
+                <Selectkategori control={control} />
             </CardContent>
         </CardFieldset>
     );

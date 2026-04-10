@@ -1,9 +1,21 @@
 // src/components/form/evaluasisales/SelectDivisi.tsx
 import { Control } from "react-hook-form";
-import SelectTypeWrapper from "@/components/SelectTypeWrapper";
 import { FilterDetailStrukInput } from "@/schema/filterDetailStruk";
-import { useQueryData } from "@/hooks/useQueryData";
-
+import { DependentSelectWrapper } from "@/components/DependentSelectWrapper";
+/**
+//  * =========================================
+//  * 🧩 COMPONENT: Selectdepartement
+//  * =========================================
+//  * 📍 Path: src/components/form/evaluasisales/Selectdepartement.tsx
+//  * 🧩 Type: Client Component (interactive)
+//  * 🏷️  CSS Class: selectdepartement
+//  * 
+//  * 📌 Tips:
+//  * - "use client" wajib untuk useState, useEffect, onClick, dll
+//  * - Gunakan clsx/tailwind-merge untuk conditional classes
+//  * - Extract logic kompleks ke custom hooks
+//  
+**/
 interface Divisi {
     div_kodedivisi: string;
     div_namadivisi: string;
@@ -18,30 +30,19 @@ const SelectDivisi = ({
     control,
     placeholder = "All Divisi",
 }: SelectDivisiProps) => {
-    const { data, error, isLoading } = useQueryData<Divisi[]>({
-        endpoint: "/select-divisi",
-    });
 
-    const options =
-        data && data.length > 0
-            ? [
-                { label: "All Divisi", value: "__ALL__" },
-                ...data.map((divisi) => ({
-                    label: `${divisi.div_kodedivisi} - ${divisi.div_namadivisi}`,
-                    value: divisi.div_kodedivisi,
-                })),
-            ]
-            : [{ label: "All Divisi", value: "__ALL__" }];
 
     return (
-        <SelectTypeWrapper<FilterDetailStrukInput>
+        <DependentSelectWrapper<Divisi, FilterDetailStrukInput>
             control={control}
             name="div"
-            data={options}
-            loading={isLoading}
-            error={!!error}
+            endpoint="/select-divisi"
+            labelAll={placeholder}
             placeholder={placeholder}
-            valueKeyTransform={(val) => (val === "__ALL__" ? "" : val)}
+            getOption={(d) => ({
+                label: `${d.div_kodedivisi} - ${d.div_namadivisi}`,
+                value: d.div_kodedivisi,
+            })}
             enableSearch
         />
     );
