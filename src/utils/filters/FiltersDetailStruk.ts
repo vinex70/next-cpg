@@ -38,7 +38,11 @@ export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
         conditions.push(`dtl_namamember ILIKE $${params.length + 1}`);
         params.push(`%${filters.namaMember}%`);
     }
-
+    // Filter Kategori Member
+    if (filters.katMember && filters.katMember !== "") {
+        conditions.push(`dtl_cusno = ANY(select crm_kodemember from tbmaster_customercrm where crm_idgroupkat = $${params.length + 1})`); // Tambahkan subquery untuk mengambil crm_kodemember berdasarkan crm_idgroupkat
+        params.push(filters.katMember);
+    }
     // Filter Kode Divisi
     if (filters.div && filters.div !== "") {
         conditions.push(`dtl_k_div = $${params.length + 1}`);
@@ -200,7 +204,7 @@ export const FilterDetailStruk = (filters: FilterDetailStrukInput) => {
         );
     }
     // Filtert Kode supplier
-    const kodeSuppliers = normalizeToArray(filters.kode_supplier);
+    const kodeSuppliers = normalizeToArray(filters.kodeSupplier);
     if (kodeSuppliers.length > 0) {
         conditions.push(`hgb_kodesupplier = ANY($${params.length + 1})`);
         params.push(kodeSuppliers);

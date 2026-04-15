@@ -6,6 +6,7 @@ import { FilterDetailStrukInput } from "@/schema/filterDetailStruk";
 import SelectOutletMember from "./SelectOutletMember";
 import SelectMemberKhusus from "./SelectMemberKhusus";
 import SelectSubOutletMember from "./SelectSubOutletMember";
+import { SelectKategoriMember } from "./SelectKategoriMember";
 
 type CardMemberProps = {
     control: Control<FilterDetailStrukInput>;
@@ -27,6 +28,7 @@ const CardMember = ({ control }: CardMemberProps) => {
                 <SelectOutletMember control={control} />
                 {/* Sub Outlet */}
                 <SelectSubOutletMember control={control} />
+                <SelectKategoriMember control={control} />
             </CardContent>
         </CardFieldset>
     );

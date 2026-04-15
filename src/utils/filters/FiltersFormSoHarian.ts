@@ -5,14 +5,14 @@ export const FilterFormSoHarian = (filters: FilterFormSoHarianInput) => {
     const conditions = [];
     const params = [];
 
-    const plu = normalizeToArray(filters.plu);
-    if (plu.length > 0) {
-        if (plu.length === 1) {
-            conditions.push(`plu = $${params.length + 1}`);
-            params.push(plu[0]);
+    const prdcd = normalizeToArray(filters.prdcd);
+    if (prdcd.length > 0) {
+        if (prdcd.length === 1) {
+            conditions.push(`prdcd = $${params.length + 1}`);
+            params.push(prdcd[0]);
         } else {
-            conditions.push(`plu = ANY($${params.length + 1})`);
-            params.push(plu);
+            conditions.push(`prdcd = ANY($${params.length + 1})`);
+            params.push(prdcd);
         }
     }
 

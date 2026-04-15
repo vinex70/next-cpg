@@ -15,6 +15,7 @@ const PeriodeSales = dynamic(() => import("@/components/form/evaluasisales/Perio
 const SelectReport = dynamic(() => import("@/components/form/evaluasisales/SelectReport"), { ssr: false });
 const CardMember = dynamic(() => import("@/components/form/evaluasisales/CardMember"), { ssr: false });
 const CardProduk = dynamic(() => import("@/components/form/evaluasisales/CardProduk"), { ssr: false });
+const CardSupplier = dynamic(() => import("@/components/form/evaluasisales/CardSupplier"), { ssr: false });
 
 const EvaluasiSales = () => {
     const router = useRouter();
@@ -87,11 +88,16 @@ const EvaluasiSales = () => {
                         <CardMember control={methods.control} />
                     </div>
 
-                    {/* Produk */}
-                    <CardProduk control={methods.control} />
+                    <div className="space-y-4">
+                        {/* Produk */}
+                        <CardProduk control={methods.control} />
+                    </div>
 
-                    {/* Select Report */}
-                    <SelectReport control={methods.control} />
+                    <div className="space-y-4">
+                        <CardSupplier />
+                        {/* Select Report */}
+                        <SelectReport control={methods.control} />
+                    </div>
 
                     {/* Button */}
                     <div className="flex justify-end w-full">

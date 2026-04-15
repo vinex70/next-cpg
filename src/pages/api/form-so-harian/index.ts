@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { conditions, params } = FilterFormSoHarian(result.data);
         const query = `
                         select
-                            plu,
+                            prdcd,
                             desk,
                             satuan,
                             tag,
@@ -29,11 +29,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                             plano,
                             lpp,
                             acost,
-                            flag
+                            flag,
+                            plano_qty,
+                            omi_recid4,
+                            qty_rom
                         from
                             (${formSoHarianQuery()}) as subquery
                         ${conditions} 
-                        order by plu
+                        order by area asc
         `;
         const data = await pool.query(query, params);
         res.status(200).json(

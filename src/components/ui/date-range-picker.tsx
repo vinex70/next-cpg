@@ -60,7 +60,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
                         id="date"
                         variant="outline"
                         className={cn(
-                            "w-[320px] justify-start text-left font-bold",
+                            "min-w-[200px] justify-start text-left font-bold",
                             !date && "text-muted-foreground"
                         )}
                     >

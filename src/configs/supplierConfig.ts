@@ -1,14 +1,14 @@
-// configs/test/test-produkConfig.ts
+// configs/supplierConfig.ts
 import { ColumnConfig } from "@/types/report";
 
 /**
  * =========================================
- * 🔥 REPORT CONFIG: TESTPRODUK
+ * 🔥 REPORT CONFIG: SUPPLIER
  * =========================================
  *
  * 📌 Cara pakai:
- * - Tambah field → edit di TestProdukRows
- * - Atur tampilan tabel → edit di testProdukColumns
+ * - Tambah field → edit di SupplierRows
+ * - Atur tampilan tabel → edit di supplierColumns
  *
  * 📌 Fitur otomatis:
  * - Header grouping berdasarkan `group`
@@ -38,25 +38,27 @@ import { ColumnConfig } from "@/types/report";
  * }
  */
 
-export type TestProdukRows = {
-    // 🔥 isi field di sini
-    field1: string;
-    field2: number;
+export type SupplierRows = {
+    hgb_kodesupplier: string;
+    sup_namasupplier: string;
+    ttl_plu: number;
+
 };
 
-export const testProdukColumns: ColumnConfig<TestProdukRows>[] = [
+export const supplierColumns: ColumnConfig<SupplierRows>[] = [
     {
-        field: "field1",
-        label: "Field 1",
+        field: "hgb_kodesupplier",
+        label: "Kode Supplier",
         isSearchable: true,
-        group: "Info",
-        groupColor: "bg-blue-400",
     },
     {
-        field: "field2",
-        label: "Field 2",
+        field: "sup_namasupplier",
+        label: "Nama Supplier",
+        isSearchable: true,
+    },
+    {
+        field: "ttl_plu",
+        label: "Ttl Produk",
         isNumeric: true,
-        group: "Data",
-        groupColor: "bg-green-400",
     },
 ];

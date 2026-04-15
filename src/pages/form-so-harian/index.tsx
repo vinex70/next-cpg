@@ -3,7 +3,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/router";
 
 import Layout from "@/components/Layout";
-import FormInput from "@/components/FormInput";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { ReportTable } from "@/components/table/ReportTable";
@@ -22,6 +21,7 @@ import { buildReport } from "@/utils/reportBuilder";
 import { formatNumber } from "@/utils/formatNumber";
 import { exportToPdf } from "@/utils/exportToPdf";
 import { RiFilePdf2Fill } from "react-icons/ri";
+import InputProdukPlu from "@/components/input/InputProdukPlu";
 
 export default function FormSoHarian() {
     const router = useRouter();
@@ -30,7 +30,13 @@ export default function FormSoHarian() {
     const config = buildReport<FormSoHarianRows>(formSoHarianColumns);
     const columns = formSoHarianColumns; // 🔥 langsung pakai config.columns jika tidak ada custom logic
     const displayColumns = columns.filter(
-        (col) => col.field !== "acost" && col.field !== "flag" && col.field !== "lpp"
+        (col) =>
+            col.field !== "acost"
+            && col.field !== "flag"
+            && col.field !== "lpp"
+            && col.field !== "plano_qty"
+            && col.field !== "omi_recid4"
+            && col.field !== "qty_rom"
     );
 
     const {
@@ -41,14 +47,14 @@ export default function FormSoHarian() {
     } = useReportPage<FormSoHarianRows>({
         basePath: "form-so-harian",
         ...config,
-        enabled: !!router.query.plu, // hanya fetch jika ada query.plu
+        enabled: !!router.query.prdcd, // hanya fetch jika ada query.plu
     });
 
     // 🔥 FORM
     const methods = useForm<FilterFormSoHarianInput>({
         resolver: zodResolver(FilterFormSoHarianSchema),
         defaultValues: {
-            plu: "",
+            prdcd: "",
         },
     });
 
@@ -79,11 +85,11 @@ export default function FormSoHarian() {
     // 🔥 SUBMIT → push ke URL (trigger fetch otomatis)
     const onSubmit = (formData: FilterFormSoHarianInput) => {
         try {
-            const formattedPlu = formatPluGrup(formData.plu || "");
+            const formattedPlu = formatPluGrup(formData.prdcd || "");
 
             router.push({
                 pathname: "/form-so-harian",
-                query: { plu: formattedPlu },
+                query: { prdcd: formattedPlu },
             });
         } catch (err) {
             if (err instanceof Error) {
@@ -95,8 +101,7 @@ export default function FormSoHarian() {
     // 🔥 FUNGSI RESET
     const handleReset = () => {
         // Reset form values
-        methods.reset({ plu: "" });
-
+        methods.reset({ prdcd: "" });
         // Hapus query params dari URL
         router.push("/form-so-harian", undefined, { shallow: true });
     };
@@ -104,15 +109,15 @@ export default function FormSoHarian() {
     return (
         <Layout title="Form SO Harian">
             <h1 className="text-2xl font-bold mb-4">
-                Form SO Harian : {query.plu ? `PLU ${query.plu}` : ""}
+                Form SO Harian : {query.prdcd ? `PLU ${query.prdcd}` : ""}
             </h1>
 
             <div className="flex gap-2 mb-2">
-                <Button
+                {query.prdcd && <Button
                     variant="outline"
                     onClick={() =>
                         exportToPdf<FormSoHarianRows>({
-                            title: `Form SO Harian ${query.plu} - ${filteredData?.slice(0, 1).map((row) => row.desk)[0] ?? ""}`,
+                            title: `Form SO Harian ${filteredData?.slice(0, 1).map((row) => row.prdcd)[0] ?? query.prdcd} - ${filteredData?.slice(0, 1).map((row) => row.desk)[0] ?? ""}`,
                             columns: displayColumns,
                             data: filteredData ?? [],
                             mode: "download",
@@ -120,10 +125,10 @@ export default function FormSoHarian() {
                     }
                 >
                     <RiFilePdf2Fill className="mr-2" /> PDF
-                </Button>
+                </Button>}
 
                 {/* 🔥 TOMBOL RESET */}
-                {query.plu && (
+                {query.prdcd && (
                     <Button
                         variant="outline"
                         onClick={handleReset}
@@ -141,22 +146,7 @@ export default function FormSoHarian() {
                     className="flex gap-4"
                 >
 
-                    <FormInput
-                        name="plu"
-                        placeholder="Input PLU"
-                        required
-                        onInvalid={() => {
-                            alert("PLU tidak boleh kosong!");
-                        }}
-                        onBlur={(value: string) => {
-                            try {
-                                const formatted = formatPluGrup(value);
-                                methods.setValue("plu", formatted);
-                            } catch (err) {
-                                console.error(err);
-                            }
-                        }}
-                    />
+                    <InputProdukPlu />
 
                     <Button type="submit" variant="outline">
                         {loading ? "Loading..." : "Submit"}
@@ -173,15 +163,18 @@ export default function FormSoHarian() {
             )}
 
             {/* 🔥 RESULT */}
-            {query.plu && !loading && (
+            {query.prdcd && !loading && (
                 <div className="mt-6" id="print-area">
 
                     <ReportTable
                         columns={displayColumns}
                         data={filteredData ?? []}
                         customFooter={(data) => {
-                            const sumPlano = data.reduce((acc, row) => acc + Number(row.plano ?? 0), 0);
                             const lpp = data.slice(0, 1).map((row) => (Number(row.lpp ?? 0)))[0] ?? 0;
+                            const plano_qty = data.slice(0, 1).map((row) => (Number(row.plano_qty ?? 0)))[0] ?? 0;
+                            const omi_recid4 = data.slice(0, 1).map((row) => (Number(row.omi_recid4 ?? 0)))[0] ?? 0;
+                            const qty_rom = data.slice(0, 1).map((row) => (Number(row.qty_rom ?? 0)))[0] ?? 0;
+                            const sumPlano = plano_qty + omi_recid4 + qty_rom;
                             const selisih = sumPlano - lpp;
 
                             const acost = data[0]?.acost ?? 0;
@@ -190,11 +183,20 @@ export default function FormSoHarian() {
                             return (
                                 <>
                                     <tr className="bg-blue-400 font-semibold">
-                                        <td colSpan={5} className="border px-2 py-2">
+                                        <td colSpan={3} className="border px-2 py-2">
                                             Acost : {formatNumber(Number(acost))}
                                         </td>
-                                        <td colSpan={3} className="border px-2 py-2 text-right">
-                                            Total QTY Plano (a):
+                                        <td>
+                                            Plano Qty : {formatNumber(plano_qty)}
+                                        </td>
+                                        <td>
+                                            Omi Recid4 : {formatNumber(omi_recid4)}
+                                        </td>
+                                        <td>
+                                            Omi Retur : {formatNumber(qty_rom)}
+                                        </td>
+                                        <td colSpan={2} className="border px-2 py-2 text-right">
+                                            Total Plano (a):
                                         </td>
                                         <td className="border px-2 py-2 text-right">
                                             {formatNumber(sumPlano)}

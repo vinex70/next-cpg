@@ -4,9 +4,11 @@ import FormInput from "@/components/FormInput";
 import { Control } from "react-hook-form";
 import { FilterDetailStrukInput } from "@/schema/filterDetailStruk";
 import SelectDivisi from "./SelectDivisi";
-import InputPluGrup from "./InputPluGrup";
 import SelectDepartement from "@/components/form/evaluasisales/SelectDepartement";
 import Selectkategori from "./Selectkategori";
+import SelectTag from "./SelectTag";
+import InputProdukPlu from "@/components/input/InputProdukPlu";
+import InputNamaProduk from "@/components/input/InputNamaProduk";
 
 type CardProdukProps = {
     control: Control<FilterDetailStrukInput>;
@@ -20,13 +22,14 @@ const CardProduk = ({ control }: CardProdukProps) => {
                 Produk
             </CardTitleLegend>
             <CardContent className="space-y-2">
-                <FormInput name="namaBarang" placeholder="Nama Barang" />
-                <InputPluGrup />
+                <InputProdukPlu />
+                <InputNamaProduk />
                 <FormInput name="barcode" placeholder="Barcode" />
                 <FormInput name="monitoringPlu" placeholder="Kode Monitoring PLU" />
                 <SelectDivisi control={control} />
                 <SelectDepartement control={control} />
                 <Selectkategori control={control} />
+                <SelectTag control={control} />
             </CardContent>
         </CardFieldset>
     );

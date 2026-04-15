@@ -1,7 +1,7 @@
 import { ColumnConfig } from "@/types/report";
 
 export type FormSoHarianRows = {
-    plu: string;
+    prdcd: string;
     desk: string;
     satuan: string;
     tag: string;
@@ -12,10 +12,13 @@ export type FormSoHarianRows = {
     lpp: number;
     acost: number;
     flag: string;
+    plano_qty: number;
+    omi_recid4: number;
+    qty_rom: number;
 };
 
 export const formSoHarianColumns: ColumnConfig<FormSoHarianRows>[] = [
-    { field: "plu", label: "PLU" },
+    { field: "prdcd", label: "PLU" },
     { field: "desk", label: "Deskripsi" },
     { field: "satuan", label: "Satuan" },
     { field: "tag", label: "Tag" },
@@ -26,4 +29,7 @@ export const formSoHarianColumns: ColumnConfig<FormSoHarianRows>[] = [
     { field: "lpp", label: "LPP", isNumeric: true },
     { field: "acost", label: "ACost", isNumeric: true },
     { field: "flag", label: "Flag" },
+    { field: "plano_qty", label: "Plano Qty", isNumeric: true },
+    { field: "omi_recid4", label: "Omi Recid4", isNumeric: true },
+    { field: "qty_rom", label: "Qty Rom", isNumeric: true },
 ];

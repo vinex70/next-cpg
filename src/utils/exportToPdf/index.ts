@@ -104,12 +104,14 @@ export function exportToPdf<T extends Record<string, unknown>>({
     // ===============================
     // 🔥 HITUNG DATA
     // ===============================
-    const sumPlano = data.reduce(
-        (acc, row) => acc + Number(row["plano"] ?? 0),
-        0
-    );
 
     const lpp = data.length > 0 ? Number(data[0]["lpp"] ?? 0) : 0;
+
+    const plano_qty = data.length > 0 ? Number(data[0]["plano_qty"] ?? 0) : 0;
+    const omi_recid4 = data.length > 0 ? Number(data[0]["omi_recid4"] ?? 0) : 0;
+    const qty_rom = data.length > 0 ? Number(data[0]["qty_rom"] ?? 0) : 0;
+
+    const sumPlano = plano_qty + omi_recid4 + qty_rom;
     const selisih = sumPlano - lpp;
 
     const acost = data.length > 0 ? Number(data[0]["acost"] ?? 0) : 0;
